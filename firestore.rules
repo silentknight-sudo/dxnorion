@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn();
+    }
+
+    function isValidLead(data) {
+      return data.name is string && data.name.size() >= 2 && data.name.size() <= 80
+        && data.phone is string && data.phone.matches('^[0-9]{10}$')
+        && data.configuration in ['3BHK', '3BHK_SERVANT', '4BHK_SERVANT']
+        && data.consent == true;
+    }
+
+    // Leads collection: Public can submit expressions of interest; Admin has read/write
+    match /leads/{leadId} {
+      allow create: if isValidId(leadId) && isValidLead(request.resource.data);
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Activities: Internal CRM timeline logs
+    match /activities/{activityId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Blog Posts: Published posts are readable by the public; Admin has full access
+    match /posts/{postId} {
+      allow read: if resource.data.status == 'PUBLISHED' || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // Site Settings: Publicly readable for RERA number & contact details; Admin can update
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,95 @@
+{
+  "entities": {
+    "Lead": {
+      "title": "Lead",
+      "description": "Captured property buyer or investor inquiry",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Full name of the prospect", "minLength": 2, "maxLength": 80 },
+        "phone": { "type": "string", "description": "10-digit Indian mobile number", "pattern": "^[0-9]{10}$" },
+        "email": { "type": "string", "description": "Email address of the prospect", "maxLength": 120 },
+        "configuration": { "type": "string", "enum": ["3BHK", "3BHK_SERVANT", "4BHK_SERVANT"], "description": "Requested apartment configuration" },
+        "budget": { "type": "string", "maxLength": 60, "description": "Estimated budget" },
+        "message": { "type": "string", "maxLength": 500, "description": "Special request or message" },
+        "source": { "type": "string", "maxLength": 50, "description": "Source form or touchpoint" },
+        "landingPage": { "type": "string", "maxLength": 100, "description": "Landing page URL path" },
+        "status": { "type": "string", "enum": ["NEW", "CONTACTED", "INTERESTED", "SITE_VISIT", "NOT_INTERESTED", "CLOSED"], "description": "CRM status" },
+        "consent": { "type": "boolean", "description": "User consent to be contacted" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last updated timestamp" }
+      },
+      "required": ["name", "phone", "configuration", "status", "consent"]
+    },
+    "LeadActivity": {
+      "title": "LeadActivity",
+      "description": "Activity, note, or call log attached to a lead",
+      "type": "object",
+      "properties": {
+        "leadId": { "type": "string", "maxLength": 64, "description": "Parent lead ID" },
+        "type": { "type": "string", "enum": ["STATUS_CHANGE", "NOTE", "CALL", "WHATSAPP"], "description": "Type of CRM activity" },
+        "content": { "type": "string", "maxLength": 500, "description": "Activity details or notes" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["leadId", "type", "content"]
+    },
+    "Post": {
+      "title": "Post",
+      "description": "Real estate intelligence or market blog post",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "maxLength": 200, "description": "Post title" },
+        "slug": { "type": "string", "maxLength": 150, "description": "Unique URL slug" },
+        "excerpt": { "type": "string", "maxLength": 500, "description": "Brief summary" },
+        "contentHtml": { "type": "string", "description": "Rich content HTML" },
+        "coverImageUrl": { "type": "string", "maxLength": 500, "description": "Cover image URL" },
+        "coverImageAlt": { "type": "string", "maxLength": 200, "description": "Cover image alt text" },
+        "status": { "type": "string", "enum": ["DRAFT", "SCHEDULED", "PUBLISHED"], "description": "Post publishing state" },
+        "authorName": { "type": "string", "maxLength": 100, "description": "Author name" },
+        "categoryName": { "type": "string", "maxLength": 100, "description": "Category name" },
+        "readingTime": { "type": "number", "description": "Estimated reading time in minutes" },
+        "views": { "type": "number", "description": "View counter" },
+        "metaTitle": { "type": "string", "maxLength": 100, "description": "SEO Meta Title" },
+        "metaDescription": { "type": "string", "maxLength": 200, "description": "SEO Meta Description" },
+        "focusKeyword": { "type": "string", "maxLength": 100, "description": "Target SEO Keyword" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Updated timestamp" }
+      },
+      "required": ["title", "slug", "status"]
+    },
+    "SiteSetting": {
+      "title": "SiteSetting",
+      "description": "Global website configuration and statutory compliance settings",
+      "type": "object",
+      "properties": {
+        "siteName": { "type": "string", "maxLength": 100, "description": "Project display name" },
+        "phone": { "type": "string", "maxLength": 30, "description": "Official sales phone number" },
+        "whatsappNumber": { "type": "string", "maxLength": 30, "description": "Sales WhatsApp number" },
+        "email": { "type": "string", "maxLength": 100, "description": "Sales inquiry email" },
+        "reraNumber": { "type": "string", "maxLength": 100, "description": "UP RERA application or registration number" },
+        "ga4Id": { "type": "string", "maxLength": 50, "description": "Google Analytics 4 Measurement ID" },
+        "metaPixelId": { "type": "string", "maxLength": 50, "description": "Meta Pixel ID" },
+        "googleAdsId": { "type": "string", "maxLength": 50, "description": "Google Ads ID" },
+        "gscVerification": { "type": "string", "maxLength": 150, "description": "Google Search Console verification" }
+      },
+      "required": ["siteName", "phone", "reraNumber"]
+    }
+  },
+  "firestore": {
+    "/leads/{leadId}": {
+      "schema": "Lead",
+      "description": "Collection of all customer expressions of interest and contact forms"
+    },
+    "/activities/{activityId}": {
+      "schema": "LeadActivity",
+      "description": "CRM interactions, notes, and call logs"
+    },
+    "/posts/{postId}": {
+      "schema": "Post",
+      "description": "Real estate research articles and location guides"
+    },
+    "/settings/{settingId}": {
+      "schema": "SiteSetting",
+      "description": "Project configuration and RERA compliance metadata"
+    }
+  }
+}

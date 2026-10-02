@@ -1,0 +1,203 @@
+// Prisma Schema for DXN Orion (Google Cloud SQL PostgreSQL 15)
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  SALES_MANAGER
+  SALES_EXECUTIVE
+}
+
+enum Configuration {
+  BHK3          @map("3BHK")
+  BHK3_SERVANT  @map("3BHK_SERVANT")
+  BHK4_SERVANT  @map("4BHK_SERVANT")
+}
+
+enum LeadSource {
+  hero_form
+  modal
+  exit_popup
+  floor_plans
+  blog_cta
+  whatsapp
+  contact_page
+  brochure_download
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  INTERESTED
+  SITE_VISIT
+  NOT_INTERESTED
+  CLOSED
+}
+
+enum ActivityType {
+  STATUS_CHANGE
+  NOTE
+  CALL
+  WHATSAPP
+}
+
+enum PostStatus {
+  DRAFT
+  SCHEDULED
+  PUBLISHED
+}
+
+model AdminUser {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  passwordHash String
+  name         String
+  role         Role        @default(ADMIN)
+  createdAt    DateTime    @default(now())
+  lastLoginAt  DateTime?
+  posts        Post[]
+  assignedLeads Lead[]
+}
+
+model Lead {
+  id            String        @id @default(uuid())
+  name          String
+  phone         String
+  email         String?
+  configuration Configuration @default(BHK3_SERVANT)
+  budget        String?
+  message       String?
+  source        LeadSource    @default(hero_form)
+  utmSource     String?
+  utmMedium     String?
+  utmCampaign   String?
+  utmTerm       String?
+  utmContent    String?
+  gclid         String?
+  fbclid        String?
+  landingPage   String        @default("/")
+  ipHash        String?
+  userAgent     String?
+  status        LeadStatus    @default(NEW)
+  notes         String?
+  assignedTo    String?
+  assignedUser  AdminUser?    @relation(fields: [assignedTo], references: [id])
+  followUpAt    DateTime?
+  consent       Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  activities    LeadActivity[]
+
+  @@index([phone])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model LeadActivity {
+  id        String       @id @default(uuid())
+  leadId    String
+  lead      Lead         @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type      ActivityType
+  content   String
+  createdAt DateTime     @default(now())
+
+  @@index([leadId])
+}
+
+model Post {
+  id              String      @id @default(uuid())
+  title           String
+  slug            String      @unique
+  excerpt         String
+  contentJson     Json?
+  contentHtml     String      @db.Text
+  coverImageUrl   String
+  coverImageAlt   String
+  status          PostStatus  @default(DRAFT)
+  publishedAt     DateTime?
+  scheduledAt     DateTime?
+  updatedAt       DateTime    @updatedAt
+  authorId        String
+  author          AdminUser   @relation(fields: [authorId], references: [id])
+  categoryId      String?
+  category        Category?   @relation(fields: [categoryId], references: [id])
+  tags            PostTag[]
+  readingTime     Int         @default(4)
+  views           Int         @default(0)
+  metaTitle       String
+  metaDescription String
+  focusKeyword    String
+  canonicalUrl    String?
+  ogImageUrl      String?
+  noindex         Boolean     @default(false)
+  faqJson         Json?
+  createdAt       DateTime    @default(now())
+
+  @@index([slug])
+  @@index([status, publishedAt])
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  posts       Post[]
+  createdAt   DateTime @default(now())
+}
+
+model Tag {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  slug      String    @unique
+  posts     PostTag[]
+  createdAt DateTime  @default(now())
+}
+
+model PostTag {
+  postId String
+  tagId  String
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+}
+
+model Media {
+  id         String   @id @default(uuid())
+  url        String
+  alt        String
+  width      Int?
+  height     Int?
+  sizeBytes  Int?
+  uploadedAt DateTime @default(now())
+}
+
+model Redirect {
+  id         String   @id @default(uuid())
+  fromPath   String   @unique
+  toPath     String
+  statusCode Int      @default(301)
+  createdAt  DateTime @default(now())
+}
+
+model SiteSetting {
+  id             String   @id @default("default")
+  siteName       String   @default("DXN Orion")
+  phone          String   @default("+919876543210")
+  whatsappNumber String   @default("+919876543210")
+  email          String   @default("sales@dxn-orion.com")
+  reraNumber     String   @default("UPRERA-PRJ-2025-APP-88492")
+  ga4Id          String   @default("G-DXNORION22D")
+  metaPixelId    String   @default("7849102938471")
+  googleAdsId    String   @default("AW-984029182")
+  gscVerification String  @default("google-site-verification=dxn_orion_yamuna_exp_sec22d")
+  updatedAt      DateTime @updatedAt
+}
