@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   FileText, Plus, Edit3, Trash2, Eye, ExternalLink, Check, AlertCircle,
   Save, Sparkles, Smartphone, Monitor, Globe, HelpCircle, Tag as TagIcon,
-  Heading2, Heading3, Bold, Italic, List, Quote, MessageSquare, Image, Youtube
+  Heading2, Heading3, Bold, Italic, List, Quote, MessageSquare, Image, Youtube,
+  UploadCloud, Loader2
 } from 'lucide-react';
 import { Post, Category } from '../../types/index.ts';
 import { adminFetch } from '../../utils/adminAuth.ts';
+import { ImageUpload } from '../../components/admin/ImageUpload.tsx';
 
 interface AdminBlogEditorPageProps {
   onNavigatePublic: (path: string) => void;
@@ -21,6 +23,43 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
   const [showLivePreview, setShowLivePreview] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string>('All changes saved');
+
+  // Inline content image upload ref
+  const inlineImageInputRef = useRef<HTMLInputElement>(null);
+  const [inlineUploading, setInlineUploading] = useState(false);
+
+  const handleInlineImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingPost) return;
+
+    setInlineUploading(true);
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      try {
+        const base64Data = ev.target?.result as string;
+        const res = await adminFetch('/api/admin/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: base64Data,
+            filename: file.name
+          })
+        });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+          const imgSnippet = `\n<figure class="my-6">\n  <img src="${data.url}" alt="${cleanName}" class="w-full rounded-2xl border border-[#C9A86A]/30 shadow-xl object-cover max-h-96" />\n  <figcaption class="text-xs text-center text-[#94A3B8] mt-2 italic">${cleanName}</figcaption>\n</figure>\n`;
+          insertSnippet(imgSnippet);
+        }
+      } catch (err) {
+        console.error('Inline upload failed', err);
+      } finally {
+        setInlineUploading(false);
+        if (inlineImageInputRef.current) inlineImageInputRef.current.value = '';
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   useEffect(() => {
     fetchPosts();
@@ -350,30 +389,16 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                   />
                 </div>
 
-                {/* Cover Image URL & Alt Text */}
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
-                      Cover Image URL
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPost.coverImageUrl || ''}
-                      onChange={(e) => setEditingPost({ ...editingPost, coverImageUrl: e.target.value })}
-                      className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
-                      Cover Image Alt Text (SEO)
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPost.coverImageAlt || ''}
-                      onChange={(e) => setEditingPost({ ...editingPost, coverImageAlt: e.target.value })}
-                      className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
-                    />
-                  </div>
+                {/* Cover Image Upload Option */}
+                <div className="pt-1">
+                  <ImageUpload
+                    label="Cover Image (Article Hero & Social SERP Card)"
+                    value={editingPost.coverImageUrl || ''}
+                    onChange={(url) => setEditingPost({ ...editingPost, coverImageUrl: url })}
+                    altText={editingPost.coverImageAlt || ''}
+                    onAltChange={(alt) => setEditingPost({ ...editingPost, coverImageAlt: alt })}
+                    recommendedSize="1200 x 630px (Landscape 16:9 or 1.91:1, Max 8MB)"
+                  />
                 </div>
 
                 {/* Status & Publication */}
@@ -412,7 +437,35 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                     </span>
                     <span className="text-[10px] text-[#C9A86A]">Click to insert block at end</span>
                   </div>
+
+                  {/* Hidden file input for inline content image upload */}
+                  <input
+                    ref={inlineImageInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
+                    onChange={handleInlineImageUpload}
+                    className="hidden"
+                  />
+
                   <div className="flex flex-wrap gap-1.5 p-2 rounded-xl bg-[#0B1426] border border-white/10">
+                    <button
+                      type="button"
+                      onClick={() => inlineImageInputRef.current?.click()}
+                      disabled={inlineUploading}
+                      className="px-2.5 py-1 rounded-lg bg-[#C9A86A]/20 hover:bg-[#C9A86A]/30 border border-[#C9A86A]/50 text-xs text-[#DFBF82] font-semibold flex items-center gap-1.5 cursor-pointer transition-all"
+                    >
+                      {inlineUploading ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#C9A86A]" />
+                          <span>Uploading Image...</span>
+                        </>
+                      ) : (
+                        <>
+                          <UploadCloud className="w-3.5 h-3.5 text-[#C9A86A]" />
+                          <span>Upload &amp; Insert Image</span>
+                        </>
+                      )}
+                    </button>
                     <button
                       type="button"
                       onClick={() => insertSnippet('<h2>Key Infrastructure Milestone</h2>\n<p>Enter detailed paragraph here...</p>')}

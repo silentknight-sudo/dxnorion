@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import fs from 'fs';
 import crypto from 'crypto';
 import { db, LeadStatus, LeadConfiguration, LeadSource, ActivityType } from './src/server/db.ts';
 
@@ -522,6 +523,80 @@ app.post('/api/admin/change-password', requireAdmin, (req: Request, res: Respons
   const admin = (req as any).admin;
   db.AdminUsers.updatePassword(admin.userId, 'hash_' + newPassword);
   res.json({ success: true, message: 'Password updated successfully.' });
+});
+
+// Admin Image Upload Endpoint (Converts file uploads to permanent hosted images)
+app.post('/api/admin/upload', requireAdmin, (req: Request, res: Response) => {
+  try {
+    const { image, filename } = req.body;
+    if (!image || typeof image !== 'string') {
+      return res.status(400).json({ error: 'Image data is required.' });
+    }
+
+    // Match data:[<mediatype>];base64,<data>
+    const matches = image.match(/^data:([A-Za-z0-9-+\/]+);base64,(.+)$/);
+    if (!matches || matches.length !== 3) {
+      return res.status(400).json({ error: 'Invalid base64 image data provided.' });
+    }
+
+    const mimeType = matches[1];
+    const base64Data = matches[2];
+    const buffer = Buffer.from(base64Data, 'base64');
+
+    // Max 8MB
+    if (buffer.length > 8 * 1024 * 1024) {
+      return res.status(400).json({ error: 'Image exceeds maximum allowed size (8MB).' });
+    }
+
+    // Determine extension
+    let ext = 'jpg';
+    if (mimeType.includes('png')) ext = 'png';
+    else if (mimeType.includes('webp')) ext = 'webp';
+    else if (mimeType.includes('gif')) ext = 'gif';
+    else if (mimeType.includes('svg')) ext = 'svg';
+    else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) ext = 'jpg';
+
+    // Generate safe clean name
+    const rawName = (filename || 'dxn-orion')
+      .replace(/\.[^/.]+$/, '')
+      .replace(/[^a-zA-Z0-9_-]/g, '-')
+      .substring(0, 40)
+      .toLowerCase();
+
+    const uniqueSuffix = Date.now() + '-' + Math.random().toString(36).substring(2, 7);
+    const finalFilename = `${rawName || 'image'}-${uniqueSuffix}.${ext}`;
+
+    const uploadsDir = path.resolve(process.cwd(), 'public', 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const filePath = path.join(uploadsDir, finalFilename);
+    fs.writeFileSync(filePath, buffer);
+
+    // Also mirror to dist/uploads if dist exists
+    try {
+      const distUploads = path.resolve(process.cwd(), 'dist', 'uploads');
+      if (fs.existsSync(path.resolve(process.cwd(), 'dist'))) {
+        if (!fs.existsSync(distUploads)) {
+          fs.mkdirSync(distUploads, { recursive: true });
+        }
+        fs.writeFileSync(path.join(distUploads, finalFilename), buffer);
+      }
+    } catch {}
+
+    const fileUrl = `/uploads/${finalFilename}`;
+    return res.json({
+      success: true,
+      url: fileUrl,
+      filename: finalFilename,
+      size: buffer.length,
+      mimeType
+    });
+  } catch (error: any) {
+    console.error('Upload error:', error);
+    return res.status(500).json({ error: 'Failed to process image upload.' });
+  }
 });
 
 // Admin Dashboard Summary Metrics
