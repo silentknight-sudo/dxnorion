@@ -11,6 +11,7 @@ const isProd = process.env.NODE_ENV === 'production';
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
+app.use(express.static(path.resolve(process.cwd(), 'public')));
 
 // Trust proxy for IP rate limiting behind Cloud Run / reverse proxies
 app.set('trust proxy', 1);
@@ -94,10 +95,20 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // --- SEO ENDPOINTS ---
 
+const CANONICAL_DOMAIN = 'https://dxn-orion.com';
+
+function getCanonicalBaseUrl(): string {
+  // If user explicitly configured custom domain in settings or env, use it; otherwise default to official dxn-orion.com
+  const envUrl = process.env.APP_URL;
+  if (envUrl && !envUrl.includes('run.app') && !envUrl.includes('localhost')) {
+    return envUrl.replace(/\/$/, '');
+  }
+  return CANONICAL_DOMAIN;
+}
+
 // Dynamic /sitemap.xml
 app.get('/sitemap.xml', (_req: Request, res: Response) => {
-  const settings = db.Settings.get();
-  const baseUrl = process.env.APP_URL || 'https://dxn-orion.com';
+  const baseUrl = getCanonicalBaseUrl();
   const posts = db.Posts.getAll(false); // published only
   const categories = db.Categories.getAll();
 
@@ -154,7 +165,7 @@ app.get('/sitemap.xml', (_req: Request, res: Response) => {
 
 // Dynamic /robots.txt
 app.get('/robots.txt', (_req: Request, res: Response) => {
-  const baseUrl = process.env.APP_URL || 'https://dxn-orion.com';
+  const baseUrl = getCanonicalBaseUrl();
   const robots = `User-agent: *
 Disallow: /admin
 Disallow: /api/
@@ -170,7 +181,7 @@ Sitemap: ${baseUrl}/sitemap.xml
 
 // Search Engine Sitemap Ping Endpoint
 app.post('/api/admin/ping-sitemap', (_req: Request, res: Response) => {
-  const baseUrl = process.env.APP_URL || 'https://dxn-orion.com';
+  const baseUrl = getCanonicalBaseUrl();
   const sitemapUrl = encodeURIComponent(`${baseUrl}/sitemap.xml`);
   console.log(`📡 Ping notification dispatched for search engines: ${sitemapUrl}`);
   res.json({
@@ -183,7 +194,7 @@ app.post('/api/admin/ping-sitemap', (_req: Request, res: Response) => {
 
 // Dynamic /blog/rss.xml
 app.get('/blog/rss.xml', (_req: Request, res: Response) => {
-  const baseUrl = process.env.APP_URL || 'https://dxn-orion.com';
+  const baseUrl = getCanonicalBaseUrl();
   const posts = db.Posts.getAll(false);
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>

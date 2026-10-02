@@ -7,7 +7,16 @@
       "name": "Shivam Pratap Singh",
       "role": "SUPER_ADMIN",
       "createdAt": "2026-10-01T18:41:49.641Z",
-      "lastLoginAt": "2026-10-02T06:16:49.997Z"
+      "lastLoginAt": "2026-10-02T08:29:43.437Z"
+    },
+    {
+      "id": "admin-2",
+      "email": "playsidgaming@gmail.com",
+      "passwordHash": "$2b$12$eX8zW1hI6dFqB9T3yU8eQO6tE3s1a4K9l0M1n2O3p4Q5r6S7t8U9v",
+      "name": "Project Administrator",
+      "role": "SUPER_ADMIN",
+      "createdAt": "2026-10-01T18:41:49.641Z",
+      "lastLoginAt": "2026-10-02T08:29:43.458Z"
     }
   ],
   "leads": [

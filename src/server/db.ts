@@ -616,6 +616,16 @@ const DEFAULT_ADMIN: AdminUser = {
   lastLoginAt: null
 };
 
+const SECONDARY_ADMIN: AdminUser = {
+  id: 'admin-2',
+  email: 'playsidgaming@gmail.com',
+  passwordHash: '$2b$12$eX8zW1hI6dFqB9T3yU8eQO6tE3s1a4K9l0M1n2O3p4Q5r6S7t8U9v',
+  name: 'Project Administrator',
+  role: 'SUPER_ADMIN',
+  createdAt: new Date().toISOString(),
+  lastLoginAt: null
+};
+
 class Database {
   private data: DatabaseData;
 
@@ -647,7 +657,7 @@ class Database {
     }
 
     const initial: DatabaseData = {
-      adminUsers: [DEFAULT_ADMIN],
+      adminUsers: [DEFAULT_ADMIN, SECONDARY_ADMIN],
       leads: INITIAL_LEADS,
       activities: INITIAL_ACTIVITIES,
       posts: INITIAL_POSTS,
