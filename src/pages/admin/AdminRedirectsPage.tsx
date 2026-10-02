@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight, Plus, Trash2, ExternalLink, ShieldCheck } from 'lucide-react';
 import { Redirect } from '../../types/index.ts';
+import { adminFetch } from '../../utils/adminAuth.ts';
 
 export const AdminRedirectsPage: React.FC = () => {
   const [redirects, setRedirects] = useState<Redirect[]>([]);
@@ -15,7 +16,7 @@ export const AdminRedirectsPage: React.FC = () => {
 
   const fetchRedirects = async () => {
     try {
-      const res = await fetch('/api/redirects');
+      const res = await adminFetch('/api/redirects');
       if (res.ok) {
         const data = await res.json();
         setRedirects(data);
@@ -29,7 +30,7 @@ export const AdminRedirectsPage: React.FC = () => {
 
     setLoading(true);
     try {
-      const res = await fetch('/api/redirects', {
+      const res = await adminFetch('/api/redirects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -52,7 +53,7 @@ export const AdminRedirectsPage: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     try {
-      const res = await fetch(`/api/redirects/${id}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/redirects/${id}`, { method: 'DELETE' });
       if (res.ok) {
         fetchRedirects();
       }

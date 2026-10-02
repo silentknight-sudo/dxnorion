@@ -25,7 +25,7 @@ async function main() {
     update: {},
     create: {
       email: adminEmail,
-      name: 'Shivam Sharma',
+      name: 'Shivam Pratap Singh',
       role: 'SUPER_ADMIN',
       passwordHash: defaultPasswordHash
     }

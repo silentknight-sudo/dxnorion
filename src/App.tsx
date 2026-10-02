@@ -21,6 +21,7 @@ import { AdminLayout } from './pages/admin/AdminLayout.tsx';
 
 import { captureUtmParams } from './utils/utm.ts';
 import { SiteSettings } from './types/index.ts';
+import { adminFetch, clearAdminAuth, getAdminToken, getStoredAdminUser } from './utils/adminAuth.ts';
 import './lib/firebase.ts';
 
 export default function App() {
@@ -61,13 +62,25 @@ export default function App() {
       .then(data => setSettings(data))
       .catch(() => {});
 
-    // 3. Verify Admin session
-    fetch('/api/admin/me')
+    // 3. Verify Admin session with bearer token support
+    adminFetch('/api/admin/me')
       .then(res => res.ok ? res.json() : null)
       .then(data => {
-        if (data) setAdminUser(data);
+        if (data) {
+          setAdminUser(data);
+        } else {
+          const stored = getStoredAdminUser();
+          if (stored && getAdminToken()) {
+            setAdminUser(stored);
+          }
+        }
       })
-      .catch(() => {})
+      .catch(() => {
+        const stored = getStoredAdminUser();
+        if (stored && getAdminToken()) {
+          setAdminUser(stored);
+        }
+      })
       .finally(() => setAuthChecking(false));
 
     // 4. Handle browser back/forward buttons
@@ -184,7 +197,8 @@ export default function App() {
       <AdminLayout
         user={adminUser}
         onLogout={async () => {
-          await fetch('/api/admin/logout', { method: 'POST' });
+          await adminFetch('/api/admin/logout', { method: 'POST' }).catch(() => {});
+          clearAdminAuth();
           setAdminUser(null);
           navigate('/admin/login');
         }}

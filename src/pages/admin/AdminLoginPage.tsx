@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Lock, Mail, Shield, AlertCircle, ArrowRight, Loader2, Sparkles } from 'lucide-react';
+import { setAdminToken, setStoredAdminUser } from '../../utils/adminAuth.ts';
 
 interface AdminLoginPageProps {
   onLoginSuccess: (user: any) => void;
@@ -27,6 +28,13 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
       const data = await res.json();
       if (!res.ok) {
         throw new Error(data.error || 'Login failed.');
+      }
+
+      if (data.token) {
+        setAdminToken(data.token);
+      }
+      if (data.user) {
+        setStoredAdminUser(data.user);
       }
 
       onLoginSuccess(data.user);

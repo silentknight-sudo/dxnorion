@@ -108,8 +108,8 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug, onNavigate, on
         {/* Metadata Byline */}
         <div className="flex flex-wrap items-center justify-between gap-4 py-4 my-4 border-y border-white/10 text-xs text-[#94A3B8]">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[#C9A86A]/20 border border-[#C9A86A]/40 flex items-center justify-center text-[#C9A86A] font-serif font-bold">
-              SS
+            <div className="w-9 h-9 rounded-full bg-[#C9A86A]/20 border border-[#C9A86A]/40 flex items-center justify-center text-[#C9A86A] font-serif font-bold text-xs">
+              {post.authorName ? post.authorName.split(' ').map((n: string) => n[0]).join('').slice(0, 3) : 'SPS'}
             </div>
             <div>
               <span className="font-semibold text-[#F7F4EE] block">{post.authorName}</span>

@@ -8,6 +8,7 @@ import { AdminLeadsPage } from './AdminLeadsPage.tsx';
 import { AdminBlogEditorPage } from './AdminBlogEditorPage.tsx';
 import { AdminRedirectsPage } from './AdminRedirectsPage.tsx';
 import { AdminSettingsPage } from './AdminSettingsPage.tsx';
+import { AdminSeoPage } from './AdminSeoPage.tsx';
 import { SiteSettings } from '../../types/index.ts';
 
 interface AdminLayoutProps {
@@ -23,7 +24,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   onNavigatePublic,
   onSettingsUpdated
 }) => {
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'leads' | 'blog' | 'redirects' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'leads' | 'blog' | 'seo' | 'redirects' | 'settings'>('dashboard');
   const [initialLeadStatus, setInitialLeadStatus] = useState<string | undefined>(undefined);
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
 
@@ -43,6 +44,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
     { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { key: 'leads', label: 'Leads & CRM', icon: Users },
     { key: 'blog', label: 'Blog & SEO Studio', icon: FileText },
+    { key: 'seo', label: 'SEO & Backlinks Hub', icon: Sparkles },
     { key: 'redirects', label: 'Redirects (301)', icon: Compass },
     { key: 'settings', label: 'Settings', icon: Settings },
   ];
@@ -141,6 +143,10 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
             <AdminBlogEditorPage
               onNavigatePublic={onNavigatePublic}
             />
+          )}
+
+          {activeTab === 'seo' && (
+            <AdminSeoPage />
           )}
 
           {activeTab === 'redirects' && (

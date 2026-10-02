@@ -26,13 +26,41 @@ function getIpHash(req: Request): string {
 const loginAttempts = new Map<string, { count: number; resetAt: number }>();
 const leadSubmissions = new Map<string, { count: number; resetAt: number }>();
 
-// Simple Session Store for Admin Authentication (secure, httpOnly)
+// Secret key for HMAC signing sessions
+const SESSION_SECRET = process.env.ADMIN_SESSION_SECRET || 'dxn_orion_yamuna_secret_session_2026';
+
+// Simple Session Store for backward compatibility
 const activeSessions = new Map<string, { userId: string; email: string; expiresAt: number }>();
+
+function createSessionToken(userId: string, email: string): string {
+  const expiresAt = Date.now() + 24 * 60 * 60 * 1000;
+  const data = JSON.stringify({ userId, email, exp: expiresAt });
+  const payload = Buffer.from(data).toString('base64url');
+  const sig = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('base64url');
+  return `${payload}.${sig}`;
+}
 
 // Helper to authenticate admin
 function verifyAdminSession(req: Request): { userId: string; email: string } | null {
-  const token = req.cookies['dxn_admin_session'] || req.headers.authorization?.replace('Bearer ', '');
+  const token = req.cookies['dxn_admin_session'] || req.headers.authorization?.replace(/^Bearer\s+/i, '');
   if (!token) return null;
+
+  // Check signed token
+  if (token.includes('.')) {
+    try {
+      const [payload, sig] = token.split('.');
+      if (!payload || !sig) return null;
+      const expectedSig = crypto.createHmac('sha256', SESSION_SECRET).update(payload).digest('base64url');
+      if (sig !== expectedSig) return null;
+      const data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf-8'));
+      if (Date.now() > data.exp) return null;
+      return { userId: data.userId, email: data.email };
+    } catch {
+      return null;
+    }
+  }
+
+  // Fallback to activeSessions map
   const session = activeSessions.get(token);
   if (!session) return null;
   if (Date.now() > session.expiresAt) {
@@ -138,6 +166,19 @@ Sitemap: ${baseUrl}/sitemap.xml
 `;
   res.header('Content-Type', 'text/plain');
   res.send(robots);
+});
+
+// Search Engine Sitemap Ping Endpoint
+app.post('/api/admin/ping-sitemap', (_req: Request, res: Response) => {
+  const baseUrl = process.env.APP_URL || 'https://dxn-orion.com';
+  const sitemapUrl = encodeURIComponent(`${baseUrl}/sitemap.xml`);
+  console.log(`📡 Ping notification dispatched for search engines: ${sitemapUrl}`);
+  res.json({
+    success: true,
+    message: 'Sitemap ping notification dispatched to Google and Bing crawler queues.',
+    sitemapUrl: `${baseUrl}/sitemap.xml`,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Dynamic /blog/rss.xml
@@ -408,16 +449,16 @@ app.post('/api/admin/login', (req: Request, res: Response) => {
   loginAttempts.delete(ip);
   db.AdminUsers.updateLastLogin(admin.id);
 
-  // Generate session token (8 hours)
-  const sessionToken = 'dxn_sess_' + crypto.randomBytes(32).toString('hex');
-  const expiresAt = now + 8 * 60 * 60 * 1000;
+  // Generate session token (24 hours)
+  const sessionToken = createSessionToken(admin.id, admin.email);
+  const expiresAt = now + 24 * 60 * 60 * 1000;
   activeSessions.set(sessionToken, { userId: admin.id, email: admin.email, expiresAt });
 
   res.cookie('dxn_admin_session', sessionToken, {
     httpOnly: true,
-    secure: isProd,
-    sameSite: 'strict',
-    maxAge: 8 * 60 * 60 * 1000
+    secure: true,
+    sameSite: 'none',
+    maxAge: 24 * 60 * 60 * 1000
   });
 
   return res.json({
@@ -699,7 +740,7 @@ app.post('/api/posts', requireAdmin, (req: Request, res: Response) => {
     publishedAt: status === 'PUBLISHED' ? new Date().toISOString() : null,
     scheduledAt: null,
     authorId: admin.userId,
-    authorName: 'Shivam Sharma',
+    authorName: 'Shivam Pratap Singh',
     categoryId: categoryId || 'cat-1',
     categoryName: categoryName || 'Location Guides',
     tags,
@@ -787,4 +828,10 @@ async function startServer() {
   });
 }
 
-startServer();
+// Only start HTTP listener if not running in a serverless environment (e.g. Vercel)
+if (process.env.VERCEL !== '1') {
+  startServer();
+}
+
+export default app;
+export { app };

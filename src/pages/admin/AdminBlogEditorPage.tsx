@@ -5,6 +5,7 @@ import {
   Heading2, Heading3, Bold, Italic, List, Quote, MessageSquare, Image, Youtube
 } from 'lucide-react';
 import { Post, Category } from '../../types/index.ts';
+import { adminFetch } from '../../utils/adminAuth.ts';
 
 interface AdminBlogEditorPageProps {
   onNavigatePublic: (path: string) => void;
@@ -29,7 +30,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/posts?admin=true');
+      const res = await adminFetch('/api/posts?admin=true');
       if (res.ok) {
         const data = await res.json();
         setPosts(data);
@@ -43,7 +44,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
 
   const fetchCategories = async () => {
     try {
-      const res = await fetch('/api/categories');
+      const res = await adminFetch('/api/categories');
       if (res.ok) {
         const data = await res.json();
         setCategories(data);
@@ -87,7 +88,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
       const url = isNew ? '/api/posts' : `/api/posts/${editingPost.id}`;
       const method = isNew ? 'POST' : 'PUT';
 
-      const res = await fetch(url, {
+      const res = await adminFetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editingPost)
@@ -111,7 +112,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
   const handleDeletePost = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this article?')) return;
     try {
-      const res = await fetch(`/api/posts/${id}`, { method: 'DELETE' });
+      const res = await adminFetch(`/api/posts/${id}`, { method: 'DELETE' });
       if (res.ok) {
         fetchPosts();
         if (editingPost?.id === id) setEditingPost(null);

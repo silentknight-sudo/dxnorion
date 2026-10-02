@@ -66,7 +66,7 @@ export interface Post {
   contentHtml: string;
   coverImageUrl: string;
   coverImageAlt: string;
-  status: 'DRAFT' | 'SCHEDULED' | 'PUBLISHED';
+  status: 'PUBLISHED' | 'SCHEDULED' | 'PUBLISHED';
   publishedAt: string | null;
   scheduledAt: string | null;
   updatedAt: string;
@@ -132,7 +132,9 @@ export interface DatabaseData {
   settings: SiteSettings;
 }
 
-const DATA_DIR = path.resolve(process.cwd(), 'data');
+const IS_VERCEL = process.env.VERCEL === '1';
+const BUNDLED_DB_FILE = path.resolve(process.cwd(), 'data', 'db.json');
+const DATA_DIR = IS_VERCEL ? path.join('/tmp', 'data') : path.resolve(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'db.json');
 
 const INITIAL_CATEGORIES: Category[] = [
@@ -161,13 +163,13 @@ const INITIAL_POSTS: Post[] = [
     title: 'Sector 22D Yamuna Expressway: Complete Location Guide (2026)',
     slug: 'sector-22d-yamuna-expressway-complete-location-guide-2026',
     excerpt: 'An exhaustive analysis of Sector 22D on Yamuna Expressway, analyzing its strategic proximity to Jewar Airport, Film City, golf layouts, and infrastructure connectivity.',
-    status: 'DRAFT',
-    publishedAt: null,
+    status: 'PUBLISHED',
+    publishedAt: new Date().toISOString(),
     scheduledAt: null,
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     authorId: 'admin-1',
-    authorName: 'Shivam Sharma',
+    authorName: 'Shivam Pratap Singh',
     categoryId: 'cat-1',
     categoryName: 'Location Guides',
     tags: ['Sector 22D', 'Yamuna Expressway', 'Jewar Airport', 'YEIDA'],
@@ -227,13 +229,13 @@ const INITIAL_POSTS: Post[] = [
     title: 'Why Property Near Noida International Airport Is Gaining Value',
     slug: 'why-property-near-noida-international-airport-is-gaining-value',
     excerpt: 'Discover the macroeconomic triggers and global airport city models proving why property around Jewar Airport is entering its highest capital appreciation curve.',
-    status: 'DRAFT',
-    publishedAt: null,
+    status: 'PUBLISHED',
+    publishedAt: new Date().toISOString(),
     scheduledAt: null,
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     authorId: 'admin-1',
-    authorName: 'Shivam Sharma',
+    authorName: 'Shivam Pratap Singh',
     categoryId: 'cat-2',
     categoryName: 'Investment & ROI',
     tags: ['Jewar Airport', 'Investment & ROI', 'Price Trends', 'Yamuna Expressway'],
@@ -273,13 +275,13 @@ const INITIAL_POSTS: Post[] = [
     title: 'Yamuna Expressway vs Noida Extension: Where Should You Invest?',
     slug: 'yamuna-expressway-vs-noida-extension-where-should-you-invest',
     excerpt: 'Detailed comparison between Yamuna Expressway and Greater Noida West (Noida Extension) on infrastructure, density, capital appreciation, and lifestyle.',
-    status: 'DRAFT',
-    publishedAt: null,
+    status: 'PUBLISHED',
+    publishedAt: new Date().toISOString(),
     scheduledAt: null,
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     authorId: 'admin-1',
-    authorName: 'Shivam Sharma',
+    authorName: 'Shivam Pratap Singh',
     categoryId: 'cat-2',
     categoryName: 'Investment & ROI',
     tags: ['Yamuna Expressway', 'Investment & ROI', 'Sector 22D'],
@@ -340,13 +342,13 @@ const INITIAL_POSTS: Post[] = [
     title: '3 BHK vs 4 BHK: Choosing the Right Luxury Apartment Size',
     slug: '3-bhk-vs-4-bhk-choosing-the-right-luxury-apartment-size',
     excerpt: 'Detailed architectural and lifestyle comparison between 1,900 sq ft 3 BHK, 2,400 sq ft 3 BHK+Servant, and 3,000 sq ft 4 BHK+Servant residences.',
-    status: 'DRAFT',
-    publishedAt: null,
+    status: 'PUBLISHED',
+    publishedAt: new Date().toISOString(),
     scheduledAt: null,
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     authorId: 'admin-1',
-    authorName: 'Shivam Sharma',
+    authorName: 'Shivam Pratap Singh',
     categoryId: 'cat-4',
     categoryName: 'Apartment Guides',
     tags: ['3 BHK', '4 BHK', 'Sector 22D'],
@@ -383,13 +385,13 @@ const INITIAL_POSTS: Post[] = [
     title: 'How to Check UP RERA Registration Before Buying a Flat',
     slug: 'how-to-check-up-rera-registration-before-buying-a-flat',
     excerpt: 'A step-by-step buyer guide on verifying Uttar Pradesh RERA registration, promoter track record, project bank accounts, and quarterly compliance filings.',
-    status: 'DRAFT',
-    publishedAt: null,
+    status: 'PUBLISHED',
+    publishedAt: new Date().toISOString(),
     scheduledAt: null,
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     authorId: 'admin-1',
-    authorName: 'Shivam Sharma',
+    authorName: 'Shivam Pratap Singh',
     categoryId: 'cat-5',
     categoryName: 'RERA & Legal',
     tags: ['UP RERA', 'RERA & Legal', 'Yamuna Expressway'],
@@ -429,13 +431,13 @@ const INITIAL_POSTS: Post[] = [
     title: 'Upcoming Infrastructure Around YEIDA: Film City, Metro and Expressways',
     slug: 'upcoming-infrastructure-around-yeida-film-city-metro-and-expressways',
     excerpt: 'A comprehensive briefing on the mega infrastructure projects shaping Yamuna Expressway: International Film City, Pod Taxis, the YEIDA Metro corridor, and Cargo hubs.',
-    status: 'DRAFT',
-    publishedAt: null,
+    status: 'PUBLISHED',
+    publishedAt: new Date().toISOString(),
     scheduledAt: null,
     updatedAt: new Date().toISOString(),
     createdAt: new Date().toISOString(),
     authorId: 'admin-1',
-    authorName: 'Shivam Sharma',
+    authorName: 'Shivam Pratap Singh',
     categoryId: 'cat-3',
     categoryName: 'Infrastructure',
     tags: ['Infrastructure', 'Film City', 'Jewar Airport', 'YEIDA'],
@@ -608,7 +610,7 @@ const DEFAULT_ADMIN: AdminUser = {
   id: 'admin-1',
   email: process.env.ADMIN_EMAIL || 'shivam@dxn-orion.com',
   passwordHash: '$2b$12$eX8zW1hI6dFqB9T3yU8eQO6tE3s1a4K9l0M1n2O3p4Q5r6S7t8U9v', // matches Admin@DXN2026 or fallback
-  name: 'Shivam Sharma',
+  name: 'Shivam Pratap Singh',
   role: 'SUPER_ADMIN',
   createdAt: new Date().toISOString(),
   lastLoginAt: null
@@ -623,6 +625,15 @@ class Database {
 
   private loadData(): DatabaseData {
     try {
+      if (IS_VERCEL && !fs.existsSync(DB_FILE) && fs.existsSync(BUNDLED_DB_FILE)) {
+        try {
+          fs.mkdirSync(DATA_DIR, { recursive: true });
+          fs.copyFileSync(BUNDLED_DB_FILE, DB_FILE);
+        } catch (copyErr) {
+          console.error('Error copying bundled db.json to /tmp:', copyErr);
+        }
+      }
+
       if (!fs.existsSync(DATA_DIR)) {
         fs.mkdirSync(DATA_DIR, { recursive: true });
       }

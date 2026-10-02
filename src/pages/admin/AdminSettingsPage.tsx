@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Lock, ShieldCheck, Check, AlertCircle } from 'lucide-react';
 import { SiteSettings } from '../../types/index.ts';
+import { adminFetch } from '../../utils/adminAuth.ts';
 
 interface AdminSettingsPageProps {
   onSettingsUpdated: (settings: SiteSettings) => void;
@@ -41,7 +42,7 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
     setSavedSuccess(false);
 
     try {
-      const res = await fetch('/api/settings', {
+      const res = await adminFetch('/api/settings', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
@@ -73,7 +74,7 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
     }
 
     try {
-      const res = await fetch('/api/admin/change-password', {
+      const res = await adminFetch('/api/admin/change-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newPassword })

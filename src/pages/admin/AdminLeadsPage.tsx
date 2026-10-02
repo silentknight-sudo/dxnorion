@@ -5,6 +5,7 @@ import {
   Send, ExternalLink, AlertCircle, ArrowUpDown
 } from 'lucide-react';
 import { Lead, LeadStatus, LeadConfiguration, LeadSource, LeadActivity } from '../../types/index.ts';
+import { adminFetch } from '../../utils/adminAuth.ts';
 
 interface AdminLeadsPageProps {
   initialStatusFilter?: string;
@@ -56,7 +57,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
       if (sourceFilter !== 'ALL') url += `&source=${sourceFilter}`;
       if (search) url += `&search=${encodeURIComponent(search)}`;
 
-      const res = await fetch(url);
+      const res = await adminFetch(url);
       if (res.ok) {
         const data = await res.json();
         setLeads(data.leads || []);
@@ -71,7 +72,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
   const openLeadDrawer = async (lead: Lead) => {
     setActiveLead(lead);
     try {
-      const res = await fetch(`/api/leads/${lead.id}`);
+      const res = await adminFetch(`/api/leads/${lead.id}`);
       if (res.ok) {
         const data = await res.json();
         setActivities(data.activities || []);
@@ -86,7 +87,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
 
   const handleUpdateStatus = async (leadId: string, newStatus: LeadStatus) => {
     try {
-      const res = await fetch(`/api/leads/${leadId}`, {
+      const res = await adminFetch(`/api/leads/${leadId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
@@ -97,7 +98,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
         if (activeLead && activeLead.id === leadId) {
           setActiveLead(updated);
           // Refresh activities
-          const actRes = await fetch(`/api/leads/${leadId}`);
+          const actRes = await adminFetch(`/api/leads/${leadId}`);
           if (actRes.ok) {
             const data = await actRes.json();
             setActivities(data.activities || []);
@@ -112,7 +113,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
     if (!activeLead || !newNote.trim()) return;
 
     try {
-      const res = await fetch(`/api/leads/${activeLead.id}/activity`, {
+      const res = await adminFetch(`/api/leads/${activeLead.id}/activity`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: noteType, content: newNote.trim() })
@@ -128,7 +129,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
   const handleBulkStatus = async (status: LeadStatus) => {
     if (selectedIds.length === 0) return;
     try {
-      const res = await fetch('/api/leads/bulk-action', {
+      const res = await adminFetch('/api/leads/bulk-action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'STATUS_CHANGE', ids: selectedIds, status })
@@ -145,7 +146,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
     if (!confirm(`Are you sure you want to permanently delete ${selectedIds.length} leads?`)) return;
 
     try {
-      const res = await fetch('/api/leads/bulk-action', {
+      const res = await adminFetch('/api/leads/bulk-action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'DELETE', ids: selectedIds })

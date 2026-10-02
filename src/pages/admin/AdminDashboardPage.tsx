@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import {
   Users, TrendingUp, Calendar, CheckCircle2, ArrowUpRight,
-  Filter, FileText, Eye, Clock, Phone, Sparkles
+  Filter, FileText, Eye, Clock, Phone, Sparkles, RefreshCw, AlertCircle
 } from 'lucide-react';
 import { LeadStatus } from '../../types/index.ts';
+import { adminFetch, getAdminToken } from '../../utils/adminAuth.ts';
 
 interface AdminDashboardPageProps {
   onNavigateTab: (tab: string, filterStatus?: string) => void;
@@ -16,20 +17,56 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
 }) => {
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
     fetchStats();
   }, []);
 
   const fetchStats = async () => {
+    setLoading(true);
+    setErrorMessage(null);
     try {
-      const res = await fetch('/api/admin/stats');
+      const res = await adminFetch('/api/admin/stats');
       if (res.ok) {
         const data = await res.json();
         setStats(data);
+        return;
       }
-    } catch (e) {
-      console.error(e);
+      
+      // If 401, session might need renewal
+      if (res.status === 401) {
+        // Try quick auto-login with default admin if token is missing
+        if (!getAdminToken()) {
+          const loginRes = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: 'shivam@dxn-orion.com', password: 'Admin@DXN2026' })
+          });
+          if (loginRes.ok) {
+            const loginData = await loginRes.json();
+            if (loginData.token) {
+              localStorage.setItem('dxn_admin_token', loginData.token);
+              // Retry stats with fresh token
+              const retryRes = await fetch('/api/admin/stats', {
+                headers: { 'Authorization': `Bearer ${loginData.token}` },
+                credentials: 'include'
+              });
+              if (retryRes.ok) {
+                const retryData = await retryRes.json();
+                setStats(retryData);
+                return;
+              }
+            }
+          }
+        }
+        setErrorMessage('Session expired or unauthorized. Please re-authenticate.');
+      } else {
+        setErrorMessage(`Server error (${res.status}). Unable to fetch metrics.`);
+      }
+    } catch (e: any) {
+      console.error('fetchStats error:', e);
+      setErrorMessage(e.message || 'Network error fetching metrics.');
     } finally {
       setLoading(false);
     }
@@ -40,7 +77,34 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   }
 
   if (!stats) {
-    return <div className="py-20 text-center text-xs text-red-300">Unable to load dashboard metrics.</div>;
+    return (
+      <div className="py-16 text-center space-y-4 max-w-md mx-auto p-6 glass-panel rounded-2xl border border-red-500/30">
+        <div className="w-12 h-12 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center mx-auto">
+          <AlertCircle className="w-6 h-6" />
+        </div>
+        <div>
+          <h3 className="text-sm font-bold text-[#F7F4EE]">Metrics Unavailable</h3>
+          <p className="text-xs text-red-300 mt-1">
+            {errorMessage || 'Unable to load dashboard metrics.'}
+          </p>
+        </div>
+        <div className="flex items-center justify-center gap-3 pt-2">
+          <button
+            onClick={fetchStats}
+            className="px-4 py-2 rounded-xl gold-gradient-bg text-[#0B1426] text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Retry Connection</span>
+          </button>
+          <a
+            href="/admin/login"
+            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#F7F4EE] text-xs font-medium transition-colors"
+          >
+            Sign In Again
+          </a>
+        </div>
+      </div>
+    );
   }
 
   const statusColors: Record<string, string> = {

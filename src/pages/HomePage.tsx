@@ -3,7 +3,7 @@ import {
   Home, Users, Trees, Flag, Download, TrendingUp, Compass, Clock, Lock,
   FileText, Crown, Waves, Dumbbell, Sparkle, Baby, CloudSun, Flower2,
   ShieldCheck, MapPin, Plane, Clapperboard, Navigation, Map, BadgeCheck,
-  ChevronDown, Shield, Check, Loader2, Sparkles
+  ChevronDown, Shield, Check, Loader2, Sparkles, ArrowUpRight
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { getStoredUtm } from '../utils/utm.ts';
@@ -849,6 +849,112 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </section>
       {/* END: Section7_Gallery */}
+
+      {/* BEGIN: Section_AuthorityApprovals */}
+      <section className="py-10 px-4">
+        <div className="text-center mb-6">
+          <span className="text-[10px] sm:text-xs font-bold text-[#C9A86A] uppercase tracking-widest">
+            Institutional Trust &amp; Regulatory Compliance
+          </span>
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#F7F4EE] mt-1">
+            Statutory Approvals &amp; Authority Verifications
+          </h2>
+          <p className="text-xs sm:text-sm text-[#94A3B8] mt-1 max-w-xl mx-auto">
+            Engineered under the master planning guidelines of Yamuna Expressway Industrial Development Authority (YEIDA) and Uttar Pradesh RERA.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4">
+          {/* Card 1: UP RERA */}
+          <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30 flex flex-col justify-between hover:border-[#C9A86A] transition-all">
+            <div>
+              <div className="w-9 h-9 rounded-full bg-[#C9A86A]/20 flex items-center justify-center text-[#C9A86A] mb-3">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">UP RERA Compliant</h3>
+              <p className="text-[11px] text-[#94A3B8] mt-1 leading-relaxed">
+                Formal application under process with UP RERA. All sales governed by state statutory real estate norms.
+              </p>
+            </div>
+            <a
+              href="https://up-rera.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-[#DFBF82] font-semibold hover:underline mt-3 inline-flex items-center gap-1"
+            >
+              <span>Verify on UP RERA Portal</span>
+              <ArrowUpRight className="w-3 h-3" />
+            </a>
+          </div>
+
+          {/* Card 2: YEIDA Master Plan */}
+          <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30 flex flex-col justify-between hover:border-[#C9A86A] transition-all">
+            <div>
+              <div className="w-9 h-9 rounded-full bg-[#C9A86A]/20 flex items-center justify-center text-[#C9A86A] mb-3">
+                <Compass className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">YEIDA Master Plan 2031</h3>
+              <p className="text-[11px] text-[#94A3B8] mt-1 leading-relaxed">
+                Zoned under low-density residential master plan with 45-meter arterial access and 100-meter green buffer belts.
+              </p>
+            </div>
+            <a
+              href="https://yamunaexpresswayauthority.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-[#DFBF82] font-semibold hover:underline mt-3 inline-flex items-center gap-1"
+            >
+              <span>YEIDA Official Portal</span>
+              <ArrowUpRight className="w-3 h-3" />
+            </a>
+          </div>
+
+          {/* Card 3: Jewar Aerocity Hub */}
+          <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30 flex flex-col justify-between hover:border-[#C9A86A] transition-all">
+            <div>
+              <div className="w-9 h-9 rounded-full bg-[#C9A86A]/20 flex items-center justify-center text-[#C9A86A] mb-3">
+                <Plane className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">Jewar Airport Corridor</h3>
+              <p className="text-[11px] text-[#94A3B8] mt-1 leading-relaxed">
+                15 minutes direct signal-free expressway access to Noida International Airport (Jewar) aviation zone.
+              </p>
+            </div>
+            <a
+              href="https://nialjewar.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-[#DFBF82] font-semibold hover:underline mt-3 inline-flex items-center gap-1"
+            >
+              <span>NIAL Project Updates</span>
+              <ArrowUpRight className="w-3 h-3" />
+            </a>
+          </div>
+
+          {/* Card 4: IGBC Pre-Certified */}
+          <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30 flex flex-col justify-between hover:border-[#C9A86A] transition-all">
+            <div>
+              <div className="w-9 h-9 rounded-full bg-[#C9A86A]/20 flex items-center justify-center text-[#C9A86A] mb-3">
+                <Trees className="w-5 h-5" />
+              </div>
+              <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">IGBC Gold Pre-Certified</h3>
+              <p className="text-[11px] text-[#94A3B8] mt-1 leading-relaxed">
+                Sustainable green building architecture with high-efficiency energy insulation, rainwater percolation, and EV charging.
+              </p>
+            </div>
+            <a
+              href="https://igbc.in/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[10px] text-[#DFBF82] font-semibold hover:underline mt-3 inline-flex items-center gap-1"
+            >
+              <span>IGBC Green Standards</span>
+              <ArrowUpRight className="w-3 h-3" />
+            </a>
+          </div>
+        </div>
+      </section>
+      {/* END: Section_AuthorityApprovals */}
 
       {/* BEGIN: Section8_SecondEnquiryBlock */}
       <section className="py-10 px-4" id="enquire">
