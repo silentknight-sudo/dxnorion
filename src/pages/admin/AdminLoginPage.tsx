@@ -8,8 +8,8 @@ interface AdminLoginPageProps {
 }
 
 export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, onNavigate }) => {
-  const [email, setEmail] = useState('shivam@dxn-orion.com');
-  const [password, setPassword] = useState('Admin@DXN2026');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,11 +43,6 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDemoFill = () => {
-    setEmail('shivam@dxn-orion.com');
-    setPassword('Admin@DXN2026');
   };
 
   return (
@@ -88,7 +83,7 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="shivam@dxn-orion.com"
+                placeholder="name@company.com"
                 className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl pl-9 pr-3 py-2 text-xs text-[#F7F4EE] placeholder-[#94A3B8] focus:border-[#C9A86A] focus:outline-none"
               />
             </div>
@@ -130,22 +125,10 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
           </button>
         </form>
 
-        {/* Quick Demo Pre-Fill Assistant */}
-        <div className="mt-5 pt-4 border-t border-white/10 text-center">
-          <p className="text-[10px] text-[#94A3B8] mb-1.5">Seeded Admin Account:</p>
-          <button
-            type="button"
-            onClick={handleDemoFill}
-            className="text-[10px] text-[#C9A86A] hover:underline bg-[#C9A86A]/10 border border-[#C9A86A]/30 px-2.5 py-1 rounded-lg cursor-pointer"
-          >
-            shivam@dxn-orion.com (Admin@DXN2026)
-          </button>
-        </div>
-
-        <div className="mt-4 text-center">
+        <div className="mt-6 pt-4 border-t border-white/10 text-center">
           <button
             onClick={() => onNavigate('/')}
-            className="text-[10px] text-[#94A3B8] hover:text-[#F7F4EE] transition-colors"
+            className="text-[10px] text-[#94A3B8] hover:text-[#C9A86A] transition-colors cursor-pointer"
           >
             &larr; Return to Public Website
           </button>

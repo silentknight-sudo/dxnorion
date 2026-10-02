@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   Search, Filter, Download, Trash2, CheckCircle2, Phone, MessageCircle,
   Calendar, Clock, User, X, Plus, ChevronRight, LayoutGrid, List,
-  Send, ExternalLink, AlertCircle, ArrowUpDown
+  Send, ExternalLink, AlertCircle, ArrowUpDown, RefreshCw, Bell, Sparkles
 } from 'lucide-react';
 import { Lead, LeadStatus, LeadConfiguration, LeadSource, LeadActivity } from '../../types/index.ts';
 import { adminFetch } from '../../utils/adminAuth.ts';
@@ -20,7 +20,11 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
 }) => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [lastSynced, setLastSynced] = useState<Date>(new Date());
+  const [newLeadAlert, setNewLeadAlert] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
+  const prevLeadsCount = useRef<number>(0);
 
   // Filters
   const [search, setSearch] = useState('');
@@ -37,9 +41,25 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
   const [newNote, setNewNote] = useState('');
   const [noteType, setNoteType] = useState<'NOTE' | 'CALL' | 'WHATSAPP'>('NOTE');
 
+  // Update status filter if initialStatusFilter changes (e.g. from Dashboard KPI click)
   useEffect(() => {
-    fetchLeads();
+    if (initialStatusFilter) {
+      setStatusFilter(initialStatusFilter);
+    }
+  }, [initialStatusFilter]);
+
+  // Initial fetch and filter changes
+  useEffect(() => {
+    fetchLeads(true);
   }, [statusFilter, configFilter, sourceFilter]);
+
+  // Real-time live auto-poll every 6 seconds so incoming leads appear automatically
+  useEffect(() => {
+    const timer = setInterval(() => {
+      fetchLeads(false);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, [statusFilter, configFilter, sourceFilter, search]);
 
   useEffect(() => {
     if (selectedLeadId && leads.length > 0) {
@@ -48,24 +68,38 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
     }
   }, [selectedLeadId, leads]);
 
-  const fetchLeads = async () => {
-    setLoading(true);
+  const fetchLeads = async (isManual = false) => {
+    if (isManual) {
+      setRefreshing(true);
+    }
     try {
       let url = '/api/leads?limit=100';
       if (statusFilter !== 'ALL') url += `&status=${statusFilter}`;
       if (configFilter !== 'ALL') url += `&configuration=${configFilter}`;
       if (sourceFilter !== 'ALL') url += `&source=${sourceFilter}`;
-      if (search) url += `&search=${encodeURIComponent(search)}`;
+      if (search.trim()) url += `&search=${encodeURIComponent(search.trim())}`;
 
       const res = await adminFetch(url);
       if (res.ok) {
         const data = await res.json();
-        setLeads(data.leads || []);
+        const incoming: Lead[] = data.leads || [];
+
+        // Detect newly arrived lead on background poll
+        if (prevLeadsCount.current > 0 && incoming.length > prevLeadsCount.current) {
+          const newest = incoming[0];
+          setNewLeadAlert(`New enquiry from ${newest.name} (${newest.phone}) just received!`);
+          setTimeout(() => setNewLeadAlert(null), 8000);
+        }
+        prevLeadsCount.current = incoming.length;
+
+        setLeads(incoming);
+        setLastSynced(new Date());
       }
     } catch (e) {
-      console.error(e);
+      console.error('Failed to load leads:', e);
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   };
 
@@ -251,6 +285,17 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
             </button>
           </div>
 
+          {/* Refresh Leads Button */}
+          <button
+            onClick={() => fetchLeads(true)}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl bg-[#C9A86A]/20 hover:bg-[#C9A86A]/30 border border-[#C9A86A]/50 text-[#DFBF82] text-xs font-semibold cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+            title="Refresh Leads Immediately"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#C9A86A]' : ''}`} />
+            <span>{refreshing ? 'Syncing...' : 'Refresh'}</span>
+          </button>
+
           {/* Export CSV */}
           <a
             href="/api/leads/export"
@@ -262,6 +307,40 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
           </a>
         </div>
       </div>
+
+      {/* Live Sync Status & New Lead Toast Banner */}
+      <div className="flex items-center justify-between px-1 text-[11px] text-[#94A3B8]">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          </span>
+          <span className="text-emerald-400 font-medium">Live Sync Active</span>
+          <span>•</span>
+          <span>Auto-checks every 6s</span>
+          <span>•</span>
+          <span>Last synced: {lastSynced.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
+        </div>
+
+        <div className="text-[11px] text-[#DFBF82]">
+          Showing <span className="font-bold text-[#F7F4EE]">{leads.length}</span> lead{leads.length !== 1 ? 's' : ''}
+        </div>
+      </div>
+
+      {newLeadAlert && (
+        <div className="glass-panel p-3.5 rounded-2xl border border-emerald-500 bg-emerald-500/10 flex items-center justify-between text-xs text-emerald-200 animate-in fade-in slide-in-from-top-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-emerald-400 animate-bounce" />
+            <span className="font-semibold text-white">{newLeadAlert}</span>
+          </div>
+          <button
+            onClick={() => setNewLeadAlert(null)}
+            className="p-1 hover:bg-emerald-500/20 rounded-lg text-emerald-300 cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
 
       {/* Bulk Actions Floating Bar */}
       {selectedIds.length > 0 && (

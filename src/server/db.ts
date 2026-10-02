@@ -605,11 +605,10 @@ const INITIAL_SETTINGS: SiteSettings = {
 };
 
 // Default seed admin: email from env or default shivam@dxn-orion.com
-// Plaintext: Admin@DXN2026
 const DEFAULT_ADMIN: AdminUser = {
   id: 'admin-1',
   email: process.env.ADMIN_EMAIL || 'shivam@dxn-orion.com',
-  passwordHash: '$2b$12$eX8zW1hI6dFqB9T3yU8eQO6tE3s1a4K9l0M1n2O3p4Q5r6S7t8U9v', // matches Admin@DXN2026 or fallback
+  passwordHash: '$2b$12$eX8zW1hI6dFqB9T3yU8eQO6tE3s1a4K9l0M1n2O3p4Q5r6S7t8U9v',
   name: 'Shivam Pratap Singh',
   role: 'SUPER_ADMIN',
   createdAt: new Date().toISOString(),
@@ -707,7 +706,25 @@ class Database {
 
   public get Leads() {
     return {
-      getAll: () => [...this.data.leads].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+      getAll: () => {
+        try {
+          if (fs.existsSync(DB_FILE)) {
+            const raw = fs.readFileSync(DB_FILE, 'utf-8');
+            const parsed = JSON.parse(raw);
+            if (parsed && Array.isArray(parsed.leads)) {
+              this.data.leads = parsed.leads;
+              if (Array.isArray(parsed.activities)) {
+                this.data.activities = parsed.activities;
+              }
+            }
+          }
+        } catch (e) {
+          // ignore error and fallback to memory
+        }
+        return [...this.data.leads].sort((a, b) => 
+          new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime()
+        );
+      },
       findById: (id: string) => this.data.leads.find(l => l.id === id),
       findByPhone: (phone: string) => this.data.leads.find(l => l.phone.replace(/\D/g, '') === phone.replace(/\D/g, '')),
       create: (lead: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'>) => {

@@ -20,11 +20,17 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchStats();
+    fetchStats(true);
+    const interval = setInterval(() => {
+      fetchStats(false);
+    }, 10000);
+    return () => clearInterval(interval);
   }, []);
 
-  const fetchStats = async () => {
-    setLoading(true);
+  const fetchStats = async (showLoading = false) => {
+    if (showLoading) {
+      setLoading(true);
+    }
     setErrorMessage(null);
     try {
       const res = await adminFetch('/api/admin/stats');
@@ -36,30 +42,6 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
       
       // If 401, session might need renewal
       if (res.status === 401) {
-        // Try quick auto-login with default admin if token is missing
-        if (!getAdminToken()) {
-          const loginRes = await fetch('/api/admin/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: 'shivam@dxn-orion.com', password: 'Admin@DXN2026' })
-          });
-          if (loginRes.ok) {
-            const loginData = await loginRes.json();
-            if (loginData.token) {
-              localStorage.setItem('dxn_admin_token', loginData.token);
-              // Retry stats with fresh token
-              const retryRes = await fetch('/api/admin/stats', {
-                headers: { 'Authorization': `Bearer ${loginData.token}` },
-                credentials: 'include'
-              });
-              if (retryRes.ok) {
-                const retryData = await retryRes.json();
-                setStats(retryData);
-                return;
-              }
-            }
-          }
-        }
         setErrorMessage('Session expired or unauthorized. Please re-authenticate.');
       } else {
         setErrorMessage(`Server error (${res.status}). Unable to fetch metrics.`);
@@ -90,7 +72,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         </div>
         <div className="flex items-center justify-center gap-3 pt-2">
           <button
-            onClick={fetchStats}
+            onClick={() => fetchStats(true)}
             className="px-4 py-2 rounded-xl gold-gradient-bg text-[#0B1426] text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
