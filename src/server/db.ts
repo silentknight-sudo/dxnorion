@@ -1,5 +1,7 @@
 import fs from 'fs';
 import path from 'path';
+import { db as firestore } from '../lib/firebase.ts';
+import { collection, getDocs, doc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export interface AdminUser {
   id: string;
@@ -473,117 +475,9 @@ const INITIAL_POSTS: Post[] = [
   }
 ];
 
-const INITIAL_LEADS: Lead[] = [
-  {
-    id: 'lead-1',
-    name: 'Vikram Malhotra',
-    phone: '9811234567',
-    email: 'vikram.malhotra@techcorp.in',
-    configuration: '3BHK_SERVANT',
-    budget: '₹2.8 Cr - ₹3.5 Cr',
-    source: 'hero_form',
-    utmSource: 'google',
-    utmMedium: 'cpc',
-    utmCampaign: 'yamuna_exp_search',
-    landingPage: '/',
-    status: 'SITE_VISIT',
-    notes: 'Requested private Sunday golf course view orientation. Interested in 18th-floor corner unit.',
-    followUpAt: '2026-10-05T11:00:00.000Z',
-    consent: true,
-    createdAt: new Date(Date.now() - 3600000 * 4).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
-  },
-  {
-    id: 'lead-2',
-    name: 'Ananya Deshmukh',
-    phone: '9820123456',
-    email: 'ananya.d@finadvisors.com',
-    configuration: '4BHK_SERVANT',
-    budget: '₹4.0 Cr+',
-    source: 'modal',
-    utmSource: 'meta',
-    utmMedium: 'cpm',
-    utmCampaign: 'luxury_realtor_carousel',
-    landingPage: '/floor-plans',
-    status: 'INTERESTED',
-    notes: 'Looking for 3,000 sq ft 4BHK with servant room. Seeking flexible 10:90 pre-launch payment plan.',
-    followUpAt: '2026-10-03T15:30:00.000Z',
-    consent: true,
-    createdAt: new Date(Date.now() - 3600000 * 12).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 8).toISOString()
-  },
-  {
-    id: 'lead-3',
-    name: 'Col. Rajeshwar Singh (Retd.)',
-    phone: '9845098765',
-    email: 'rsingh.defence@gmail.com',
-    configuration: '3BHK',
-    budget: '₹2.2 Cr - ₹2.6 Cr',
-    source: 'floor_plans',
-    utmSource: 'direct',
-    landingPage: '/floor-plans',
-    status: 'CONTACTED',
-    notes: 'Interested in low-density 4 units/floor plan. Prefers North-East facing morning sun balcony.',
-    consent: true,
-    createdAt: new Date(Date.now() - 3600000 * 20).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 18).toISOString()
-  },
-  {
-    id: 'lead-4',
-    name: 'Kavita Chawla',
-    phone: '9871188223',
-    email: 'kavita@chawlagroup.com',
-    configuration: '4BHK_SERVANT',
-    source: 'whatsapp',
-    utmSource: 'whatsapp_campaign',
-    landingPage: '/',
-    status: 'NEW',
-    notes: 'Inquired via WhatsApp for brochure and Jewar Airport drive-time specifics.',
-    consent: true,
-    createdAt: new Date(Date.now() - 3600000 * 2).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 2).toISOString()
-  },
-  {
-    id: 'lead-5',
-    name: 'Deepak Agrawal',
-    phone: '9829033445',
-    email: 'deepak.a@agrawalimpex.com',
-    configuration: '3BHK_SERVANT',
-    source: 'blog_cta',
-    utmSource: 'organic',
-    utmCampaign: 'sector_22d_guide',
-    landingPage: '/blog/sector-22d-yamuna-expressway-complete-location-guide-2026',
-    status: 'CLOSED',
-    notes: 'EOI Priority pass #014 allocated with token expression of interest submitted.',
-    consent: true,
-    createdAt: new Date(Date.now() - 3600000 * 48).toISOString(),
-    updatedAt: new Date(Date.now() - 3600000 * 24).toISOString()
-  }
-];
+const INITIAL_LEADS: Lead[] = [];
 
-const INITIAL_ACTIVITIES: LeadActivity[] = [
-  {
-    id: 'act-1',
-    leadId: 'lead-1',
-    type: 'CALL',
-    content: 'Spoke with Vikram Malhotra regarding 18th-floor corner inventory. Confirmed site visit.',
-    createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
-  },
-  {
-    id: 'act-2',
-    leadId: 'lead-1',
-    type: 'STATUS_CHANGE',
-    content: 'Status updated to SITE_VISIT for Sunday 11:00 AM.',
-    createdAt: new Date(Date.now() - 3600000 * 2).toISOString()
-  },
-  {
-    id: 'act-3',
-    leadId: 'lead-2',
-    type: 'WHATSAPP',
-    content: 'Sent pre-launch pricing matrix and 4 BHK floor plans via official WhatsApp desk.',
-    createdAt: new Date(Date.now() - 3600000 * 8).toISOString()
-  }
-];
+const INITIAL_ACTIVITIES: LeadActivity[] = [];
 
 const INITIAL_REDIRECTS: Redirect[] = [
   { id: 'red-1', fromPath: '/brochure', toPath: '/#enquire', statusCode: 301, createdAt: new Date().toISOString() },
@@ -706,13 +600,45 @@ class Database {
 
   public get Leads() {
     return {
+      syncFromFirestore: async () => {
+        try {
+          const snap = await getDocs(collection(firestore, 'leads'));
+          const firestoreLeads: Lead[] = snap.empty ? [] : snap.docs.map(d => ({ id: d.id, ...d.data() } as Lead));
+          const validFirestore = firestoreLeads.filter(l => 
+            l.name && !['Vikram Malhotra', 'Ananya Deshmukh', 'Col. Rajeshwar Singh (Retd.)', 'Kavita Chawla', 'Deepak Agrawal', 'Test User', 'TEST', 'Test'].includes(l.name)
+          );
+
+          // Merge local and firestore leads so no newly submitted lead is lost
+          const mergedMap = new Map<string, Lead>();
+          validFirestore.forEach(l => mergedMap.set(l.id, l));
+
+          this.data.leads.forEach(l => {
+            if (l.name && !['Vikram Malhotra', 'Ananya Deshmukh', 'Col. Rajeshwar Singh (Retd.)', 'Kavita Chawla', 'Deepak Agrawal', 'Test User', 'TEST', 'Test'].includes(l.name)) {
+              if (!mergedMap.has(l.id)) {
+                mergedMap.set(l.id, l);
+                // Background sync to Firestore
+                try {
+                  setDoc(doc(firestore, 'leads', l.id), l, { merge: true }).catch(() => {});
+                } catch (e) {}
+              }
+            }
+          });
+
+          this.data.leads = Array.from(mergedMap.values());
+          this.saveData(this.data);
+        } catch (e) {
+          console.error('Firestore sync error in Leads.syncFromFirestore:', e);
+        }
+      },
       getAll: () => {
         try {
           if (fs.existsSync(DB_FILE)) {
             const raw = fs.readFileSync(DB_FILE, 'utf-8');
             const parsed = JSON.parse(raw);
             if (parsed && Array.isArray(parsed.leads)) {
-              this.data.leads = parsed.leads;
+              this.data.leads = parsed.leads.filter((l: any) =>
+                l.name && !['Vikram Malhotra', 'Ananya Deshmukh', 'Col. Rajeshwar Singh (Retd.)', 'Kavita Chawla', 'Deepak Agrawal', 'Test User', 'TEST', 'Test'].includes(l.name)
+              );
               if (Array.isArray(parsed.activities)) {
                 this.data.activities = parsed.activities;
               }
@@ -721,12 +647,45 @@ class Database {
         } catch (e) {
           // ignore error and fallback to memory
         }
-        return [...this.data.leads].sort((a, b) => 
-          new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime()
-        );
+        return [...this.data.leads]
+          .filter(l => l.name && !['Vikram Malhotra', 'Ananya Deshmukh', 'Col. Rajeshwar Singh (Retd.)', 'Kavita Chawla', 'Deepak Agrawal', 'Test User', 'TEST', 'Test'].includes(l.name))
+          .sort((a, b) => 
+            new Date(b.updatedAt || b.createdAt).getTime() - new Date(a.updatedAt || a.createdAt).getTime()
+          );
       },
       findById: (id: string) => this.data.leads.find(l => l.id === id),
       findByPhone: (phone: string) => this.data.leads.find(l => l.phone.replace(/\D/g, '') === phone.replace(/\D/g, '')),
+      createAsync: async (lead: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'>) => {
+        const id = 'lead-' + Math.random().toString(36).substring(2, 9);
+        const now = new Date().toISOString();
+        const newLead: Lead = {
+          ...lead,
+          id,
+          createdAt: now,
+          updatedAt: now
+        };
+        this.data.leads.unshift(newLead);
+        
+        // Add initial activity
+        this.data.activities.push({
+          id: 'act-' + Math.random().toString(36).substring(2, 9),
+          leadId: id,
+          type: 'STATUS_CHANGE',
+          content: `Lead registered via ${lead.source} (${lead.configuration})`,
+          createdAt: now
+        });
+
+        this.saveData(this.data);
+
+        // Await Firestore persistence so subsequent reads immediately see it
+        try {
+          await setDoc(doc(firestore, 'leads', id), newLead, { merge: true });
+        } catch (e) {
+          console.error('Failed to sync new lead to Firestore:', e);
+        }
+
+        return newLead;
+      },
       create: (lead: Omit<Lead, 'id' | 'createdAt' | 'updatedAt'>) => {
         const id = 'lead-' + Math.random().toString(36).substring(2, 9);
         const now = new Date().toISOString();
@@ -748,6 +707,14 @@ class Database {
         });
 
         this.saveData(this.data);
+
+        // Permanently persist to Firestore
+        try {
+          setDoc(doc(firestore, 'leads', id), newLead, { merge: true }).catch(err => {
+            console.error('Failed to sync new lead to Firestore:', err);
+          });
+        } catch (e) {}
+
         return newLead;
       },
       update: (id: string, updates: Partial<Lead>) => {
@@ -774,6 +741,14 @@ class Database {
         }
 
         this.saveData(this.data);
+
+        // Permanently sync update to Firestore
+        try {
+          setDoc(doc(firestore, 'leads', id), updated, { merge: true }).catch(err => {
+            console.error('Failed to sync updated lead to Firestore:', err);
+          });
+        } catch (e) {}
+
         return updated;
       },
       delete: (id: string) => {
@@ -781,12 +756,28 @@ class Database {
         this.data.leads = this.data.leads.filter(l => l.id !== id);
         this.data.activities = this.data.activities.filter(a => a.leadId !== id);
         this.saveData(this.data);
+
+        // Permanently delete from Firestore
+        try {
+          deleteDoc(doc(firestore, 'leads', id)).catch(err => {
+            console.error('Failed to delete lead from Firestore:', err);
+          });
+        } catch (e) {}
+
         return this.data.leads.length < len;
       },
       bulkDelete: (ids: string[]) => {
         this.data.leads = this.data.leads.filter(l => !ids.includes(l.id));
         this.data.activities = this.data.activities.filter(a => !ids.includes(a.leadId));
         this.saveData(this.data);
+
+        // Permanently delete from Firestore
+        ids.forEach(id => {
+          try {
+            deleteDoc(doc(firestore, 'leads', id)).catch(() => {});
+          } catch (e) {}
+        });
+
         return true;
       },
       bulkStatus: (ids: string[], status: LeadStatus) => {

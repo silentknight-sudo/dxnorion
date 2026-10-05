@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { Lead, LeadStatus, LeadConfiguration, LeadSource, LeadActivity } from '../../types/index.ts';
 import { adminFetch } from '../../utils/adminAuth.ts';
+import { firestoreService } from '../../lib/firestoreService.ts';
 
 interface AdminLeadsPageProps {
   initialStatusFilter?: string;
@@ -47,6 +48,42 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
       setStatusFilter(initialStatusFilter);
     }
   }, [initialStatusFilter]);
+
+  // Real-time Firestore WebSocket listener
+  useEffect(() => {
+    try {
+      const unsubscribe = firestoreService.subscribeToLeads(
+        (firestoreLeads) => {
+          const valid = firestoreLeads.filter(l => 
+            l.name && !['Vikram Malhotra', 'Ananya Deshmukh', 'Col. Rajeshwar Singh (Retd.)', 'Kavita Chawla', 'Deepak Agrawal', 'Test User', 'TEST', 'Test'].includes(l.name)
+          );
+          if (valid.length > 0) {
+            if (prevLeadsCount.current > 0 && valid.length > prevLeadsCount.current) {
+              const newest = valid[0];
+              setNewLeadAlert(`⚡ New enquiry from ${newest.name} (${newest.phone}) received in real-time!`);
+              setTimeout(() => setNewLeadAlert(null), 8000);
+            }
+            prevLeadsCount.current = valid.length;
+            
+            // Only overwrite if no active search or custom filter
+            if (statusFilter === 'ALL' && configFilter === 'ALL' && sourceFilter === 'ALL' && !search.trim()) {
+              setLeads(valid);
+              setLoading(false);
+              setLastSynced(new Date());
+            }
+          }
+        },
+        (err) => {
+          console.warn('Firestore live listener fallback:', err);
+        }
+      );
+      return () => {
+        if (typeof unsubscribe === 'function') unsubscribe();
+      };
+    } catch (e) {
+      console.warn('Could not initialize firestore subscription:', e);
+    }
+  }, [statusFilter, configFilter, sourceFilter, search]);
 
   // Initial fetch and filter changes
   useEffect(() => {

@@ -229,7 +229,7 @@ app.get('/blog/rss.xml', (_req: Request, res: Response) => {
 
 // --- LEAD CAPTURE & CONVERSION API ---
 
-app.post('/api/leads', (req: Request, res: Response) => {
+app.post('/api/leads', async (req: Request, res: Response) => {
   try {
     const {
       name,
@@ -318,8 +318,8 @@ app.post('/api/leads', (req: Request, res: Response) => {
         content: `Lead re-submitted form from ${source} (${configuration})`
       });
     } else {
-      // Create new lead
-      leadResult = db.Leads.create({
+      // Create new lead with immediate Firestore persistence
+      leadResult = await db.Leads.createAsync({
         name: name.trim(),
         phone: cleanPhone,
         email: email ? email.trim() : undefined,
@@ -600,7 +600,10 @@ app.post('/api/admin/upload', requireAdmin, (req: Request, res: Response) => {
 });
 
 // Admin Dashboard Summary Metrics
-app.get('/api/admin/stats', requireAdmin, (_req: Request, res: Response) => {
+app.get('/api/admin/stats', requireAdmin, async (_req: Request, res: Response) => {
+  try {
+    await db.Leads.syncFromFirestore();
+  } catch (e) {}
   const leads = db.Leads.getAll();
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
@@ -660,7 +663,10 @@ app.get('/api/admin/stats', requireAdmin, (_req: Request, res: Response) => {
 });
 
 // Admin Leads Listing & Filtering
-app.get('/api/leads', requireAdmin, (req: Request, res: Response) => {
+app.get('/api/leads', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    await db.Leads.syncFromFirestore();
+  } catch (e) {}
   let leads = db.Leads.getAll();
 
   const { search, status, configuration, source, campaign, page = '1', limit = '20' } = req.query;
@@ -894,6 +900,9 @@ app.post('/api/settings', requireAdmin, (req: Request, res: Response) => {
 // --- VITE MIDDLEWARE / STATIC ASSETS ---
 
 async function startServer() {
+  // Sync real leads from Firestore on boot
+  db.Leads.syncFromFirestore().catch(console.error);
+
   if (!isProd) {
     const { createServer } = await import('vite');
     const vite = await createServer({
