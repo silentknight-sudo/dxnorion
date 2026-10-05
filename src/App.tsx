@@ -21,7 +21,8 @@ import { AdminLayout } from './pages/admin/AdminLayout.tsx';
 
 import { captureUtmParams } from './utils/utm.ts';
 import { SiteSettings } from './types/index.ts';
-import { adminFetch, clearAdminAuth, getAdminToken, getStoredAdminUser } from './utils/adminAuth.ts';
+import { adminFetch, clearAdminAuth, getAdminToken, getStoredAdminUser, safeJson } from './utils/adminAuth.ts';
+import { firestoreService } from './lib/firestoreService.ts';
 import './lib/firebase.ts';
 
 export default function App() {
@@ -56,17 +57,27 @@ export default function App() {
     // 1. Capture first-touch UTM attribution from URL query params
     captureUtmParams();
 
-    // 2. Fetch live site settings
+    // 2. Fetch live site settings from Firebase Firestore
+    firestoreService.getSettings().then(cloudSettings => {
+      if (cloudSettings) setSettings(cloudSettings);
+    }).catch(() => {});
+
+    const unsubSettings = firestoreService.subscribeToSettings((liveSettings) => {
+      if (liveSettings) setSettings(liveSettings);
+    });
+
     fetch('/api/settings')
-      .then(res => res.json())
-      .then(data => setSettings(data))
+      .then(safeJson)
+      .then(({ ok, data }) => {
+        if (ok && data) setSettings(prev => ({ ...prev, ...data }));
+      })
       .catch(() => {});
 
     // 3. Verify Admin session with bearer token support
     adminFetch('/api/admin/me')
-      .then(res => res.ok ? res.json() : null)
-      .then(data => {
-        if (data) {
+      .then(safeJson)
+      .then(({ ok, data }) => {
+        if (ok && data) {
           setAdminUser(data);
         } else {
           const stored = getStoredAdminUser();
@@ -88,7 +99,10 @@ export default function App() {
       setCurrentPath(window.location.pathname);
     };
     window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (typeof unsubSettings === 'function') unsubSettings();
+    };
   }, []);
 
   const navigate = (path: string) => {

@@ -10,6 +10,7 @@ import { getStoredUtm } from '../utils/utm.ts';
 import { fireLeadConversion, trackEvent } from '../utils/analytics.ts';
 import { LeadConfiguration, LeadSource } from '../types/index.ts';
 import { firestoreService } from '../lib/firestoreService.ts';
+import { safeJson } from '../utils/adminAuth.ts';
 
 interface HomePageProps {
   onOpenEnquiry: (contextTitle?: string, configuration?: string) => void;
@@ -57,34 +58,11 @@ export const HomePage: React.FC<HomePageProps> = ({
 
     try {
       const utmData = getStoredUtm();
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: heroName.trim(),
-          phone: cleanPhone,
-          email: heroEmail.trim() || undefined,
-          configuration: heroConfig,
-          source: 'hero_form' as LeadSource,
-          landingPage: '/',
-          consent: true,
-          utmSource: utmData?.utmSource,
-          utmMedium: utmData?.utmMedium,
-          utmCampaign: utmData?.utmCampaign,
-          utmTerm: utmData?.utmTerm,
-          utmContent: utmData?.utmContent,
-          gclid: utmData?.gclid,
-          fbclid: utmData?.fbclid
-        })
-      });
+      const generatedId = 'lead-' + Math.random().toString(36).substring(2, 9);
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Submission failed.');
-
-      fireLeadConversion({ configuration: heroConfig, source: 'hero_form', leadId: data.leadId });
-
-      firestoreService.saveLead({
-        id: data.leadId,
+      // 1. Direct Firebase Firestore save (guarantees lead is recorded instantly)
+      await firestoreService.saveLead({
+        id: generatedId,
         name: heroName.trim(),
         phone: cleanPhone,
         email: heroEmail.trim() || undefined,
@@ -95,7 +73,41 @@ export const HomePage: React.FC<HomePageProps> = ({
         consent: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
-      }).catch(console.error);
+      });
+
+      // 2. Sync to API backend with safeJson
+      let finalLeadId = generatedId;
+      try {
+        const res = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: heroName.trim(),
+            phone: cleanPhone,
+            email: heroEmail.trim() || undefined,
+            configuration: heroConfig,
+            source: 'hero_form' as LeadSource,
+            landingPage: '/',
+            consent: true,
+            utmSource: utmData?.utmSource,
+            utmMedium: utmData?.utmMedium,
+            utmCampaign: utmData?.utmCampaign,
+            utmTerm: utmData?.utmTerm,
+            utmContent: utmData?.utmContent,
+            gclid: utmData?.gclid,
+            fbclid: utmData?.fbclid
+          })
+        });
+
+        const { ok, data } = await safeJson(res);
+        if (ok && data?.leadId) {
+          finalLeadId = data.leadId;
+        }
+      } catch (apiErr) {
+        console.warn('API sync background notice:', apiErr);
+      }
+
+      fireLeadConversion({ configuration: heroConfig, source: 'hero_form', leadId: finalLeadId });
 
       try {
         confetti({
@@ -106,7 +118,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         });
       } catch (e) {}
 
-      onLeadSuccess(data.leadId);
+      onLeadSuccess(finalLeadId);
     } catch (err: any) {
       setHeroError(err.message || 'Error submitting details. Please try again.');
     } finally {
@@ -133,34 +145,11 @@ export const HomePage: React.FC<HomePageProps> = ({
 
     try {
       const utmData = getStoredUtm();
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: secName.trim(),
-          phone: cleanPhone,
-          email: secEmail.trim() || undefined,
-          configuration: secConfig,
-          source: 'modal' as LeadSource,
-          landingPage: '/',
-          consent: true,
-          utmSource: utmData?.utmSource,
-          utmMedium: utmData?.utmMedium,
-          utmCampaign: utmData?.utmCampaign,
-          utmTerm: utmData?.utmTerm,
-          utmContent: utmData?.utmContent,
-          gclid: utmData?.gclid,
-          fbclid: utmData?.fbclid
-        })
-      });
+      const generatedId = 'lead-' + Math.random().toString(36).substring(2, 9);
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Submission failed.');
-
-      fireLeadConversion({ configuration: secConfig, source: 'section_8_form', leadId: data.leadId });
-
-      firestoreService.saveLead({
-        id: data.leadId,
+      // 1. Direct Firebase Firestore save
+      await firestoreService.saveLead({
+        id: generatedId,
         name: secName.trim(),
         phone: cleanPhone,
         email: secEmail.trim() || undefined,
@@ -171,7 +160,41 @@ export const HomePage: React.FC<HomePageProps> = ({
         consent: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
-      }).catch(console.error);
+      });
+
+      // 2. Sync to API backend with safeJson
+      let finalLeadId = generatedId;
+      try {
+        const res = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: secName.trim(),
+            phone: cleanPhone,
+            email: secEmail.trim() || undefined,
+            configuration: secConfig,
+            source: 'modal' as LeadSource,
+            landingPage: '/',
+            consent: true,
+            utmSource: utmData?.utmSource,
+            utmMedium: utmData?.utmMedium,
+            utmCampaign: utmData?.utmCampaign,
+            utmTerm: utmData?.utmTerm,
+            utmContent: utmData?.utmContent,
+            gclid: utmData?.gclid,
+            fbclid: utmData?.fbclid
+          })
+        });
+
+        const { ok, data } = await safeJson(res);
+        if (ok && data?.leadId) {
+          finalLeadId = data.leadId;
+        }
+      } catch (apiErr) {
+        console.warn('API sync notice:', apiErr);
+      }
+
+      fireLeadConversion({ configuration: secConfig, source: 'section_8_form', leadId: finalLeadId });
 
       try {
         confetti({
@@ -182,7 +205,7 @@ export const HomePage: React.FC<HomePageProps> = ({
         });
       } catch (e) {}
 
-      onLeadSuccess(data.leadId);
+      onLeadSuccess(finalLeadId);
     } catch (err: any) {
       setSecError(err.message || 'Error submitting details.');
     } finally {

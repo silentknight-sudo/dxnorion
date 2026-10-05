@@ -6,8 +6,9 @@ import {
   UploadCloud, Loader2
 } from 'lucide-react';
 import { Post, Category } from '../../types/index.ts';
-import { adminFetch } from '../../utils/adminAuth.ts';
+import { adminFetch, safeJson } from '../../utils/adminAuth.ts';
 import { ImageUpload } from '../../components/admin/ImageUpload.tsx';
+import { firestoreService } from '../../lib/firestoreService.ts';
 
 interface AdminBlogEditorPageProps {
   onNavigatePublic: (path: string) => void;
@@ -62,16 +63,33 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
   };
 
   useEffect(() => {
+    // 1. Direct Firestore loading & subscription
+    firestoreService.getPosts().then(cloudPosts => {
+      if (cloudPosts && cloudPosts.length > 0) {
+        setPosts(cloudPosts);
+      }
+    }).catch(console.warn);
+
+    const unsubscribe = firestoreService.subscribeToPosts((livePosts) => {
+      if (livePosts && livePosts.length > 0) {
+        setPosts(livePosts);
+      }
+    });
+
     fetchPosts();
     fetchCategories();
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, []);
 
   const fetchPosts = async () => {
     setLoading(true);
     try {
       const res = await adminFetch('/api/posts?admin=true');
-      if (res.ok) {
-        const data = await res.json();
+      const { ok, data } = await safeJson(res);
+      if (ok && Array.isArray(data) && data.length > 0) {
         setPosts(data);
       }
     } catch (e) {
@@ -84,8 +102,8 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
   const fetchCategories = async () => {
     try {
       const res = await adminFetch('/api/categories');
-      if (res.ok) {
-        const data = await res.json();
+      const { ok, data } = await safeJson(res);
+      if (ok && Array.isArray(data)) {
         setCategories(data);
       }
     } catch (e) {}
@@ -124,26 +142,58 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
 
     try {
       const isNew = !editingPost.id;
-      const url = isNew ? '/api/posts' : `/api/posts/${editingPost.id}`;
-      const method = isNew ? 'POST' : 'PUT';
+      const postId = editingPost.id || ('post-' + Math.random().toString(36).substring(2, 9));
+      const now = new Date().toISOString();
 
-      const res = await adminFetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editingPost)
-      });
+      const postToSave: Post = {
+        id: postId,
+        title: editingPost.title || '',
+        slug: editingPost.slug || '',
+        excerpt: editingPost.excerpt || '',
+        contentHtml: editingPost.contentHtml || '',
+        coverImageUrl: editingPost.coverImageUrl || '',
+        coverImageAlt: editingPost.coverImageAlt || '',
+        status: editingPost.status || 'DRAFT',
+        publishedAt: editingPost.status === 'PUBLISHED' ? (editingPost.publishedAt || now) : null,
+        scheduledAt: null,
+        categoryId: editingPost.categoryId || 'cat-1',
+        categoryName: editingPost.categoryName || 'Location Guides',
+        authorId: editingPost.authorId || 'admin-1',
+        authorName: editingPost.authorName || 'DXN Orion Editorial Desk',
+        tags: editingPost.tags || ['Yamuna Expressway', 'Sector 22D'],
+        readingTime: editingPost.readingTime || 5,
+        views: editingPost.views || 0,
+        metaTitle: editingPost.metaTitle || editingPost.title || '',
+        metaDescription: editingPost.metaDescription || editingPost.excerpt || '',
+        focusKeyword: editingPost.focusKeyword || '',
+        faqJson: editingPost.faqJson || [],
+        noindex: editingPost.noindex || false,
+        createdAt: editingPost.createdAt || now,
+        updatedAt: now
+      };
 
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || 'Failed to save post.');
+      // 1. Direct Firebase Firestore save
+      await firestoreService.savePost(postToSave);
+
+      // 2. Server sync with safeJson
+      try {
+        const url = isNew ? '/api/posts' : `/api/posts/${postId}`;
+        const method = isNew ? 'POST' : 'PUT';
+        const res = await adminFetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(postToSave)
+        });
+        await safeJson(res);
+      } catch (apiErr) {
+        console.warn('API sync warning:', apiErr);
       }
 
-      const saved = await res.json();
       setSaveStatus('Saved at ' + new Date().toLocaleTimeString());
       fetchPosts();
-      setEditingPost(saved);
+      setEditingPost(postToSave);
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || 'Error saving post');
       setSaveStatus('Error saving');
     }
   };
@@ -151,11 +201,17 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
   const handleDeletePost = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this article?')) return;
     try {
-      const res = await adminFetch(`/api/posts/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        fetchPosts();
-        if (editingPost?.id === id) setEditingPost(null);
-      }
+      // 1. Delete from Firebase Firestore
+      await firestoreService.deletePost(id);
+
+      // 2. Server sync with safeJson
+      try {
+        const res = await adminFetch(`/api/posts/${id}`, { method: 'DELETE' });
+        await safeJson(res);
+      } catch {}
+
+      fetchPosts();
+      if (editingPost?.id === id) setEditingPost(null);
     } catch (e) {}
   };
 

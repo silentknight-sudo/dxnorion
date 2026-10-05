@@ -423,7 +423,15 @@ app.get('/api/tags', (_req: Request, res: Response) => {
   res.json(db.Tags.getAll());
 });
 
-app.get('/api/settings', (_req: Request, res: Response) => {
+app.get('/api/settings', async (_req: Request, res: Response) => {
+  try {
+    const { doc, getDoc } = await import('firebase/firestore');
+    const { db: firestore } = await import('./src/lib/firebase.ts');
+    const snap = await getDoc(doc(firestore, 'settings', 'default'));
+    if (snap.exists()) {
+      return res.json(snap.data());
+    }
+  } catch (e) {}
   res.json(db.Settings.get());
 });
 
@@ -789,7 +797,7 @@ app.post('/api/leads/bulk-action', requireAdmin, (req: Request, res: Response) =
 });
 
 // Admin Blog Management
-app.post('/api/posts', requireAdmin, (req: Request, res: Response) => {
+app.post('/api/posts', requireAdmin, async (req: Request, res: Response) => {
   const admin = (req as any).admin;
   const {
     title,
@@ -846,10 +854,16 @@ app.post('/api/posts', requireAdmin, (req: Request, res: Response) => {
     faqJson
   });
 
+  try {
+    const { doc, setDoc } = await import('firebase/firestore');
+    const { db: firestore } = await import('./src/lib/firebase.ts');
+    setDoc(doc(firestore, 'posts', post.id), post, { merge: true }).catch(() => {});
+  } catch (e) {}
+
   res.json(post);
 });
 
-app.put('/api/posts/:id', requireAdmin, (req: Request, res: Response) => {
+app.put('/api/posts/:id', requireAdmin, async (req: Request, res: Response) => {
   const post = db.Posts.findById(req.params.id);
   if (!post) return res.status(404).json({ error: 'Post not found.' });
 
@@ -859,11 +873,23 @@ app.put('/api/posts/:id', requireAdmin, (req: Request, res: Response) => {
   }
 
   const updated = db.Posts.update(req.params.id, updates);
+  try {
+    const { doc, setDoc } = await import('firebase/firestore');
+    const { db: firestore } = await import('./src/lib/firebase.ts');
+    setDoc(doc(firestore, 'posts', req.params.id), updated, { merge: true }).catch(() => {});
+  } catch (e) {}
+
   res.json(updated);
 });
 
-app.delete('/api/posts/:id', requireAdmin, (req: Request, res: Response) => {
+app.delete('/api/posts/:id', requireAdmin, async (req: Request, res: Response) => {
   const deleted = db.Posts.delete(req.params.id);
+  try {
+    const { doc, deleteDoc } = await import('firebase/firestore');
+    const { db: firestore } = await import('./src/lib/firebase.ts');
+    deleteDoc(doc(firestore, 'posts', req.params.id)).catch(() => {});
+  } catch (e) {}
+
   res.json({ success: deleted });
 });
 
@@ -892,8 +918,13 @@ app.delete('/api/redirects/:id', requireAdmin, (req: Request, res: Response) => 
 });
 
 // Admin Settings
-app.post('/api/settings', requireAdmin, (req: Request, res: Response) => {
+app.post('/api/settings', requireAdmin, async (req: Request, res: Response) => {
   const updated = db.Settings.update(req.body);
+  try {
+    const { doc, setDoc } = await import('firebase/firestore');
+    const { db: firestore } = await import('./src/lib/firebase.ts');
+    setDoc(doc(firestore, 'settings', 'default'), updated, { merge: true }).catch(() => {});
+  } catch (e) {}
   res.json(updated);
 });
 

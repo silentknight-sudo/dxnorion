@@ -5,6 +5,7 @@ import { getStoredUtm } from '../utils/utm.ts';
 import { fireLeadConversion } from '../utils/analytics.ts';
 import { LeadConfiguration, LeadSource } from '../types/index.ts';
 import { firestoreService } from '../lib/firestoreService.ts';
+import { safeJson } from '../utils/adminAuth.ts';
 
 interface LeadModalProps {
   isOpen: boolean;
@@ -52,38 +53,11 @@ export const LeadModal: React.FC<LeadModalProps> = ({
 
     try {
       const utmData = getStoredUtm();
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          phone: cleanPhone,
-          email: email.trim() || undefined,
-          configuration: config,
-          source: 'modal' as LeadSource,
-          landingPage: window.location.pathname,
-          consent: true,
-          utmSource: utmData?.utmSource,
-          utmMedium: utmData?.utmMedium,
-          utmCampaign: utmData?.utmCampaign,
-          utmTerm: utmData?.utmTerm,
-          utmContent: utmData?.utmContent,
-          gclid: utmData?.gclid,
-          fbclid: utmData?.fbclid,
-          website: honeypot // honeypot spam trap
-        })
-      });
+      const generatedId = 'lead-' + Math.random().toString(36).substring(2, 9);
 
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to submit enquiry.');
-      }
-
-      // Success! Fire conversion and confetti
-      fireLeadConversion({ configuration: config, source: 'modal', leadId: data.leadId });
-
-      firestoreService.saveLead({
-        id: data.leadId,
+      // 1. Direct Firebase Firestore save
+      await firestoreService.saveLead({
+        id: generatedId,
         name: name.trim(),
         phone: cleanPhone,
         email: email.trim() || undefined,
@@ -94,7 +68,43 @@ export const LeadModal: React.FC<LeadModalProps> = ({
         consent: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
-      }).catch(console.error);
+      });
+
+      // 2. Sync to API backend with safeJson
+      let finalLeadId = generatedId;
+      try {
+        const res = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name.trim(),
+            phone: cleanPhone,
+            email: email.trim() || undefined,
+            configuration: config,
+            source: 'modal' as LeadSource,
+            landingPage: window.location.pathname,
+            consent: true,
+            utmSource: utmData?.utmSource,
+            utmMedium: utmData?.utmMedium,
+            utmCampaign: utmData?.utmCampaign,
+            utmTerm: utmData?.utmTerm,
+            utmContent: utmData?.utmContent,
+            gclid: utmData?.gclid,
+            fbclid: utmData?.fbclid,
+            website: honeypot // honeypot spam trap
+          })
+        });
+
+        const { ok, data } = await safeJson(res);
+        if (ok && data?.leadId) {
+          finalLeadId = data.leadId;
+        }
+      } catch (apiErr) {
+        console.warn('API sync background notice:', apiErr);
+      }
+
+      // Success! Fire conversion and confetti
+      fireLeadConversion({ configuration: config, source: 'modal', leadId: finalLeadId });
 
       try {
         confetti({
@@ -108,7 +118,7 @@ export const LeadModal: React.FC<LeadModalProps> = ({
       setIsSuccess(true);
       if (onSuccessRedirect) {
         setTimeout(() => {
-          onSuccessRedirect(data.leadId);
+          onSuccessRedirect(finalLeadId);
         }, 1500);
       }
     } catch (err: any) {

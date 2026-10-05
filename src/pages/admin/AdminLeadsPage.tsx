@@ -5,7 +5,7 @@ import {
   Send, ExternalLink, AlertCircle, ArrowUpDown, RefreshCw, Bell, Sparkles
 } from 'lucide-react';
 import { Lead, LeadStatus, LeadConfiguration, LeadSource, LeadActivity } from '../../types/index.ts';
-import { adminFetch } from '../../utils/adminAuth.ts';
+import { adminFetch, safeJson } from '../../utils/adminAuth.ts';
 import { firestoreService } from '../../lib/firestoreService.ts';
 
 interface AdminLeadsPageProps {
@@ -117,8 +117,8 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
       if (search.trim()) url += `&search=${encodeURIComponent(search.trim())}`;
 
       const res = await adminFetch(url);
-      if (res.ok) {
-        const data = await res.json();
+      const { ok, data } = await safeJson(res);
+      if (ok && data) {
         const incoming: Lead[] = data.leads || [];
 
         // Detect newly arrived lead on background poll
@@ -144,8 +144,8 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
     setActiveLead(lead);
     try {
       const res = await adminFetch(`/api/leads/${lead.id}`);
-      if (res.ok) {
-        const data = await res.json();
+      const { ok, data } = await safeJson(res);
+      if (ok && data) {
         setActivities(data.activities || []);
       }
     } catch (e) {}
@@ -158,21 +158,28 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
 
   const handleUpdateStatus = async (leadId: string, newStatus: LeadStatus) => {
     try {
+      const targetLead = leads.find(l => l.id === leadId);
+      if (targetLead) {
+        const updatedLocal = { ...targetLead, status: newStatus, updatedAt: new Date().toISOString() };
+        // 1. Direct Firestore update
+        firestoreService.saveLead(updatedLocal).catch(console.warn);
+      }
+
       const res = await adminFetch(`/api/leads/${leadId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })
       });
-      if (res.ok) {
-        const updated = await res.json();
-        setLeads(leads.map(l => (l.id === leadId ? updated : l)));
+      const { ok, data } = await safeJson(res);
+      if (ok && data) {
+        setLeads(leads.map(l => (l.id === leadId ? data : l)));
         if (activeLead && activeLead.id === leadId) {
-          setActiveLead(updated);
+          setActiveLead(data);
           // Refresh activities
           const actRes = await adminFetch(`/api/leads/${leadId}`);
-          if (actRes.ok) {
-            const data = await actRes.json();
-            setActivities(data.activities || []);
+          const { ok: actOk, data: actData } = await safeJson(actRes);
+          if (actOk && actData) {
+            setActivities(actData.activities || []);
           }
         }
       }
@@ -184,31 +191,49 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
     if (!activeLead || !newNote.trim()) return;
 
     try {
+      const newAct: LeadActivity = {
+        id: 'act-' + Math.random().toString(36).substring(2, 9),
+        leadId: activeLead.id,
+        type: noteType,
+        content: newNote.trim(),
+        createdAt: new Date().toISOString()
+      };
+
+      // 1. Direct Firestore save
+      firestoreService.saveActivity(newAct).catch(console.warn);
+
       const res = await adminFetch(`/api/leads/${activeLead.id}/activity`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ type: noteType, content: newNote.trim() })
       });
-      if (res.ok) {
-        const act = await res.json();
-        setActivities([act, ...activities]);
-        setNewNote('');
+      const { ok, data } = await safeJson(res);
+      if (ok && data) {
+        setActivities([data, ...activities]);
+      } else {
+        setActivities([newAct, ...activities]);
       }
+      setNewNote('');
     } catch (e) {}
   };
 
   const handleBulkStatus = async (status: LeadStatus) => {
     if (selectedIds.length === 0) return;
     try {
+      // 1. Update each in Firestore
+      selectedIds.forEach(id => {
+        const l = leads.find(item => item.id === id);
+        if (l) firestoreService.saveLead({ ...l, status, updatedAt: new Date().toISOString() }).catch(() => {});
+      });
+
       const res = await adminFetch('/api/leads/bulk-action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'STATUS_CHANGE', ids: selectedIds, status })
       });
-      if (res.ok) {
-        setSelectedIds([]);
-        fetchLeads();
-      }
+      await safeJson(res);
+      setSelectedIds([]);
+      fetchLeads();
     } catch (e) {}
   };
 
@@ -217,15 +242,19 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
     if (!confirm(`Are you sure you want to permanently delete ${selectedIds.length} leads?`)) return;
 
     try {
+      // 1. Direct Firestore delete
+      for (const id of selectedIds) {
+        await firestoreService.deleteLead(id);
+      }
+
       const res = await adminFetch('/api/leads/bulk-action', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'DELETE', ids: selectedIds })
       });
-      if (res.ok) {
-        setSelectedIds([]);
-        fetchLeads();
-      }
+      await safeJson(res);
+      setSelectedIds([]);
+      fetchLeads();
     } catch (e) {}
   };
 

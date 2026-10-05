@@ -44,6 +44,35 @@ export function getAdminAuthHeaders(customHeaders: Record<string, string> = {}):
   return headers;
 }
 
+export async function safeJson<T = any>(res: Response): Promise<{ ok: boolean; data: T | null; error?: string }> {
+  try {
+    const text = await res.text();
+    if (!text || text.trim() === '') {
+      return { ok: res.ok, data: null };
+    }
+    const trimmed = text.trim();
+    if (trimmed.startsWith('<') || trimmed.startsWith('A server error') || trimmed.startsWith('Internal Server Error')) {
+      return {
+        ok: false,
+        data: null,
+        error: `Server returned an error (${res.status}). Please check network or reload.`
+      };
+    }
+    const parsed = JSON.parse(text);
+    return {
+      ok: res.ok,
+      data: parsed,
+      error: parsed?.error || (!res.ok ? `Request failed (${res.status})` : undefined)
+    };
+  } catch {
+    return {
+      ok: false,
+      data: null,
+      error: !res.ok ? `Server error (${res.status}).` : 'Invalid response from server.'
+    };
+  }
+}
+
 export async function adminFetch(url: string, options: RequestInit = {}): Promise<Response> {
   const existingHeaders = (options.headers as Record<string, string>) || {};
   const token = getAdminToken();

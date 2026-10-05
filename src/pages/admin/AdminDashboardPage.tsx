@@ -4,7 +4,8 @@ import {
   Filter, FileText, Eye, Clock, Phone, Sparkles, RefreshCw, AlertCircle
 } from 'lucide-react';
 import { LeadStatus } from '../../types/index.ts';
-import { adminFetch, getAdminToken } from '../../utils/adminAuth.ts';
+import { adminFetch, getAdminToken, safeJson } from '../../utils/adminAuth.ts';
+import { firestoreService } from '../../lib/firestoreService.ts';
 
 interface AdminDashboardPageProps {
   onNavigateTab: (tab: string, filterStatus?: string) => void;
@@ -34,21 +35,56 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     setErrorMessage(null);
     try {
       const res = await adminFetch('/api/admin/stats');
-      if (res.ok) {
-        const data = await res.json();
+      const { ok, data, error } = await safeJson(res);
+      if (ok && data) {
         setStats(data);
         return;
       }
       
-      // If 401, session might need renewal
+      // Fallback: Compute metrics directly from Firebase Firestore leads
+      try {
+        const firestoreLeads = await firestoreService.getLeads();
+        const valid = firestoreLeads.filter(l => 
+          l.name && !['Vikram Malhotra', 'Ananya Deshmukh', 'Col. Rajeshwar Singh (Retd.)', 'Kavita Chawla', 'Deepak Agrawal', 'Test User', 'TEST', 'Test'].includes(l.name)
+        );
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+        const weekStart = now.getTime() - 7 * 24 * 60 * 60 * 1000;
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+
+        const statusCounts: Record<LeadStatus, number> = {
+          NEW: 0, CONTACTED: 0, INTERESTED: 0, SITE_VISIT: 0, CLOSED: 0, NOT_INTERESTED: 0
+        };
+        valid.forEach(l => {
+          if (statusCounts[l.status] !== undefined) statusCounts[l.status]++;
+        });
+
+        const fallbackStats = {
+          totalLeads: valid.length,
+          leadsToday: valid.filter(l => new Date(l.createdAt).getTime() >= todayStart).length,
+          leadsThisWeek: valid.filter(l => new Date(l.createdAt).getTime() >= weekStart).length,
+          leadsThisMonth: valid.filter(l => new Date(l.createdAt).getTime() >= monthStart).length,
+          conversionRate: valid.length ? Math.round((statusCounts.CLOSED / valid.length) * 100) : 0,
+          statusCounts,
+          sourceCounts: {},
+          campaignCounts: {},
+          recentLeads: valid.slice(0, 10),
+          topPosts: []
+        };
+        setStats(fallbackStats);
+        return;
+      } catch (cloudErr) {
+        console.warn('Firestore fallback stats warning:', cloudErr);
+      }
+
       if (res.status === 401) {
         setErrorMessage('Session expired or unauthorized. Please re-authenticate.');
       } else {
-        setErrorMessage(`Server error (${res.status}). Unable to fetch metrics.`);
+        setErrorMessage(error || `Server status ${res.status}.`);
       }
     } catch (e: any) {
       console.error('fetchStats error:', e);
-      setErrorMessage(e.message || 'Network error fetching metrics.');
+      setErrorMessage(e.message || 'Error fetching metrics.');
     } finally {
       setLoading(false);
     }

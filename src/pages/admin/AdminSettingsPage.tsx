@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Save, Lock, ShieldCheck, Check, AlertCircle } from 'lucide-react';
 import { SiteSettings } from '../../types/index.ts';
-import { adminFetch } from '../../utils/adminAuth.ts';
+import { adminFetch, safeJson } from '../../utils/adminAuth.ts';
+import { firestoreService } from '../../lib/firestoreService.ts';
 
 interface AdminSettingsPageProps {
   onSettingsUpdated: (settings: SiteSettings) => void;
@@ -30,10 +31,35 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
   const [pwStatus, setPwStatus] = useState<string | null>(null);
 
   useEffect(() => {
+    // 1. Load directly from Firebase Firestore
+    firestoreService.getSettings().then(cloudSettings => {
+      if (cloudSettings) {
+        setSettings(cloudSettings);
+        onSettingsUpdated(cloudSettings);
+      }
+    }).catch(console.warn);
+
+    // 2. Real-time Firestore sync
+    const unsubscribe = firestoreService.subscribeToSettings((liveSettings) => {
+      if (liveSettings) {
+        setSettings(liveSettings);
+        onSettingsUpdated(liveSettings);
+      }
+    });
+
+    // 3. Fallback check from API with safeJson
     fetch('/api/settings')
-      .then(res => res.json())
-      .then(data => setSettings(data))
-      .catch(console.error);
+      .then(safeJson)
+      .then(({ ok, data }) => {
+        if (ok && data) {
+          setSettings(prev => ({ ...prev, ...data }));
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      if (typeof unsubscribe === 'function') unsubscribe();
+    };
   }, []);
 
   const handleSaveSettings = async (e: React.FormEvent) => {
@@ -42,19 +68,38 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
     setSavedSuccess(false);
 
     try {
-      const res = await adminFetch('/api/settings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(settings)
-      });
-      if (res.ok) {
-        const data = await res.json();
-        setSettings(data);
-        onSettingsUpdated(data);
-        setSavedSuccess(true);
-        setTimeout(() => setSavedSuccess(false), 3000);
+      const updated = {
+        ...settings,
+        updatedAt: new Date().toISOString()
+      };
+
+      // 1. Direct Firebase Firestore save
+      await firestoreService.saveSettings(updated);
+
+      // 2. Server API sync with safeJson
+      try {
+        const res = await adminFetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updated)
+        });
+        const { ok, data } = await safeJson(res);
+        if (ok && data) {
+          setSettings(data);
+          onSettingsUpdated(data);
+        } else {
+          setSettings(updated);
+          onSettingsUpdated(updated);
+        }
+      } catch {
+        setSettings(updated);
+        onSettingsUpdated(updated);
       }
-    } catch (e) {
+
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
+    } catch (e: any) {
+      console.error('Error saving settings:', e);
     } finally {
       setSaving(false);
     }
@@ -79,15 +124,15 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ newPassword })
       });
-      const data = await res.json();
-      if (res.ok) {
+      const { ok, data, error } = await safeJson(res);
+      if (ok) {
         setPwStatus('Success: Admin password updated successfully.');
         setNewPassword('');
         setConfirmPassword('');
       } else {
-        setPwStatus(`Error: ${data.error || 'Failed to update'}`);
+        setPwStatus(`Error: ${error || data?.error || 'Failed to update password'}`);
       }
-    } catch (e: any) {
+    } catch {
       setPwStatus('Error updating password.');
     }
   };

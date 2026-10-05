@@ -5,6 +5,7 @@ import { getStoredUtm } from '../utils/utm.ts';
 import { fireLeadConversion } from '../utils/analytics.ts';
 import { LeadConfiguration, LeadSource } from '../types/index.ts';
 import { firestoreService } from '../lib/firestoreService.ts';
+import { safeJson } from '../utils/adminAuth.ts';
 
 interface ContactPageProps {
   onLeadSuccess: (leadId: string) => void;
@@ -49,35 +50,11 @@ export const ContactPage: React.FC<ContactPageProps> = ({
 
     try {
       const utmData = getStoredUtm();
-      const res = await fetch('/api/leads', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: name.trim(),
-          phone: cleanUserPhone,
-          email: userEmail.trim() || undefined,
-          configuration: config,
-          message: message.trim() || undefined,
-          source: 'contact_page' as LeadSource,
-          landingPage: '/contact',
-          consent: true,
-          utmSource: utmData?.utmSource,
-          utmMedium: utmData?.utmMedium,
-          utmCampaign: utmData?.utmCampaign,
-          utmTerm: utmData?.utmTerm,
-          utmContent: utmData?.utmContent,
-          gclid: utmData?.gclid,
-          fbclid: utmData?.fbclid
-        })
-      });
+      const generatedId = 'lead-' + Math.random().toString(36).substring(2, 9);
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Submission failed.');
-
-      fireLeadConversion({ configuration: config, source: 'contact_page', leadId: data.leadId });
-
-      firestoreService.saveLead({
-        id: data.leadId,
+      // 1. Direct Firebase Firestore save
+      await firestoreService.saveLead({
+        id: generatedId,
         name: name.trim(),
         phone: cleanUserPhone,
         email: userEmail.trim() || undefined,
@@ -89,7 +66,42 @@ export const ContactPage: React.FC<ContactPageProps> = ({
         consent: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
-      }).catch(console.error);
+      });
+
+      // 2. Sync to API backend with safeJson
+      let finalLeadId = generatedId;
+      try {
+        const res = await fetch('/api/leads', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: name.trim(),
+            phone: cleanUserPhone,
+            email: userEmail.trim() || undefined,
+            configuration: config,
+            message: message.trim() || undefined,
+            source: 'contact_page' as LeadSource,
+            landingPage: '/contact',
+            consent: true,
+            utmSource: utmData?.utmSource,
+            utmMedium: utmData?.utmMedium,
+            utmCampaign: utmData?.utmCampaign,
+            utmTerm: utmData?.utmTerm,
+            utmContent: utmData?.utmContent,
+            gclid: utmData?.gclid,
+            fbclid: utmData?.fbclid
+          })
+        });
+
+        const { ok, data } = await safeJson(res);
+        if (ok && data?.leadId) {
+          finalLeadId = data.leadId;
+        }
+      } catch (apiErr) {
+        console.warn('API sync notice:', apiErr);
+      }
+
+      fireLeadConversion({ configuration: config, source: 'contact_page', leadId: finalLeadId });
 
       try {
         confetti({
@@ -100,7 +112,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
         });
       } catch (e) {}
 
-      onLeadSuccess(data.leadId);
+      onLeadSuccess(finalLeadId);
     } catch (err: any) {
       setError(err.message || 'Error sending message. Please try again.');
     } finally {
