@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  FileText, Plus, Edit3, Trash2, Eye, ExternalLink, Check, AlertCircle,
-  Save, Sparkles, Smartphone, Monitor, Globe, HelpCircle, Tag as TagIcon,
-  Heading2, Heading3, Bold, Italic, List, Quote, MessageSquare, Image, Youtube,
-  UploadCloud, Loader2
+  Plus, Edit3, Trash2, Eye, ExternalLink, X, Bold, Italic,
+  List, ListOrdered, Quote, Code, Link as LinkIcon, Image as ImageIcon,
+  Undo, Redo, Sparkles, Check, Loader2, Minus, FileText, UploadCloud,
+  CheckCircle2, RefreshCw
 } from 'lucide-react';
 import { Post, Category } from '../../types/index.ts';
 import { adminFetch, safeJson } from '../../utils/adminAuth.ts';
-import { ImageUpload } from '../../components/admin/ImageUpload.tsx';
 import { firestoreService } from '../../lib/firestoreService.ts';
 
 interface AdminBlogEditorPageProps {
@@ -19,51 +18,32 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Edit Mode state
+  // Main Modal State for Create/Edit
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPost, setEditingPost] = useState<Partial<Post> | null>(null);
-  const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
-  const [showLivePreview, setShowLivePreview] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<string>('All changes saved');
+  const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<string | null>(null);
 
-  // Inline content image upload ref
-  const inlineImageInputRef = useRef<HTMLInputElement>(null);
-  const [inlineUploading, setInlineUploading] = useState(false);
+  // Content Textarea Ref & History for Undo/Redo
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [history, setHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
 
-  const handleInlineImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !editingPost) return;
+  // Dedicated Insert Image Dialog State
+  const [isImageModalOpen, setIsImageModalOpen] = useState(false);
+  const [imageTab, setImageTab] = useState<'upload' | 'url'>('upload');
+  const [imageUploadLoading, setImageUploadLoading] = useState(false);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>('');
+  const [imageAltText, setImageAltText] = useState<string>('');
+  const [imageAsCover, setImageAsCover] = useState<boolean>(false);
+  const [imageError, setImageError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const coverFileInputRef = useRef<HTMLInputElement>(null);
+  const [coverUploading, setCoverUploading] = useState(false);
 
-    setInlineUploading(true);
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      try {
-        const base64Data = ev.target?.result as string;
-        const res = await adminFetch('/api/admin/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: base64Data,
-            filename: file.name
-          })
-        });
-        const data = await res.json();
-        if (res.ok && data.url) {
-          const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-          const imgSnippet = `\n<figure class="my-6">\n  <img src="${data.url}" alt="${cleanName}" class="w-full rounded-2xl border border-[#C9A86A]/30 shadow-xl object-cover max-h-96" />\n  <figcaption class="text-xs text-center text-[#94A3B8] mt-2 italic">${cleanName}</figcaption>\n</figure>\n`;
-          insertSnippet(imgSnippet);
-        }
-      } catch (err) {
-        console.error('Inline upload failed', err);
-      } finally {
-        setInlineUploading(false);
-        if (inlineImageInputRef.current) inlineImageInputRef.current.value = '';
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
+  // Real-time Firestore sync & load
   useEffect(() => {
-    // 1. Direct Firestore loading & subscription
     firestoreService.getPosts().then(cloudPosts => {
       if (cloudPosts && cloudPosts.length > 0) {
         setPosts(cloudPosts);
@@ -109,15 +89,16 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
     } catch (e) {}
   };
 
-  const handleCreateNew = () => {
-    setEditingPost({
+  // Open modal for new post
+  const handleOpenNewModal = () => {
+    const newDraft: Partial<Post> = {
       title: '',
       slug: '',
       excerpt: '',
-      contentHtml: '<h2>Overview</h2><p>Write your detailed analysis regarding Sector 22D or Yamuna Expressway real estate here...</p>',
-      coverImageUrl: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD5pTukeE2hQkmXut-7c8iJ0yI61f-uCHv8VYP7ZWazC1nbxF-o6pZvc6bFD3qPLWuYYhW71XwY4fTfHHwN1OAV-ys3BryEpwm_4AYB9zjJIhanugWiuBmzXz-WNtiCeUe6JUKF21nViuaD5Uwoz001Z1sooeyVwR4Dj4g2gtzSFZZ49Rn8E8ypv6H5ci2hAfbohZCltgRHA0jBdnC5NS4fCMwyvXMc1bhWpY6IKdHJeF8ZetQ9hb3d',
-      coverImageAlt: 'Luxury residences Sector 22D Yamuna Expressway',
-      status: 'DRAFT',
+      contentHtml: '',
+      coverImageUrl: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&auto=format&fit=crop',
+      coverImageAlt: 'DXN Orion Residences Sector 22D',
+      status: 'PUBLISHED',
       categoryId: categories[0]?.id || 'cat-1',
       categoryName: categories[0]?.name || 'Location Guides',
       tags: ['Yamuna Expressway', 'Sector 22D'],
@@ -126,44 +107,324 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
       metaDescription: '',
       focusKeyword: '',
       noindex: false,
-      faqJson: [
-        { question: 'What makes Sector 22D prime for property investment?', answer: 'Sector 22D is located just 15 minutes from Jewar Airport and 8 minutes from Film City with low-density golf layouts.' }
-      ]
+      faqJson: []
+    };
+    setEditingPost(newDraft);
+    setHistory(['']);
+    setHistoryIndex(0);
+    setIsPreviewMode(false);
+    setSaveStatus(null);
+    setIsModalOpen(true);
+  };
+
+  // Open modal for editing existing post
+  const handleOpenEditModal = (post: Post) => {
+    setEditingPost({ ...post });
+    setHistory([post.contentHtml || '']);
+    setHistoryIndex(0);
+    setIsPreviewMode(false);
+    setSaveStatus(null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setEditingPost(null);
+    setIsPreviewMode(false);
+    setIsImageModalOpen(false);
+  };
+
+  const handleTitleChange = (newTitle: string) => {
+    if (!editingPost) return;
+    const currentSlug = editingPost.slug || '';
+    const oldTitle = editingPost.title || '';
+    const shouldUpdateSlug = !currentSlug || currentSlug === generateSlug(oldTitle);
+    
+    setEditingPost({
+      ...editingPost,
+      title: newTitle,
+      metaTitle: editingPost.metaTitle || newTitle,
+      slug: shouldUpdateSlug ? generateSlug(newTitle) : currentSlug
     });
   };
 
-  const handleSavePost = async () => {
-    if (!editingPost || !editingPost.title || !editingPost.slug) {
-      alert('Please provide at least a title and URL slug.');
+  const generateSlug = (str: string) => {
+    return str
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
+
+  const handleContentChange = (newContent: string) => {
+    if (!editingPost) return;
+    setEditingPost({ ...editingPost, contentHtml: newContent });
+    
+    const newHistory = history.slice(0, historyIndex + 1);
+    newHistory.push(newContent);
+    setHistory(newHistory);
+    setHistoryIndex(newHistory.length - 1);
+  };
+
+  // Toolbar Actions (Inserting HTML / markdown tags)
+  const applyFormatting = (before: string, after: string = '', defaultText: string = 'text') => {
+    const textarea = textareaRef.current;
+    if (!textarea || !editingPost) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const currentText = editingPost.contentHtml || '';
+    const selectedText = currentText.substring(start, end) || defaultText;
+
+    const replacement = `${before}${selectedText}${after}`;
+    const updatedContent = currentText.substring(0, start) + replacement + currentText.substring(end);
+
+    handleContentChange(updatedContent);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
+    }, 10);
+  };
+
+  // Open Image Modal
+  const openImageModal = () => {
+    setImagePreviewUrl('');
+    setImageAltText('');
+    setImageAsCover(false);
+    setImageError(null);
+    setImageTab('upload');
+    setIsImageModalOpen(true);
+  };
+
+  // Upload an image file through backend API with fallback
+  const uploadImageFile = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        try {
+          const base64Data = e.target?.result as string;
+          if (!base64Data) {
+            throw new Error('Failed to read image file.');
+          }
+
+          // Try uploading to server
+          try {
+            const res = await adminFetch('/api/admin/upload', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                image: base64Data,
+                filename: file.name
+              })
+            });
+            const { ok, data } = await safeJson(res);
+            if (ok && data?.url) {
+              resolve(data.url);
+              return;
+            }
+          } catch (err) {
+            console.warn('Server upload notice, using persistent base64:', err);
+          }
+
+          // Fallback to base64 data URL so it never fails
+          resolve(base64Data);
+        } catch (err) {
+          reject(err);
+        }
+      };
+      reader.onerror = () => reject(new Error('File reader error'));
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Handle image file selection in the Insert Image Dialog
+  const handleImageFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setImageError(null);
+    setImageUploadLoading(true);
+
+    try {
+      const cleanName = file.name
+        .replace(/\.[^/.]+$/, '')
+        .replace(/[-_]/g, ' ')
+        .trim();
+      setImageAltText(cleanName);
+
+      const url = await uploadImageFile(file);
+      setImagePreviewUrl(url);
+    } catch (err: any) {
+      setImageError(err.message || 'Error processing image.');
+    } finally {
+      setImageUploadLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // Handle Cover Image upload
+  const handleCoverFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingPost) return;
+
+    setCoverUploading(true);
+    try {
+      const url = await uploadImageFile(file);
+      const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ').trim();
+      setEditingPost({
+        ...editingPost,
+        coverImageUrl: url,
+        coverImageAlt: cleanName
+      });
+    } catch (err) {
+      console.error('Cover upload error:', err);
+    } finally {
+      setCoverUploading(false);
+      if (coverFileInputRef.current) coverFileInputRef.current.value = '';
+    }
+  };
+
+  // Insert image into article from the dialog
+  const handleInsertImageIntoContent = () => {
+    if (!imagePreviewUrl.trim()) {
+      setImageError('Please select or enter an image URL.');
       return;
     }
 
-    setSaveStatus('Saving changes...');
+    const alt = imageAltText.trim() || 'Blog Illustration';
+    const figureHtml = `\n<figure class="my-6">\n  <img src="${imagePreviewUrl.trim()}" alt="${alt}" class="w-full rounded-2xl object-cover max-h-96 shadow-md" />\n  <figcaption class="text-xs text-center text-slate-500 mt-2 italic">${alt}</figcaption>\n</figure>\n`;
+
+    applyFormatting(figureHtml, '', '');
+
+    if (imageAsCover && editingPost) {
+      setEditingPost({
+        ...editingPost,
+        coverImageUrl: imagePreviewUrl.trim(),
+        coverImageAlt: alt
+      });
+    }
+
+    setIsImageModalOpen(false);
+    setImagePreviewUrl('');
+    setImageAltText('');
+  };
+
+  const handleToolbarAction = (type: string) => {
+    switch (type) {
+      case 'bold':
+        applyFormatting('<strong>', '</strong>', 'bold text');
+        break;
+      case 'italic':
+        applyFormatting('<em>', '</em>', 'italic text');
+        break;
+      case 'h1':
+        applyFormatting('<h1>', '</h1>', 'Heading 1');
+        break;
+      case 'h2':
+        applyFormatting('<h2>', '</h2>', 'Heading 2');
+        break;
+      case 'h3':
+        applyFormatting('<h3>', '</h3>', 'Heading 3');
+        break;
+      case 'ul':
+        applyFormatting('<ul>\n  <li>', '</li>\n  <li>List item 2</li>\n</ul>', 'List item 1');
+        break;
+      case 'ol':
+        applyFormatting('<ol>\n  <li>', '</li>\n  <li>Step 2</li>\n</ol>', 'Step 1');
+        break;
+      case 'quote':
+        applyFormatting('<blockquote>', '</blockquote>', 'Notable insight or quote...');
+        break;
+      case 'code':
+        applyFormatting('<pre><code>', '</code></pre>', '// Code snippet here');
+        break;
+      case 'link': {
+        const url = prompt('Enter URL:', 'https://');
+        if (url) {
+          applyFormatting(`<a href="${url}" target="_blank" rel="noopener noreferrer">`, '</a>', 'Link Text');
+        }
+        break;
+      }
+      case 'hr':
+        applyFormatting('\n<hr class="my-6 border-slate-200" />\n', '', '');
+        break;
+      case 'image':
+        openImageModal();
+        break;
+      case 'clear':
+        if (textareaRef.current) {
+          const start = textareaRef.current.selectionStart;
+          const end = textareaRef.current.selectionEnd;
+          const currentText = editingPost?.contentHtml || '';
+          const selected = currentText.substring(start, end);
+          const cleaned = selected.replace(/<[^>]*>/g, '');
+          const updated = currentText.substring(0, start) + cleaned + currentText.substring(end);
+          handleContentChange(updated);
+        }
+        break;
+      case 'undo':
+        if (historyIndex > 0) {
+          const prev = history[historyIndex - 1];
+          setHistoryIndex(historyIndex - 1);
+          setEditingPost(prevPost => prevPost ? { ...prevPost, contentHtml: prev } : null);
+        }
+        break;
+      case 'redo':
+        if (historyIndex < history.length - 1) {
+          const next = history[historyIndex + 1];
+          setHistoryIndex(historyIndex + 1);
+          setEditingPost(prevPost => prevPost ? { ...prevPost, contentHtml: next } : null);
+        }
+        break;
+      default:
+        break;
+    }
+  };
+
+  // Word count calculator
+  const calculateWords = (html: string = '') => {
+    const textOnly = html.replace(/<[^>]+>/g, ' ').trim();
+    if (!textOnly) return 0;
+    return textOnly.split(/\s+/).filter(Boolean).length;
+  };
+
+  const currentWords = calculateWords(editingPost?.contentHtml || '');
+
+  // Save Post to Firebase & Server API
+  const handleSavePost = async () => {
+    if (!editingPost || !editingPost.title?.trim()) {
+      alert('Please enter a Blog Title.');
+      return;
+    }
+
+    setSaving(true);
+    setSaveStatus('Saving article...');
 
     try {
       const isNew = !editingPost.id;
       const postId = editingPost.id || ('post-' + Math.random().toString(36).substring(2, 9));
       const now = new Date().toISOString();
+      const slug = editingPost.slug?.trim() || generateSlug(editingPost.title);
 
       const postToSave: Post = {
         id: postId,
-        title: editingPost.title || '',
-        slug: editingPost.slug || '',
+        title: editingPost.title.trim(),
+        slug,
         excerpt: editingPost.excerpt || '',
         contentHtml: editingPost.contentHtml || '',
-        coverImageUrl: editingPost.coverImageUrl || '',
-        coverImageAlt: editingPost.coverImageAlt || '',
-        status: editingPost.status || 'DRAFT',
+        coverImageUrl: editingPost.coverImageUrl || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=1200&auto=format&fit=crop',
+        coverImageAlt: editingPost.coverImageAlt || editingPost.title,
+        status: editingPost.status || 'PUBLISHED',
         publishedAt: editingPost.status === 'PUBLISHED' ? (editingPost.publishedAt || now) : null,
         scheduledAt: null,
         categoryId: editingPost.categoryId || 'cat-1',
         categoryName: editingPost.categoryName || 'Location Guides',
         authorId: editingPost.authorId || 'admin-1',
         authorName: editingPost.authorName || 'DXN Orion Editorial Desk',
-        tags: editingPost.tags || ['Yamuna Expressway', 'Sector 22D'],
-        readingTime: editingPost.readingTime || 5,
+        tags: editingPost.focusKeyword ? editingPost.focusKeyword.split(',').map(s => s.trim()) : (editingPost.tags || ['Yamuna Expressway']),
+        readingTime: Math.max(1, Math.ceil(currentWords / 200)),
         views: editingPost.views || 0,
-        metaTitle: editingPost.metaTitle || editingPost.title || '',
+        metaTitle: editingPost.metaTitle || editingPost.title,
         metaDescription: editingPost.metaDescription || editingPost.excerpt || '',
         focusKeyword: editingPost.focusKeyword || '',
         faqJson: editingPost.faqJson || [],
@@ -186,527 +447,668 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
         });
         await safeJson(res);
       } catch (apiErr) {
-        console.warn('API sync warning:', apiErr);
+        console.warn('API sync background notice:', apiErr);
       }
 
-      setSaveStatus('Saved at ' + new Date().toLocaleTimeString());
+      setSaveStatus('Saved successfully!');
       fetchPosts();
-      setEditingPost(postToSave);
+      setTimeout(() => {
+        handleCloseModal();
+      }, 600);
     } catch (err: any) {
       alert(err.message || 'Error saving post');
       setSaveStatus('Error saving');
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleDeletePost = async (id: string) => {
     if (!confirm('Are you sure you want to permanently delete this article?')) return;
     try {
-      // 1. Delete from Firebase Firestore
       await firestoreService.deletePost(id);
-
-      // 2. Server sync with safeJson
       try {
         const res = await adminFetch(`/api/posts/${id}`, { method: 'DELETE' });
         await safeJson(res);
       } catch {}
-
       fetchPosts();
-      if (editingPost?.id === id) setEditingPost(null);
     } catch (e) {}
   };
 
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '');
-  };
-
-  // Block Insertion Helpers
-  const insertSnippet = (snippet: string) => {
-    if (!editingPost) return;
-    setEditingPost({
-      ...editingPost,
-      contentHtml: (editingPost.contentHtml || '') + '\n' + snippet
-    });
-  };
-
-  // Live SEO Calculations
-  const titleLen = editingPost?.metaTitle?.length || 0;
-  const descLen = editingPost?.metaDescription?.length || 0;
-  const keyword = (editingPost?.focusKeyword || '').toLowerCase();
-  const content = editingPost?.contentHtml || '';
-
-  const hasKeywordInTitle = keyword ? (editingPost?.title || '').toLowerCase().includes(keyword) : false;
-  const hasKeywordInMeta = keyword ? (editingPost?.metaDescription || '').toLowerCase().includes(keyword) : false;
-  const hasKeywordInSlug = keyword ? (editingPost?.slug || '').toLowerCase().includes(keyword.replace(/\s+/g, '-')) : false;
-  const hasH2 = content.includes('<h2>');
-  const wordCount = content.replace(/<[^>]+>/g, ' ').split(/\s+/).filter(Boolean).length;
-  const hasGoodLength = wordCount >= 300;
-
   return (
     <div className="space-y-6">
-      {/* View 1: Blog Post List */}
-      {!editingPost ? (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between pb-3 border-b border-white/10">
-            <div>
-              <h2 className="font-serif font-bold text-xl text-[#F7F4EE]">
-                Blog Management &amp; Content Studio
-              </h2>
-              <p className="text-xs text-[#94A3B8]">
-                Publish high-ranking SEO guides for Yamuna Expressway, Jewar Airport, and Sector 22D searches.
-              </p>
-            </div>
-            <button
-              onClick={handleCreateNew}
-              className="py-2 px-4 rounded-xl gold-gradient-bg text-[#0B1426] font-bold text-xs flex items-center gap-1.5 shadow-md shadow-[#C9A86A]/20 cursor-pointer active:scale-95"
-            >
-              <Plus className="w-4 h-4 text-[#0B1426]" />
-              <span>Create New Article</span>
-            </button>
-          </div>
+      {/* Top Header matching background of screenshot */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+        <div>
+          <h1 className="font-serif font-bold text-2xl text-[#F7F4EE]">
+            Blog Management
+          </h1>
+          <p className="text-xs text-[#94A3B8] mt-1">
+            Create, edit, and publish search-optimized property guides.
+          </p>
+        </div>
+        <button
+          onClick={handleOpenNewModal}
+          className="py-2.5 px-4 rounded-xl gold-gradient-bg text-[#0B1426] font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-[#C9A86A]/20 cursor-pointer active:scale-95 transition"
+        >
+          <Plus className="w-4 h-4 text-[#0B1426]" />
+          <span>Create New Blog Post</span>
+        </button>
+      </div>
 
-          <div className="grid gap-3">
-            {posts.map((post) => (
+      {/* Posts List Cards matching background in screenshot */}
+      <div className="space-y-3">
+        {loading && posts.length === 0 ? (
+          <div className="py-16 text-center text-xs text-[#94A3B8]">Loading articles...</div>
+        ) : posts.length === 0 ? (
+          <div className="py-16 text-center glass-panel rounded-2xl border border-white/10 p-8 space-y-3">
+            <FileText className="w-10 h-10 text-[#C9A86A]/60 mx-auto" />
+            <p className="text-sm text-[#F7F4EE] font-medium">No blog posts published yet.</p>
+            <p className="text-xs text-[#94A3B8]">Click "Create New Blog Post" to add your first article.</p>
+          </div>
+        ) : (
+          posts.map((post) => {
+            const words = calculateWords(post.contentHtml);
+            return (
               <div
                 key={post.id}
-                className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#C9A86A]/50 transition-colors"
+                className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4 transition hover:shadow-md"
               >
-                <div className="flex items-start gap-3">
-                  <img
-                    src={post.coverImageUrl}
-                    alt={post.coverImageAlt}
-                    className="w-16 h-16 rounded-xl object-cover shrink-0"
-                  />
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full border ${
-                        post.status === 'PUBLISHED'
-                          ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
-                          : 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                      }`}>
-                        {post.status}
-                      </span>
-                      <span className="text-[10px] text-[#C9A86A]">{post.categoryName}</span>
-                      <span className="text-[10px] text-[#94A3B8]">• {post.views} views</span>
-                    </div>
-                    <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">
+                <div className="flex items-start gap-4">
+                  {post.coverImageUrl && (
+                    <img
+                      src={post.coverImageUrl}
+                      alt={post.coverImageAlt || post.title}
+                      className="w-16 h-16 rounded-xl object-cover shrink-0 border border-slate-200 hidden sm:block"
+                    />
+                  )}
+                  <div className="space-y-1">
+                    <h3 className="font-serif font-bold text-base text-slate-900 leading-snug">
                       {post.title}
                     </h3>
-                    <p className="text-[11px] text-[#94A3B8] mt-0.5">
-                      /blog/{post.slug}
+                    <p className="text-xs text-slate-500 font-mono">
+                      /{post.slug}
                     </p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 self-end sm:self-center">
-                  {post.status === 'PUBLISHED' && (
+                <div className="flex flex-wrap items-center gap-3 md:gap-6 self-start md:self-center">
+                  <div className="text-xs text-slate-500">
+                    <span className="font-semibold text-slate-700">{words}</span>
+                    <span className="text-slate-400"> / 5000 words</span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
                     <button
-                      onClick={() => onNavigatePublic(`/blog/${post.slug}`)}
-                      className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-[#94A3B8] hover:text-[#F7F4EE] border border-white/10"
-                      title="View Public URL"
+                      onClick={() => handleOpenEditModal(post)}
+                      className="py-1.5 px-3.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer transition shadow-2xs"
                     >
-                      <ExternalLink className="w-3.5 h-3.5" />
+                      Edit
                     </button>
-                  )}
-                  <button
-                    onClick={() => setEditingPost(post)}
-                    className="py-1.5 px-3 rounded-xl bg-[#C9A86A]/20 border border-[#C9A86A]/40 text-[#DFBF82] hover:bg-[#C9A86A]/30 text-xs font-semibold flex items-center gap-1.5"
-                  >
-                    <Edit3 className="w-3.5 h-3.5" />
-                    <span>Edit</span>
-                  </button>
-                  <button
-                    onClick={() => handleDeletePost(post.id)}
-                    className="p-2 rounded-xl bg-red-500/20 text-red-300 hover:bg-red-500/40 border border-red-500/30"
-                    title="Delete Article"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                    {post.slug && (
+                      <button
+                        onClick={() => onNavigatePublic(`/blog/${post.slug}`)}
+                        className="py-1.5 px-3.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold cursor-pointer transition shadow-2xs"
+                      >
+                        View
+                      </button>
+                    )}
+                    <button
+                      onClick={() => handleDeletePost(post.id)}
+                      className="p-1.5 rounded-lg border border-red-200 bg-white hover:bg-red-50 text-red-500 text-xs cursor-pointer transition"
+                      title="Delete post"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        /* View 2: Full-Featured Blog & SEO Editor */
-        <div className="space-y-6">
-          {/* Editor Header Bar */}
-          <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setEditingPost(null)}
-                className="text-xs text-[#94A3B8] hover:text-[#F7F4EE]"
-              >
-                &larr; All Posts
-              </button>
-              <span className="text-[#94A3B8]">|</span>
-              <span className="text-xs text-[#C9A86A] font-semibold">{saveStatus}</span>
-            </div>
+            );
+          })
+        )}
+      </div>
 
-            <div className="flex items-center gap-2">
+      {/* MAIN MODAL DIALOG - EXACT MATCH TO USER'S SCREENSHOT */}
+      {isModalOpen && editingPost && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white w-full max-w-2xl max-h-[92vh] rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-slate-200 text-slate-800">
+            
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+              <h2 className="font-serif font-bold text-lg sm:text-xl text-slate-900">
+                {editingPost.id ? 'Edit Blog Post' : 'Create New Blog Post'}
+              </h2>
               <button
-                onClick={() => setShowLivePreview(!showLivePreview)}
-                className={`py-1.5 px-3 rounded-xl text-xs font-semibold flex items-center gap-1.5 border ${
-                  showLivePreview
-                    ? 'bg-[#C9A86A] text-[#0B1426] border-[#C9A86A]'
-                    : 'bg-white/5 text-[#F7F4EE] border-white/20'
-                }`}
+                onClick={handleCloseModal}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer transition"
+                title="Close"
               >
-                <Eye className="w-3.5 h-3.5" />
-                <span>{showLivePreview ? 'Close Preview' : 'Side Preview'}</span>
-              </button>
-
-              <button
-                onClick={handleSavePost}
-                className="py-1.5 px-4 rounded-xl gold-gradient-bg text-[#0B1426] font-bold text-xs uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-[#C9A86A]/20 cursor-pointer active:scale-95"
-              >
-                <Save className="w-3.5 h-3.5 text-[#0B1426]" />
-                <span>Save Post</span>
+                <X className="w-5 h-5" />
               </button>
             </div>
-          </div>
 
-          <div className="grid lg:grid-cols-3 gap-6 items-start">
-            {/* Left 2 Cols: Editor */}
-            <div className={`space-y-4 ${showLivePreview ? 'lg:col-span-2' : 'lg:col-span-2'}`}>
-              <div className="glass-panel p-5 rounded-3xl border border-[#C9A86A]/30 space-y-4">
-                {/* Title */}
-                <div>
-                  <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
-                    Article Title
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Enter engaging, keyword-focused article title..."
-                    value={editingPost.title || ''}
-                    onChange={(e) => {
-                      const newTitle = e.target.value;
-                      setEditingPost({
-                        ...editingPost,
-                        title: newTitle,
-                        slug: editingPost.id ? editingPost.slug : generateSlug(newTitle)
-                      });
-                    }}
-                    className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-2 text-sm sm:text-base font-serif font-bold text-[#F7F4EE] focus:border-[#C9A86A] focus:outline-none"
-                  />
-                </div>
+            {/* Modal Body - Scrollable Form */}
+            <div className="p-6 overflow-y-auto space-y-3.5">
+              
+              {/* Blog Title */}
+              <div>
+                <input
+                  type="text"
+                  placeholder="Blog Title"
+                  value={editingPost.title || ''}
+                  onChange={(e) => handleTitleChange(e.target.value)}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                />
+              </div>
 
-                {/* Slug & Category Row */}
-                <div className="grid sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
-                      URL Slug
-                    </label>
-                    <input
-                      type="text"
-                      value={editingPost.slug || ''}
-                      onChange={(e) => setEditingPost({ ...editingPost, slug: generateSlug(e.target.value) })}
-                      className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#C9A86A] focus:border-[#C9A86A] focus:outline-none"
+              {/* Blog Slug */}
+              <div>
+                <input
+                  type="text"
+                  placeholder="Blog Slug (e.g., my-awesome-blog)"
+                  value={editingPost.slug || ''}
+                  onChange={(e) => setEditingPost({ ...editingPost, slug: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition font-mono text-xs"
+                />
+              </div>
+
+              {/* Excerpt */}
+              <div>
+                <input
+                  type="text"
+                  placeholder="Excerpt (short description)"
+                  value={editingPost.excerpt || ''}
+                  onChange={(e) => setEditingPost({ ...editingPost, excerpt: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                />
+              </div>
+
+              {/* SEO Title */}
+              <div>
+                <input
+                  type="text"
+                  placeholder="SEO Title"
+                  value={editingPost.metaTitle || ''}
+                  onChange={(e) => setEditingPost({ ...editingPost, metaTitle: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                />
+              </div>
+
+              {/* SEO Description */}
+              <div>
+                <input
+                  type="text"
+                  placeholder="SEO Description"
+                  value={editingPost.metaDescription || ''}
+                  onChange={(e) => setEditingPost({ ...editingPost, metaDescription: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                />
+              </div>
+
+              {/* SEO Keywords */}
+              <div>
+                <input
+                  type="text"
+                  placeholder="SEO Keywords"
+                  value={editingPost.focusKeyword || ''}
+                  onChange={(e) => setEditingPost({ ...editingPost, focusKeyword: e.target.value })}
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                />
+              </div>
+
+              {/* Cover / Featured Image Header Box */}
+              <div className="border border-slate-200 rounded-xl p-3 bg-slate-50/60 flex items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-3 min-w-0">
+                  {editingPost.coverImageUrl ? (
+                    <img
+                      src={editingPost.coverImageUrl}
+                      alt="Cover"
+                      className="w-12 h-10 rounded-lg object-cover border border-slate-200 shrink-0"
                     />
-                  </div>
-
-                  <div>
-                    <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
-                      Category
-                    </label>
-                    <select
-                      value={editingPost.categoryId || 'cat-1'}
-                      onChange={(e) => {
-                        const cat = categories.find(c => c.id === e.target.value);
-                        setEditingPost({
-                          ...editingPost,
-                          categoryId: e.target.value,
-                          categoryName: cat?.name || 'Location Guides'
-                        });
-                      }}
-                      className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE] focus:border-[#C9A86A] focus:outline-none"
-                    >
-                      {categories.map(c => (
-                        <option key={c.id} value={c.id}>{c.name}</option>
-                      ))}
-                    </select>
+                  ) : (
+                    <div className="w-12 h-10 rounded-lg bg-slate-200 flex items-center justify-center shrink-0 text-slate-400">
+                      <ImageIcon className="w-5 h-5" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="font-semibold text-slate-700">Cover Image</p>
+                    <p className="text-[11px] text-slate-400 truncate max-w-[260px]">
+                      {editingPost.coverImageUrl || 'Default property render'}
+                    </p>
                   </div>
                 </div>
 
-                {/* Excerpt */}
-                <div>
-                  <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
-                    Excerpt / Synopsis
-                  </label>
-                  <textarea
-                    rows={2}
-                    value={editingPost.excerpt || ''}
-                    onChange={(e) => setEditingPost({ ...editingPost, excerpt: e.target.value })}
-                    placeholder="Brief 2-line summary for SERP and blog cards..."
-                    className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl p-3 text-xs text-[#F7F4EE] focus:border-[#C9A86A] focus:outline-none resize-none"
-                  />
-                </div>
-
-                {/* Cover Image Upload Option */}
-                <div className="pt-1">
-                  <ImageUpload
-                    label="Cover Image (Article Hero & Social SERP Card)"
-                    value={editingPost.coverImageUrl || ''}
-                    onChange={(url) => setEditingPost({ ...editingPost, coverImageUrl: url })}
-                    altText={editingPost.coverImageAlt || ''}
-                    onAltChange={(alt) => setEditingPost({ ...editingPost, coverImageAlt: alt })}
-                    recommendedSize="1200 x 630px (Landscape 16:9 or 1.91:1, Max 8MB)"
-                  />
-                </div>
-
-                {/* Status & Publication */}
-                <div className="grid sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
-                  <div>
-                    <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
-                      Publication Status
-                    </label>
-                    <select
-                      value={editingPost.status || 'DRAFT'}
-                      onChange={(e) => setEditingPost({ ...editingPost, status: e.target.value as any })}
-                      className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
-                    >
-                      <option value="DRAFT">DRAFT (Review Mode)</option>
-                      <option value="PUBLISHED">PUBLISHED (Live on Site)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
-                      Est. Reading Time (Mins)
-                    </label>
-                    <input
-                      type="number"
-                      value={editingPost.readingTime || 5}
-                      onChange={(e) => setEditingPost({ ...editingPost, readingTime: parseInt(e.target.value, 10) || 5 })}
-                      className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
-                    />
-                  </div>
-                </div>
-
-                {/* Block Editor Snippet Toolbar */}
-                <div className="pt-2">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[10px] text-[#94A3B8] uppercase tracking-wider font-semibold">
-                      Rich Content Blocks
-                    </span>
-                    <span className="text-[10px] text-[#C9A86A]">Click to insert block at end</span>
-                  </div>
-
-                  {/* Hidden file input for inline content image upload */}
+                <div className="flex items-center gap-2 shrink-0">
                   <input
-                    ref={inlineImageInputRef}
+                    ref={coverFileInputRef}
                     type="file"
-                    accept="image/png,image/jpeg,image/webp,image/svg+xml,image/gif"
-                    onChange={handleInlineImageUpload}
+                    accept="image/*"
+                    onChange={handleCoverFileChange}
                     className="hidden"
                   />
-
-                  <div className="flex flex-wrap gap-1.5 p-2 rounded-xl bg-[#0B1426] border border-white/10">
-                    <button
-                      type="button"
-                      onClick={() => inlineImageInputRef.current?.click()}
-                      disabled={inlineUploading}
-                      className="px-2.5 py-1 rounded-lg bg-[#C9A86A]/20 hover:bg-[#C9A86A]/30 border border-[#C9A86A]/50 text-xs text-[#DFBF82] font-semibold flex items-center gap-1.5 cursor-pointer transition-all"
-                    >
-                      {inlineUploading ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-[#C9A86A]" />
-                          <span>Uploading Image...</span>
-                        </>
-                      ) : (
-                        <>
-                          <UploadCloud className="w-3.5 h-3.5 text-[#C9A86A]" />
-                          <span>Upload &amp; Insert Image</span>
-                        </>
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => insertSnippet('<h2>Key Infrastructure Milestone</h2>\n<p>Enter detailed paragraph here...</p>')}
-                      className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-[#F7F4EE] flex items-center gap-1"
-                    >
-                      <Heading2 className="w-3.5 h-3.5 text-[#C9A86A]" /> H2 Heading
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => insertSnippet('<h3>Sub-Section Analysis</h3>\n<p>Contextual details...</p>')}
-                      className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-[#F7F4EE] flex items-center gap-1"
-                    >
-                      <Heading3 className="w-3.5 h-3.5 text-[#C9A86A]" /> H3 Heading
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => insertSnippet('<div class="glass-panel p-4 rounded-xl border border-[#C9A86A]/40 my-4 text-[#F7F4EE]">\n  <strong>Expert Takeaway:</strong> Yamuna Expressway property values are positioned for 20%+ annual growth.\n</div>')}
-                      className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-[#F7F4EE] flex items-center gap-1"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5 text-[#C9A86A]" /> Callout Box
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => insertSnippet('<div class="blog-cta-box glass-panel p-6 rounded-2xl border border-[#C9A86A] text-center my-6">\n  <h3 class="font-serif text-lg font-bold text-[#F7F4EE] mb-2">Explore DXN Orion Sector 22D</h3>\n  <a href="/#enquire" class="gold-gradient-bg text-[#0B1426] font-bold text-xs uppercase px-6 py-2.5 rounded-xl inline-block">Download Pre-Launch Price Matrix</a>\n</div>')}
-                      className="px-2 py-1 rounded bg-white/5 hover:bg-white/10 text-xs text-[#F7F4EE] flex items-center gap-1"
-                    >
-                      <Sparkles className="w-3.5 h-3.5 text-[#C9A86A]" /> CTA Block
-                    </button>
-                  </div>
-
-                  {/* HTML / Content Area */}
-                  <textarea
-                    rows={14}
-                    value={editingPost.contentHtml || ''}
-                    onChange={(e) => setEditingPost({ ...editingPost, contentHtml: e.target.value })}
-                    className="w-full bg-[#0B1426] border border-[#C9A86A]/30 rounded-xl p-3 text-xs text-[#F7F4EE] font-mono leading-relaxed mt-2 focus:border-[#C9A86A] focus:outline-none"
-                  />
+                  <button
+                    type="button"
+                    onClick={() => coverFileInputRef.current?.click()}
+                    disabled={coverUploading}
+                    className="py-1.5 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 font-medium text-xs flex items-center gap-1.5 cursor-pointer transition disabled:opacity-60"
+                  >
+                    {coverUploading ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Uploading...</span>
+                      </>
+                    ) : (
+                      <>
+                        <UploadCloud className="w-3.5 h-3.5 text-[#C9A86A]" />
+                        <span>Change Cover</span>
+                      </>
+                    )}
+                  </button>
                 </div>
               </div>
 
-              {/* Side-by-side live preview if enabled */}
-              {showLivePreview && (
-                <div className="glass-panel p-5 rounded-3xl border border-[#C9A86A] space-y-3">
-                  <div className="flex items-center justify-between pb-2 border-b border-white/10">
-                    <span className="text-xs font-serif font-bold text-[#F7F4EE]">
-                      Live Rendered Article Preview
-                    </span>
-                    <div className="flex rounded-lg border border-white/10 overflow-hidden">
-                      <button
-                        onClick={() => setPreviewDevice('desktop')}
-                        className={`p-1 ${previewDevice === 'desktop' ? 'bg-[#C9A86A] text-[#0B1426]' : 'text-[#94A3B8]'}`}
-                      >
-                        <Monitor className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => setPreviewDevice('mobile')}
-                        className={`p-1 ${previewDevice === 'mobile' ? 'bg-[#C9A86A] text-[#0B1426]' : 'text-[#94A3B8]'}`}
-                      >
-                        <Smartphone className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+              {/* Rich Text Editor Container matching the screenshot */}
+              <div className="border border-slate-200 rounded-2xl p-3.5 bg-white space-y-3 shadow-2xs">
+                
+                {/* Toolbar Header Row matching Screenshot 1 & 2 */}
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  
+                  {/* Left Toolbar Icons */}
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    {/* B */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('bold')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-800 text-xs font-bold cursor-pointer transition active:scale-95"
+                      title="Bold"
+                    >
+                      B
+                    </button>
+
+                    {/* I */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('italic')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-800 text-xs italic font-serif cursor-pointer transition active:scale-95"
+                      title="Italic"
+                    >
+                      I
+                    </button>
+
+                    {/* H1 */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('h1')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-800 text-[11px] font-bold cursor-pointer transition active:scale-95"
+                      title="Heading 1"
+                    >
+                      H₁
+                    </button>
+
+                    {/* H2 */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('h2')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-800 text-[11px] font-bold cursor-pointer transition active:scale-95"
+                      title="Heading 2"
+                    >
+                      H₂
+                    </button>
+
+                    {/* H3 */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('h3')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-800 text-[11px] font-bold cursor-pointer transition active:scale-95"
+                      title="Heading 3"
+                    >
+                      H₃
+                    </button>
+
+                    {/* Bullet List */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('ul')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 cursor-pointer transition active:scale-95"
+                      title="Bullet list"
+                    >
+                      <List className="w-4 h-4" />
+                    </button>
+
+                    {/* Numbered List */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('ol')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 cursor-pointer transition active:scale-95"
+                      title="Numbered list"
+                    >
+                      <ListOrdered className="w-4 h-4" />
+                    </button>
+
+                    {/* Quote */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('quote')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 cursor-pointer transition active:scale-95"
+                      title="Quote"
+                    >
+                      <Quote className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Code */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('code')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 cursor-pointer transition active:scale-95"
+                      title="Code Block"
+                    >
+                      <Code className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Link */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('link')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 cursor-pointer transition active:scale-95"
+                      title="Add Link"
+                    >
+                      <LinkIcon className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Divider / HR */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('hr')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 cursor-pointer transition active:scale-95"
+                      title="Horizontal Line"
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+
+                    {/* Image Button with instant working modal */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('image')}
+                      className="w-8 h-8 rounded-lg border border-[#C9A86A]/40 bg-[#C9A86A]/10 hover:bg-[#C9A86A]/20 flex items-center justify-center text-[#967439] cursor-pointer transition active:scale-95"
+                      title="Upload or Insert Image"
+                    >
+                      <ImageIcon className="w-4 h-4 text-[#967439]" />
+                    </button>
+
+                    {/* Clear Format Tx */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('clear')}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 text-xs font-serif cursor-pointer transition active:scale-95"
+                      title="Clear Formatting"
+                    >
+                      T<span className="text-[10px] text-slate-400">x</span>
+                    </button>
+
+                    {/* Undo */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('undo')}
+                      disabled={historyIndex <= 0}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 flex items-center justify-center text-slate-700 cursor-pointer transition active:scale-95"
+                      title="Undo"
+                    >
+                      <Undo className="w-3.5 h-3.5" />
+                    </button>
+
+                    {/* Redo */}
+                    <button
+                      type="button"
+                      onClick={() => handleToolbarAction('redo')}
+                      disabled={historyIndex >= history.length - 1}
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-40 flex items-center justify-center text-slate-700 cursor-pointer transition active:scale-95"
+                      title="Redo"
+                    >
+                      <Redo className="w-3.5 h-3.5" />
+                    </button>
                   </div>
 
-                  <div className={`mx-auto bg-[#0B1426] rounded-2xl p-4 border border-white/10 ${previewDevice === 'mobile' ? 'max-w-xs' : 'w-full'}`}>
-                    <h1 className="text-xl font-serif font-bold text-[#F7F4EE] mb-2">
-                      {editingPost.title || 'Untitled Post'}
-                    </h1>
-                    <div
-                      dangerouslySetInnerHTML={{ __html: editingPost.contentHtml || '' }}
-                      className="text-xs text-[#94A3B8] space-y-2 [&>h2]:text-sm [&>h2]:font-bold [&>h2]:text-[#C9A86A] [&>h3]:text-xs [&>h3]:text-[#F7F4EE]"
-                    />
+                  {/* Right Side Controls: Preview Article + Word Counter Badge */}
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setIsPreviewMode(!isPreviewMode)}
+                      className="text-amber-600 hover:text-amber-700 font-semibold text-xs cursor-pointer transition flex items-center gap-1 select-none"
+                    >
+                      {isPreviewMode ? 'Edit article' : 'Preview article'}
+                    </button>
+
+                    <div className="bg-blue-50 text-blue-600 text-xs font-semibold px-3 py-1 rounded-full">
+                      {currentWords} words
+                    </div>
                   </div>
+                </div>
+
+                <div className="border-b border-slate-100" />
+
+                {/* Content Writing / Preview Area */}
+                {isPreviewMode ? (
+                  <div className="w-full min-h-[300px] max-h-[420px] overflow-y-auto p-4 border border-slate-200 rounded-xl bg-slate-50/50 text-slate-800 text-sm leading-relaxed prose prose-sm max-w-none">
+                    {editingPost.contentHtml ? (
+                      <div dangerouslySetInnerHTML={{ __html: editingPost.contentHtml }} />
+                    ) : (
+                      <p className="text-slate-400 italic">No content to preview yet. Switch back to edit and start typing.</p>
+                    )}
+                  </div>
+                ) : (
+                  <textarea
+                    ref={textareaRef}
+                    rows={12}
+                    placeholder="Write your article content here... (HTML or text formatted)"
+                    value={editingPost.contentHtml || ''}
+                    onChange={(e) => handleContentChange(e.target.value)}
+                    className="w-full border border-slate-200 rounded-xl p-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent font-sans leading-relaxed resize-y min-h-[280px]"
+                  />
+                )}
+              </div>
+
+              {/* Status Notice if saving */}
+              {saveStatus && (
+                <div className="text-xs text-center text-slate-600 py-1 font-medium">
+                  {saveStatus}
                 </div>
               )}
             </div>
 
-            {/* Right Column: SEO Panel & Live Score Checklist */}
-            <div className="space-y-4">
-              <div className="glass-panel p-5 rounded-3xl border border-[#C9A86A]/40 space-y-4">
-                <div className="flex items-center gap-2 pb-2 border-b border-white/10">
-                  <Globe className="w-4 h-4 text-[#C9A86A]" />
-                  <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">
-                    Search Engine Optimization (SEO)
-                  </h3>
-                </div>
-
-                {/* Focus Keyword */}
-                <div>
-                  <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
-                    Focus Target Keyword
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Sector 22D Yamuna Expressway"
-                    value={editingPost.focusKeyword || ''}
-                    onChange={(e) => setEditingPost({ ...editingPost, focusKeyword: e.target.value })}
-                    className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
-                  />
-                </div>
-
-                {/* Meta Title with 60-char counter */}
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider font-semibold">
-                      Meta Title
-                    </label>
-                    <span className={`text-[10px] font-bold ${titleLen > 60 ? 'text-red-400' : 'text-[#C9A86A]'}`}>
-                      {titleLen}/60 chars
-                    </span>
-                  </div>
-                  <input
-                    type="text"
-                    value={editingPost.metaTitle || ''}
-                    onChange={(e) => setEditingPost({ ...editingPost, metaTitle: e.target.value })}
-                    placeholder="Title shown on Google SERP..."
-                    className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
-                  />
-                </div>
-
-                {/* Meta Description with 160-char counter */}
-                <div>
-                  <div className="flex justify-between items-center mb-1">
-                    <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider font-semibold">
-                      Meta Description
-                    </label>
-                    <span className={`text-[10px] font-bold ${descLen > 160 ? 'text-red-400' : 'text-[#C9A86A]'}`}>
-                      {descLen}/160 chars
-                    </span>
-                  </div>
-                  <textarea
-                    rows={3}
-                    value={editingPost.metaDescription || ''}
-                    onChange={(e) => setEditingPost({ ...editingPost, metaDescription: e.target.value })}
-                    placeholder="Search snippet summary (160 characters)..."
-                    className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl p-2.5 text-xs text-[#F7F4EE] resize-none"
-                  />
-                </div>
-
-                {/* Google SERP Snippet Preview */}
-                <div className="p-3 rounded-xl bg-white text-slate-800 text-xs shadow-inner">
-                  <div className="text-[9px] text-slate-500 mb-0.5">https://dxn-orion.com › blog › {editingPost.slug || 'url-slug'}</div>
-                  <div className="text-[#1a0dab] font-medium hover:underline text-xs line-clamp-1">
-                    {editingPost.metaTitle || editingPost.title || 'Page Title'}
-                  </div>
-                  <div className="text-[11px] text-slate-600 line-clamp-2 mt-0.5">
-                    {editingPost.metaDescription || editingPost.excerpt || 'Meta description summary text...'}
-                  </div>
-                </div>
-
-                {/* Live SEO Score Checklist */}
-                <div className="pt-3 border-t border-white/10 space-y-2 text-xs">
-                  <span className="text-[10px] text-[#C9A86A] uppercase font-bold tracking-wider block">
-                    Live SEO Readiness Checklist
-                  </span>
-
-                  <div className="flex items-center gap-2">
-                    {hasKeywordInTitle ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <AlertCircle className="w-3.5 h-3.5 text-amber-400" />}
-                    <span className={hasKeywordInTitle ? 'text-[#F7F4EE]' : 'text-[#94A3B8]'}>Focus keyword in Title</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {hasKeywordInSlug ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <AlertCircle className="w-3.5 h-3.5 text-amber-400" />}
-                    <span className={hasKeywordInSlug ? 'text-[#F7F4EE]' : 'text-[#94A3B8]'}>Focus keyword in URL slug</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {hasKeywordInMeta ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <AlertCircle className="w-3.5 h-3.5 text-amber-400" />}
-                    <span className={hasKeywordInMeta ? 'text-[#F7F4EE]' : 'text-[#94A3B8]'}>Focus keyword in Meta Description</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {hasH2 ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <AlertCircle className="w-3.5 h-3.5 text-amber-400" />}
-                    <span className={hasH2 ? 'text-[#F7F4EE]' : 'text-[#94A3B8]'}>Contains at least one H2 heading</span>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {hasGoodLength ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <AlertCircle className="w-3.5 h-3.5 text-amber-400" />}
-                    <span className={hasGoodLength ? 'text-[#F7F4EE]' : 'text-[#94A3B8]'}>Word count: {wordCount} words (min 300)</span>
-                  </div>
-                </div>
-              </div>
+            {/* Modal Footer matching Screenshot 1 & 2 */}
+            <div className="px-6 py-4 border-t border-slate-100 flex items-center justify-start bg-white">
+              <button
+                type="button"
+                onClick={handleSavePost}
+                disabled={saving}
+                className="bg-[#DFBF82] hover:bg-[#C9A86A] text-[#0B1426] font-semibold text-sm px-7 py-2.5 rounded-xl shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-60 flex items-center gap-2"
+              >
+                {saving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-[#0B1426]" />
+                    <span>Saving...</span>
+                  </>
+                ) : (
+                  <span>Save article</span>
+                )}
+              </button>
             </div>
+
           </div>
         </div>
       )}
+
+      {/* DEDICATED IMAGE UPLOAD / INSERT MODAL (WORKING DIRECTLY IN IFRAMES) */}
+      {isImageModalOpen && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 text-slate-800 p-5 space-y-4">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <ImageIcon className="w-5 h-5 text-[#C9A86A]" />
+                <h3 className="font-serif font-bold text-base text-slate-900">Insert Image</h3>
+              </div>
+              <button
+                onClick={() => setIsImageModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 p-1 rounded-lg hover:bg-slate-100 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Tabs: Upload File vs Web URL */}
+            <div className="flex rounded-xl bg-slate-100 p-1 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={() => setImageTab('upload')}
+                className={`flex-1 py-1.5 rounded-lg transition cursor-pointer ${
+                  imageTab === 'upload' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Upload from Device
+              </button>
+              <button
+                type="button"
+                onClick={() => setImageTab('url')}
+                className={`flex-1 py-1.5 rounded-lg transition cursor-pointer ${
+                  imageTab === 'url' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-600 hover:text-slate-900'
+                }`}
+              >
+                Paste Image URL
+              </button>
+            </div>
+
+            {/* Error banner */}
+            {imageError && (
+              <div className="p-2.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs">
+                {imageError}
+              </div>
+            )}
+
+            {/* Tab 1: Upload from Computer */}
+            {imageTab === 'upload' && (
+              <div className="space-y-3">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageFileChange}
+                  className="hidden"
+                />
+
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-slate-200 hover:border-[#C9A86A] rounded-2xl p-6 text-center cursor-pointer transition bg-slate-50/50 hover:bg-[#C9A86A]/5"
+                >
+                  {imageUploadLoading ? (
+                    <div className="space-y-2 py-4">
+                      <Loader2 className="w-8 h-8 text-[#C9A86A] animate-spin mx-auto" />
+                      <p className="text-xs text-slate-600 font-medium">Processing image...</p>
+                    </div>
+                  ) : imagePreviewUrl ? (
+                    <div className="space-y-2">
+                      <img
+                        src={imagePreviewUrl}
+                        alt="Preview"
+                        className="max-h-36 mx-auto rounded-xl object-contain border border-slate-200 shadow-xs"
+                      />
+                      <p className="text-[11px] text-[#C9A86A] font-semibold">Click to choose a different image</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2 py-2">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-[#C9A86A]">
+                        <UploadCloud className="w-5 h-5" />
+                      </div>
+                      <p className="text-xs font-semibold text-slate-800">
+                        Click to select an image from your computer
+                      </p>
+                      <p className="text-[11px] text-slate-400">
+                        Supports PNG, JPG, WebP, SVG, GIF (up to 8MB)
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Tab 2: URL Input */}
+            {imageTab === 'url' && (
+              <div className="space-y-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-700 block mb-1">
+                    Image Link
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="https://images.unsplash.com/photo-..."
+                    value={imagePreviewUrl}
+                    onChange={(e) => setImagePreviewUrl(e.target.value)}
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60"
+                  />
+                </div>
+
+                {imagePreviewUrl && (
+                  <div className="p-2 border border-slate-200 rounded-xl bg-slate-50">
+                    <img
+                      src={imagePreviewUrl}
+                      alt="Preview"
+                      className="max-h-32 mx-auto rounded-lg object-contain"
+                      onError={() => setImageError('Could not load image from this URL.')}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Alt Text / Caption Field */}
+            <div>
+              <label className="text-xs font-semibold text-slate-700 block mb-1">
+                Image Caption / Alt Text (for SEO)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Master Bedroom with Golf View"
+                value={imageAltText}
+                onChange={(e) => setImageAltText(e.target.value)}
+                className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60"
+              />
+            </div>
+
+            {/* Optional: Checkbox to also set as Cover Image */}
+            <label className="flex items-center gap-2 cursor-pointer text-xs text-slate-700 select-none">
+              <input
+                type="checkbox"
+                checked={imageAsCover}
+                onChange={(e) => setImageAsCover(e.target.checked)}
+                className="rounded text-[#C9A86A] focus:ring-[#C9A86A]"
+              />
+              <span>Also use this image as the main article cover photo</span>
+            </label>
+
+            {/* Action Buttons */}
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <button
+                type="button"
+                onClick={() => setIsImageModalOpen(false)}
+                className="py-2 px-4 rounded-xl border border-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleInsertImageIntoContent}
+                disabled={!imagePreviewUrl.trim() || imageUploadLoading}
+                className="py-2 px-5 rounded-xl bg-[#DFBF82] hover:bg-[#C9A86A] text-[#0B1426] text-xs font-semibold shadow-2xs cursor-pointer transition disabled:opacity-50"
+              >
+                Insert Image into Article
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
