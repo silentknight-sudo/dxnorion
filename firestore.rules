@@ -46,5 +46,10 @@ service cloud.firestore {
     match /settings/{settingId} {
       allow read, write: if true;
     }
+
+    // Hosted Images (Stores optimized blog photos permanently)
+    match /images/{imageId} {
+      allow read, write: if true;
+    }
   }
 }

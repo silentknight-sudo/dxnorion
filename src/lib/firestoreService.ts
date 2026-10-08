@@ -12,6 +12,7 @@ import {
 } from 'firebase/firestore';
 import { db, handleFirestoreError, OperationType } from './firebase.ts';
 import { Lead, LeadActivity, Post, SiteSettings } from '../types/index.ts';
+import { sanitizePostForFirestore } from '../utils/imageCompressor.ts';
 
 export const firestoreService = {
   // --- LEADS ---
@@ -152,8 +153,15 @@ export const firestoreService = {
   async savePost(post: Post): Promise<void> {
     const path = `posts/${post.id}`;
     try {
-      await setDoc(doc(db, 'posts', post.id), {
-        ...post,
+      let finalPost = post;
+      try {
+        finalPost = await sanitizePostForFirestore(post);
+      } catch (err) {
+        console.warn('Image sanitize note:', err);
+      }
+
+      await setDoc(doc(db, 'posts', finalPost.id), {
+        ...finalPost,
         updatedAt: new Date().toISOString()
       }, { merge: true });
     } catch (error) {

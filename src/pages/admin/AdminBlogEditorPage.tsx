@@ -8,6 +8,7 @@ import {
 import { Post, Category } from '../../types/index.ts';
 import { adminFetch, safeJson } from '../../utils/adminAuth.ts';
 import { firestoreService } from '../../lib/firestoreService.ts';
+import { compressImage, sanitizePostForFirestore } from '../../utils/imageCompressor.ts';
 
 interface AdminBlogEditorPageProps {
   onNavigatePublic: (path: string) => void;
@@ -196,45 +197,40 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
     setIsImageModalOpen(true);
   };
 
-  // Upload an image file through backend API with fallback
+  // Upload an image file through backend API with client-side compression fallback
   const uploadImageFile = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const base64Data = e.target?.result as string;
-          if (!base64Data) {
-            throw new Error('Failed to read image file.');
-          }
+    // 1. Immediately compress client-side via canvas (instantly drops 3-10MB down to ~60-120KB)
+    let optimizedDataUrl: string;
+    try {
+      optimizedDataUrl = await compressImage(file, 1280, 1280, 0.78);
+    } catch {
+      optimizedDataUrl = '';
+    }
 
-          // Try uploading to server
-          try {
-            const res = await adminFetch('/api/admin/upload', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                image: base64Data,
-                filename: file.name
-              })
-            });
-            const { ok, data } = await safeJson(res);
-            if (ok && data?.url) {
-              resolve(data.url);
-              return;
-            }
-          } catch (err) {
-            console.warn('Server upload notice, using persistent base64:', err);
-          }
+    if (!optimizedDataUrl) {
+      throw new Error('Could not read or process image file.');
+    }
 
-          // Fallback to base64 data URL so it never fails
-          resolve(base64Data);
-        } catch (err) {
-          reject(err);
-        }
-      };
-      reader.onerror = () => reject(new Error('File reader error'));
-      reader.readAsDataURL(file);
-    });
+    // 2. Try uploading compressed image to server
+    try {
+      const res = await adminFetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: optimizedDataUrl,
+          filename: file.name
+        })
+      });
+      const { ok, data } = await safeJson(res);
+      if (ok && data?.url) {
+        return data.url;
+      }
+    } catch (err) {
+      console.warn('Server upload notice, using client compressed image:', err);
+    }
+
+    // 3. Fallback to the web-optimized compressed data URL
+    return optimizedDataUrl;
   };
 
   // Handle image file selection in the Insert Image Dialog
@@ -406,7 +402,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
       const now = new Date().toISOString();
       const slug = editingPost.slug?.trim() || generateSlug(editingPost.title);
 
-      const postToSave: Post = {
+      const rawPostToSave: Post = {
         id: postId,
         title: editingPost.title.trim(),
         slug,
@@ -433,10 +429,13 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
         updatedAt: now
       };
 
-      // 1. Direct Firebase Firestore save
+      // 1. Sanitize & compress all images in the post so the document NEVER exceeds Firestore's 1MB limit
+      const postToSave = await sanitizePostForFirestore(rawPostToSave);
+
+      // 2. Direct Firebase Firestore save
       await firestoreService.savePost(postToSave);
 
-      // 2. Server sync with safeJson
+      // 3. Server sync with safeJson
       try {
         const url = isNew ? '/api/posts' : `/api/posts/${postId}`;
         const method = isNew ? 'POST' : 'PUT';
@@ -456,8 +455,19 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
         handleCloseModal();
       }, 600);
     } catch (err: any) {
-      alert(err.message || 'Error saving post');
-      setSaveStatus('Error saving');
+      let friendlyError = 'Error saving article.';
+      if (err.message && err.message.includes('exceeds the maximum allowed size')) {
+        friendlyError = 'Article size exceeds database limit. Images are being compressed to web dimensions.';
+      } else {
+        try {
+          const parsed = JSON.parse(err.message);
+          friendlyError = parsed.error || err.message;
+        } catch {
+          friendlyError = err.message || 'Error saving article.';
+        }
+      }
+      setSaveStatus(friendlyError);
+      alert(friendlyError);
     } finally {
       setSaving(false);
     }
