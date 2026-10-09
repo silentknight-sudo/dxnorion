@@ -80,7 +80,7 @@ export const FloorPlansPage: React.FC<FloorPlansPageProps> = ({ onOpenEnquiry, o
           Master Planned Layouts
         </span>
         <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#F7F4EE]">
-          Exclusive Floor Plans
+          DXN Orion Floor Plans – 3 &amp; 4 BHK
         </h1>
         <p className="text-xs sm:text-sm text-[#94A3B8] mt-2 max-w-xl mx-auto">
           Low-density 4-to-a-core luxury residences in Sector 22D, Yamuna Expressway. Explore protected blueprints and specifications.

@@ -66,7 +66,7 @@ export const LocationPage: React.FC<LocationPageProps> = ({ onOpenEnquiry, onNav
           Strategic Epicenter of NCR
         </span>
         <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#F7F4EE]">
-          Sector 22D Location Advantage
+          DXN Orion Location – Sector 22D, Yamuna Expressway
         </h1>
         <p className="text-xs sm:text-sm text-[#94A3B8] mt-2 max-w-xl mx-auto">
           Positioned directly on the Yamuna Expressway growth corridor between Greater Noida and Jewar International Airport.

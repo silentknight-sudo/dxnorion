@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { Header } from './components/Header.tsx';
 import { Footer } from './components/Footer.tsx';
 import { StickyBottomBar } from './components/StickyBottomBar.tsx';
@@ -16,9 +16,15 @@ import { LegalPage } from './pages/LegalPage.tsx';
 import { ThankYouPage } from './pages/ThankYouPage.tsx';
 import { NotFoundPage } from './pages/NotFoundPage.tsx';
 
-import { AdminLoginPage } from './pages/admin/AdminLoginPage.tsx';
-import { AdminLayout } from './pages/admin/AdminLayout.tsx';
+// Admin screens are code-split so public visitors don't download them
+const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage.tsx').then(m => ({ default: m.AdminLoginPage })));
+const AdminLayout = lazy(() => import('./pages/admin/AdminLayout.tsx').then(m => ({ default: m.AdminLayout })));
+const adminFallback = (
+  <div className="min-h-screen bg-[#0B1426] flex items-center justify-center text-xs text-[#94A3B8]">Loading…</div>
+);
 
+import { PAGE_SEO, NOT_FOUND_SEO, categorySeo } from './seo/pages.ts';
+import { applySeo } from './seo/applySeo.ts';
 import { captureUtmParams } from './utils/utm.ts';
 import { SiteSettings } from './types/index.ts';
 import { adminFetch, clearAdminAuth, getAdminToken, getStoredAdminUser, safeJson } from './utils/adminAuth.ts';
@@ -105,6 +111,26 @@ export default function App() {
     };
   }, []);
 
+  // Per-route SEO tags (blog posts set their own once loaded)
+  useEffect(() => {
+    const path = currentPath.replace(/\/$/, '') || '/';
+    if (path.startsWith('/admin')) {
+      applySeo({ title: 'Admin | DXN Orion', description: 'DXN Orion admin', path, noindex: true });
+      return;
+    }
+    const page = PAGE_SEO[path];
+    if (page) {
+      applySeo({ title: page.title, description: page.description, path, noindex: page.noindex });
+    } else if (path.startsWith('/blog/category/') || path.startsWith('/blog/tag/')) {
+      const raw = decodeURIComponent(path.split('/').pop() || '');
+      const name = raw.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      const seo = categorySeo(name, `Articles about ${name} on Yamuna Expressway real estate.`);
+      applySeo({ title: seo.title, description: seo.description, path, noindex: path.startsWith('/blog/tag/') });
+    } else if (!path.startsWith('/blog/')) {
+      applySeo({ title: NOT_FOUND_SEO.title, description: NOT_FOUND_SEO.description, path, noindex: true });
+    }
+  }, [currentPath]);
+
   const navigate = (path: string) => {
     window.history.pushState({}, '', path);
     setCurrentPath(path);
@@ -177,6 +203,7 @@ export default function App() {
   if (isAdminRoute) {
     if (currentPath === '/admin/login') {
       return (
+        <Suspense fallback={adminFallback}>
         <AdminLoginPage
           onLoginSuccess={(user) => {
             setAdminUser(user);
@@ -184,6 +211,7 @@ export default function App() {
           }}
           onNavigate={navigate}
         />
+        </Suspense>
       );
     }
 
@@ -197,6 +225,7 @@ export default function App() {
 
     if (!adminUser) {
       return (
+        <Suspense fallback={adminFallback}>
         <AdminLoginPage
           onLoginSuccess={(user) => {
             setAdminUser(user);
@@ -204,10 +233,12 @@ export default function App() {
           }}
           onNavigate={navigate}
         />
+        </Suspense>
       );
     }
 
     return (
+      <Suspense fallback={adminFallback}>
       <AdminLayout
         user={adminUser}
         onLogout={async () => {
@@ -219,6 +250,7 @@ export default function App() {
         onNavigatePublic={navigate}
         onSettingsUpdated={(newSettings) => setSettings(newSettings)}
       />
+      </Suspense>
     );
   }
 
