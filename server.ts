@@ -534,7 +534,7 @@ app.post('/api/admin/change-password', requireAdmin, (req: Request, res: Respons
 });
 
 // Admin Image Upload Endpoint (Converts file uploads to permanent hosted images)
-app.post('/api/admin/upload', requireAdmin, (req: Request, res: Response) => {
+app.post('/api/admin/upload', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { image, filename } = req.body;
     if (!image || typeof image !== 'string') {
@@ -564,7 +564,7 @@ app.post('/api/admin/upload', requireAdmin, (req: Request, res: Response) => {
     else if (mimeType.includes('svg')) ext = 'svg';
     else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) ext = 'jpg';
 
-    // Generate safe clean name
+    // Generate safe clean name & unique ID
     const rawName = (filename || 'dxn-orion')
       .replace(/\.[^/.]+$/, '')
       .replace(/[^a-zA-Z0-9_-]/g, '-')
@@ -573,17 +573,23 @@ app.post('/api/admin/upload', requireAdmin, (req: Request, res: Response) => {
 
     const uniqueSuffix = Date.now() + '-' + Math.random().toString(36).substring(2, 7);
     const finalFilename = `${rawName || 'image'}-${uniqueSuffix}.${ext}`;
+    const imageId = `img-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
 
-    const uploadsDir = path.resolve(process.cwd(), 'public', 'uploads');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
+    let fileUrl = `/uploads/${finalFilename}`;
+    let diskWriteSuccess = false;
 
-    const filePath = path.join(uploadsDir, finalFilename);
-    fs.writeFileSync(filePath, buffer);
-
-    // Also mirror to dist/uploads if dist exists
+    // 1. Try local disk write (dev / persistent containers)
     try {
+      const uploadsDir = path.resolve(process.cwd(), 'public', 'uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      const filePath = path.join(uploadsDir, finalFilename);
+      fs.writeFileSync(filePath, buffer);
+      diskWriteSuccess = true;
+
+      // Also mirror to dist/uploads if dist exists
       const distUploads = path.resolve(process.cwd(), 'dist', 'uploads');
       if (fs.existsSync(path.resolve(process.cwd(), 'dist'))) {
         if (!fs.existsSync(distUploads)) {
@@ -591,9 +597,31 @@ app.post('/api/admin/upload', requireAdmin, (req: Request, res: Response) => {
         }
         fs.writeFileSync(path.join(distUploads, finalFilename), buffer);
       }
-    } catch {}
+    } catch {
+      diskWriteSuccess = false;
+    }
 
-    const fileUrl = `/uploads/${finalFilename}`;
+    // 2. If disk is read-only (e.g. Vercel serverless), store in Firestore images collection
+    if (!diskWriteSuccess) {
+      try {
+        const { doc, setDoc } = await import('firebase/firestore');
+        const { db: firestore } = await import('./src/lib/firebase.ts');
+        await setDoc(doc(firestore, 'images', imageId), {
+          id: imageId,
+          data: image,
+          mimeType,
+          filename: finalFilename,
+          size: buffer.length,
+          createdAt: new Date().toISOString()
+        });
+        fileUrl = `/api/images/${imageId}`;
+      } catch (cloudErr) {
+        console.error('Firestore image store error:', cloudErr);
+        // Fallback: Return raw data URL if both disk and Firestore had issues
+        fileUrl = image;
+      }
+    }
+
     return res.json({
       success: true,
       url: fileUrl,
@@ -605,6 +633,26 @@ app.post('/api/admin/upload', requireAdmin, (req: Request, res: Response) => {
     console.error('Upload error:', error);
     return res.status(500).json({ error: 'Failed to process image upload.' });
   }
+});
+
+// Serve hosted images stored in Firestore (works seamlessly across Vercel and serverless)
+app.get('/api/images/:id', async (req: Request, res: Response) => {
+  try {
+    const { doc, getDoc } = await import('firebase/firestore');
+    const { db: firestore } = await import('./src/lib/firebase.ts');
+    const snap = await getDoc(doc(firestore, 'images', req.params.id));
+    if (snap.exists()) {
+      const item = snap.data();
+      const base64Clean = (item.data || '').replace(/^data:image\/[a-zA-Z0-9-+]+;base64,/, '');
+      const imgBuffer = Buffer.from(base64Clean, 'base64');
+      res.setHeader('Content-Type', item.mimeType || 'image/jpeg');
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      return res.send(imgBuffer);
+    }
+  } catch (e) {
+    console.warn('Image fetch note:', e);
+  }
+  res.status(404).send('Image not found');
 });
 
 // Admin Dashboard Summary Metrics
