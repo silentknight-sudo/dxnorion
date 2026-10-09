@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { Post } from '../types/index.ts';
 import { trackEvent } from '../utils/analytics.ts';
+import { applySeo } from '../seo/applySeo.ts';
+import { clampDescription, NOT_FOUND_SEO } from '../seo/pages.ts';
 
 interface BlogPostPageProps {
   slug: string;
@@ -26,9 +28,20 @@ export const BlogPostPage: React.FC<BlogPostPageProps> = ({ slug, onNavigate, on
     setLoading(true);
     try {
       const res = await fetch(`/api/posts/${encodeURIComponent(slug)}`);
-      if (!res.ok) throw new Error('Not found');
+      if (!res.ok) {
+        applySeo({ title: NOT_FOUND_SEO.title, description: NOT_FOUND_SEO.description, path: `/blog/${slug}`, noindex: true });
+        throw new Error('Not found');
+      }
       const data = await res.json();
       setPost(data);
+      applySeo({
+        title: data.metaTitle || data.title,
+        description: clampDescription(data.metaDescription || data.excerpt || data.title),
+        path: `/blog/${data.slug}`,
+        noindex: Boolean(data.noindex),
+        image: data.ogImageUrl || (data.coverImageUrl?.startsWith('http') ? data.coverImageUrl : undefined),
+        type: 'article'
+      });
 
       // Track article view
       trackEvent('blog_view', { slug: data.slug, title: data.title });

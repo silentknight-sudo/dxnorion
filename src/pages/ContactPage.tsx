@@ -128,7 +128,7 @@ export const ContactPage: React.FC<ContactPageProps> = ({
           Official Sales Desk
         </span>
         <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#F7F4EE]">
-          Connect with DXN Orion
+          Contact DXN Orion Sales – Sector 22D
         </h1>
         <p className="text-xs sm:text-sm text-[#94A3B8] mt-2 max-w-xl mx-auto">
           Our senior relationship managers are available 7 days a week to schedule private preview appointments, answer compliance queries, and share architectural dossiers.

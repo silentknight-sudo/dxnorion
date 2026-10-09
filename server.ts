@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import { renderSeoPage } from './src/server/seoRender.ts';
 import { db, LeadStatus, LeadConfiguration, LeadSource, ActivityType } from './src/server/db.ts';
 
 const app = express();
@@ -1047,6 +1048,54 @@ app.post('/api/settings', requireAdmin, async (req: Request, res: Response) => {
   } catch (e) {}
   res.json(updated);
 });
+
+// --- SERVER-SIDE SEO RENDERING (production / Vercel) ---
+// Each public URL gets its own title, description, canonical, JSON-LD and crawlable HTML.
+let cachedTemplate: string | null = null;
+
+async function getIndexTemplate(req: Request): Promise<string> {
+  if (cachedTemplate) return cachedTemplate;
+  for (const candidate of [
+    path.resolve(process.cwd(), 'dist', 'index.html'),
+    path.resolve(process.cwd(), 'index.html')
+  ]) {
+    try {
+      const html = fs.readFileSync(candidate, 'utf-8');
+      // Only use a built template (source index.html references /src/main.tsx).
+      if (!html.includes('/src/main.tsx')) {
+        cachedTemplate = html;
+        return html;
+      }
+    } catch {}
+  }
+  // Fallback: fetch the statically deployed index.html from our own origin.
+  const proto = (req.headers['x-forwarded-proto'] as string) || 'https';
+  const resp = await fetch(`${proto}://${req.headers.host}/index.html`);
+  cachedTemplate = await resp.text();
+  return cachedTemplate;
+}
+
+if (isProd || process.env.VERCEL === '1') {
+  app.get('*', async (req: Request, res: Response, next: NextFunction) => {
+    const p = req.path;
+    if (req.method !== 'GET' || p === '/' || p.startsWith('/api/') || /\.[a-z0-9]+$/i.test(p)) return next();
+    try {
+      const template = await getIndexTemplate(req);
+      if (p.startsWith('/admin')) {
+        return res.type('html').send(template);
+      }
+      const { status, html } = await renderSeoPage(template, p, {
+        getPosts: () => getAllPosts(false),
+        getCategories: () => db.Categories.getAll()
+      });
+      res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=86400');
+      res.status(status).type('html').send(html);
+    } catch (e) {
+      console.error('SEO render failed:', e);
+      next();
+    }
+  });
+}
 
 // --- VITE MIDDLEWARE / STATIC ASSETS ---
 

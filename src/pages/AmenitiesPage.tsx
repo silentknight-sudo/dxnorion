@@ -97,7 +97,7 @@ export const AmenitiesPage: React.FC<AmenitiesPageProps> = ({ onOpenEnquiry, onN
           Resort Living Masterplan
         </span>
         <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#F7F4EE]">
-          Curated Lifestyle Amenities
+          DXN Orion Amenities – Curated Lifestyle
         </h1>
         <p className="text-xs sm:text-sm text-[#94A3B8] mt-2 max-w-xl mx-auto">
           Over 60,000 sq.ft. of ultra-luxurious indoor and outdoor recreation designed for holistic wellness, elite entertainment, and sporting indulgence.

@@ -71,7 +71,7 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
           Yamuna Expressway Real Estate Journal
         </span>
         <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#F7F4EE]">
-          Insights, Trends &amp; Location Intelligence
+          Yamuna Expressway Real Estate Blog
         </h1>
         <p className="text-xs sm:text-sm text-[#94A3B8] mt-2 max-w-xl mx-auto">
           In-depth research on Jewar Airport, Sector 22D growth dynamics, RERA guidelines, and pre-launch property investment in Greater Noida.
