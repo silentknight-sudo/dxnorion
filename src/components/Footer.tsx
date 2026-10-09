@@ -22,17 +22,14 @@ export const Footer: React.FC<FooterProps> = ({
     <footer className="border-t border-[#C9A86A]/20 bg-[#111D36]/95 py-10 px-4 text-center text-[#94A3B8]">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Emblem & Project Name */}
-        <div className="flex items-center justify-center space-x-2.5">
-          <div className="w-8 h-8 rounded-full border border-[#C9A86A]/50 flex items-center justify-center bg-[#C9A86A]/10">
-            <span className="font-serif font-bold text-[#C9A86A] text-xs">DO</span>
-          </div>
-          <span className="font-serif font-bold text-base tracking-wider uppercase text-[#F7F4EE]">
-            DXN Orion
+        <div className="flex items-center justify-center">
+          <span className="bg-white rounded-md px-3 py-1.5 inline-flex">
+            <img src="/logo.png" alt="DXN Orion Yamuna Expressway logo" width={178} height={63} loading="lazy" className="h-10 w-auto" />
           </span>
         </div>
 
         <p className="text-xs text-[#C9A86A] font-semibold uppercase tracking-wider">
-          Sector 22D, Yamuna Expressway, Uttar Pradesh, India
+          Plot GH-01, Sector 22D, Yamuna Expressway, Greater Noida, Uttar Pradesh 203201, India
         </p>
 
         {/* Quick Nav Links */}

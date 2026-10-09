@@ -108,9 +108,78 @@ function getCanonicalBaseUrl(): string {
 }
 
 // Dynamic /sitemap.xml
-app.get('/sitemap.xml', (_req: Request, res: Response) => {
+// --- BLOG POSTS: Firestore is the source of truth (admin editor writes there directly) ---
+// Local JSON store is ephemeral on serverless hosts, so always merge in Firestore posts.
+type AnyPost = ReturnType<typeof db.Posts.getAll>[number];
+
+function normalizePost(raw: any): AnyPost {
+  const now = new Date().toISOString();
+  return {
+    ...raw,
+    id: String(raw.id),
+    title: String(raw.title || 'Untitled'),
+    slug: String(raw.slug || raw.id),
+    excerpt: String(raw.excerpt || ''),
+    contentHtml: String(raw.contentHtml || ''),
+    coverImageUrl: String(raw.coverImageUrl || ''),
+    coverImageAlt: String(raw.coverImageAlt || raw.title || ''),
+    status: raw.status || 'DRAFT',
+    publishedAt: raw.publishedAt || null,
+    scheduledAt: raw.scheduledAt || null,
+    authorId: String(raw.authorId || ''),
+    authorName: String(raw.authorName || 'DXN Orion'),
+    categoryId: String(raw.categoryId || 'cat-1'),
+    categoryName: String(raw.categoryName || 'Location Guides'),
+    tags: Array.isArray(raw.tags) ? raw.tags.map(String) : [],
+    readingTime: Number(raw.readingTime) || 1,
+    views: Number(raw.views) || 0,
+    metaTitle: String(raw.metaTitle || raw.title || ''),
+    metaDescription: String(raw.metaDescription || raw.excerpt || ''),
+    focusKeyword: String(raw.focusKeyword || ''),
+    noindex: Boolean(raw.noindex),
+    faqJson: Array.isArray(raw.faqJson) ? raw.faqJson : [],
+    createdAt: String(raw.createdAt || raw.publishedAt || now),
+    updatedAt: String(raw.updatedAt || raw.createdAt || now)
+  } as AnyPost;
+}
+
+function isLive(p: AnyPost): boolean {
+  if (p.status === 'PUBLISHED') return true;
+  return p.status === 'SCHEDULED' && !!p.scheduledAt && new Date(p.scheduledAt).getTime() <= Date.now();
+}
+
+async function fetchFirestorePosts(): Promise<AnyPost[]> {
+  try {
+    const { collection, getDocs } = await import('firebase/firestore');
+    const { db: firestore } = await import('./src/lib/firebase.ts');
+    const snap = await Promise.race([
+      getDocs(collection(firestore, 'posts')),
+      new Promise<never>((_, rej) => setTimeout(() => rej(new Error('Firestore timeout')), 8000))
+    ]);
+    return snap.docs.map(d => normalizePost({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.error('Failed to load posts from Firestore:', e);
+    return [];
+  }
+}
+
+async function getAllPosts(includeDrafts: boolean): Promise<AnyPost[]> {
+  const byId = new Map<string, AnyPost>();
+  for (const p of db.Posts.getAll(true)) byId.set(p.id, normalizePost(p));
+  for (const p of await fetchFirestorePosts()) {
+    const local = byId.get(p.id);
+    if (!local || new Date(p.updatedAt).getTime() >= new Date(local.updatedAt).getTime()) byId.set(p.id, p);
+  }
+  let list = [...byId.values()];
+  if (!includeDrafts) list = list.filter(isLive);
+  return list.sort((a, b) =>
+    new Date(b.publishedAt || b.createdAt).getTime() - new Date(a.publishedAt || a.createdAt).getTime()
+  );
+}
+
+app.get('/sitemap.xml', async (_req: Request, res: Response) => {
   const baseUrl = getCanonicalBaseUrl();
-  const posts = db.Posts.getAll(false); // published only
+  const posts = await getAllPosts(false); // published only
   const categories = db.Categories.getAll();
 
   const staticPages = [
@@ -194,9 +263,9 @@ app.post('/api/admin/ping-sitemap', (_req: Request, res: Response) => {
 });
 
 // Dynamic /blog/rss.xml
-app.get('/blog/rss.xml', (_req: Request, res: Response) => {
+app.get('/blog/rss.xml', async (_req: Request, res: Response) => {
   const baseUrl = getCanonicalBaseUrl();
-  const posts = db.Posts.getAll(false);
+  const posts = await getAllPosts(false);
 
   let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
@@ -359,13 +428,13 @@ app.post('/api/leads', async (req: Request, res: Response) => {
 
 // --- PUBLIC BLOG ENDPOINTS ---
 
-app.get('/api/posts', (req: Request, res: Response) => {
+app.get('/api/posts', async (req: Request, res: Response) => {
   const includeDrafts = req.query.admin === 'true' && Boolean(verifyAdminSession(req));
   const category = req.query.category as string;
   const tag = req.query.tag as string;
   const search = (req.query.search as string || '').toLowerCase();
 
-  let posts = db.Posts.getAll(includeDrafts);
+  let posts = await getAllPosts(includeDrafts);
 
   if (category) {
     posts = posts.filter(p => p.categoryId === category || p.categoryName.toLowerCase() === category.toLowerCase());
@@ -386,19 +455,21 @@ app.get('/api/posts', (req: Request, res: Response) => {
   res.json(posts);
 });
 
-app.get('/api/posts/:slug', (req: Request, res: Response) => {
-  const post = db.Posts.findBySlug(req.params.slug);
+app.get('/api/posts/:slug', async (req: Request, res: Response) => {
+  const isPreview = req.query.preview === 'true';
+  const allMerged = await getAllPosts(true);
+  const post = allMerged.find(p => p.slug === req.params.slug && (isLive(p) || isPreview));
   if (!post) {
     return res.status(404).json({ error: 'Post not found.' });
   }
 
   // Increment view counter if not in admin preview
-  if (req.query.preview !== 'true') {
+  if (!isPreview) {
     db.Posts.incrementViews(req.params.slug);
   }
 
   // Return post with related posts (same category or tags)
-  const allPosts = db.Posts.getAll(false);
+  const allPosts = allMerged.filter(isLive);
   const relatedPosts = allPosts
     .filter(p => p.id !== post.id && (p.categoryId === post.categoryId || p.tags.some(t => post.tags.includes(t))))
     .slice(0, 3)
@@ -913,7 +984,8 @@ app.post('/api/posts', requireAdmin, async (req: Request, res: Response) => {
 
 app.put('/api/posts/:id', requireAdmin, async (req: Request, res: Response) => {
   const post = db.Posts.findById(req.params.id);
-  if (!post) return res.status(404).json({ error: 'Post not found.' });
+  // Post may exist only in Firestore (saved directly by the admin editor) — nothing to sync locally.
+  if (!post) return res.json(normalizePost({ ...req.body, id: req.params.id }));
 
   const updates = req.body;
   if (updates.status === 'PUBLISHED' && !post.publishedAt) {

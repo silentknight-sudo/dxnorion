@@ -37,8 +37,8 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
         url += `&tag=${encodeURIComponent(tagFilter)}`;
       }
       const res = await fetch(url);
-      const data = await res.json();
-      setPosts(data);
+      const data = await res.json().catch(() => []);
+      setPosts(res.ok && Array.isArray(data) ? data : []);
     } catch (e) {
       console.error(e);
     } finally {
@@ -49,15 +49,15 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
   const fetchCategories = async () => {
     try {
       const res = await fetch('/api/categories');
-      const data = await res.json();
-      setCategories(data);
+      const data = await res.json().catch(() => []);
+      setCategories(res.ok && Array.isArray(data) ? data : []);
     } catch (e) {}
   };
 
   const filteredPosts = posts.filter(p => {
     if (!searchQuery) return true;
     const q = searchQuery.toLowerCase();
-    return p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q);
+    return (p.title || '').toLowerCase().includes(q) || (p.excerpt || '').toLowerCase().includes(q);
   });
 
   const featuredPost = filteredPosts[0];

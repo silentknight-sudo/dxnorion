@@ -35,19 +35,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenEnquiry, activePath = '/',
         <a 
           href="/" 
           onClick={(e) => { e.preventDefault(); handleNavClick('/'); }}
-          className="flex items-center space-x-2.5 group cursor-pointer"
+          aria-label="DXN Orion Sector 22D Yamuna Expressway – Home"
+          className="flex items-center group cursor-pointer"
         >
-          <div className="w-8 h-8 rounded-full border border-[#C9A86A]/50 flex items-center justify-center bg-[#C9A86A]/10 group-hover:bg-[#C9A86A]/20 transition-all">
-            <span className="font-serif font-bold text-[#C9A86A] text-sm tracking-wider">DO</span>
-          </div>
-          <div>
-            <span className="block text-sm sm:text-base tracking-[0.2em] font-serif font-bold text-[#F7F4EE] uppercase leading-none">
-              DXN Orion
-            </span>
-            <span className="text-[9px] tracking-wider text-[#C9A86A]/90 uppercase block font-medium mt-0.5">
-              Sec 22D, Yamuna Exp.
-            </span>
-          </div>
+          <span className="bg-white rounded-md px-2 py-1 flex items-center group-hover:opacity-90 transition-opacity">
+            <img
+              src="/logo.png"
+              alt="DXN Orion Yamuna Expressway logo"
+              width={178}
+              height={63}
+              className="h-8 sm:h-9 w-auto"
+            />
+          </span>
         </a>
 
         {/* Desktop Navigation Links */}

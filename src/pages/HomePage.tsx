@@ -241,7 +241,7 @@ export const HomePage: React.FC<HomePageProps> = ({
           {/* Headings */}
           <div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#F7F4EE] tracking-tight leading-tight">
-              Luxury Living Beside the <span className="gold-text-gradient italic">Greens</span>
+              DXN Orion Sector 22D Yamuna Expressway: <span className="gold-text-gradient italic">Luxury 3 &amp; 4 BHK</span> Beside the Greens
             </h1>
             <p className="text-xs sm:text-sm text-[#94A3B8] mt-1.5 leading-relaxed max-w-xl">
               Ultra-modern 3 &amp; 4 BHK sky estates overlooking panoramic golf courses. 15 Mins from Noida Int&apos;l Airport (Jewar).
@@ -620,7 +620,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <Crown className="w-4 h-4 text-[#C9A86A]" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-[#F7F4EE]">Palatial Clubhouse</h4>
+              <h3 className="text-xs font-semibold text-[#F7F4EE]">Palatial Clubhouse</h3>
               <p className="text-[9px] text-[#94A3B8]">Cigar &amp; Wine Lounge</p>
             </div>
           </div>
@@ -630,7 +630,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <Waves className="w-4 h-4 text-[#C9A86A]" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-[#F7F4EE]">Infinity Edge Pool</h4>
+              <h3 className="text-xs font-semibold text-[#F7F4EE]">Infinity Edge Pool</h3>
               <p className="text-[9px] text-[#94A3B8]">Cabanas &amp; Sun Decks</p>
             </div>
           </div>
@@ -640,7 +640,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <Dumbbell className="w-4 h-4 text-[#C9A86A]" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-[#F7F4EE]">Gym &amp; Aerobics</h4>
+              <h3 className="text-xs font-semibold text-[#F7F4EE]">Gym &amp; Aerobics</h3>
               <p className="text-[9px] text-[#94A3B8]">Technogym Equipped</p>
             </div>
           </div>
@@ -650,7 +650,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <Sparkle className="w-4 h-4 text-[#C9A86A]" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-[#F7F4EE]">Ayurveda Spa</h4>
+              <h3 className="text-xs font-semibold text-[#F7F4EE]">Ayurveda Spa</h3>
               <p className="text-[9px] text-[#94A3B8]">Steam, Sauna &amp; Salon</p>
             </div>
           </div>
@@ -660,7 +660,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <Baby className="w-4 h-4 text-[#C9A86A]" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-[#F7F4EE]">Kids Play Arena</h4>
+              <h3 className="text-xs font-semibold text-[#F7F4EE]">Kids Play Arena</h3>
               <p className="text-[9px] text-[#94A3B8]">Safe Toddler Splash Zone</p>
             </div>
           </div>
@@ -670,7 +670,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <CloudSun className="w-4 h-4 text-[#C9A86A]" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-[#F7F4EE]">Sky Observatory</h4>
+              <h3 className="text-xs font-semibold text-[#F7F4EE]">Sky Observatory</h3>
               <p className="text-[9px] text-[#94A3B8]">Telescopic View Deck</p>
             </div>
           </div>
@@ -680,7 +680,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <Flower2 className="w-4 h-4 text-[#C9A86A]" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-[#F7F4EE]">Zen Greens</h4>
+              <h3 className="text-xs font-semibold text-[#F7F4EE]">Zen Greens</h3>
               <p className="text-[9px] text-[#94A3B8]">Aromatic Herb Gardens</p>
             </div>
           </div>
@@ -690,7 +690,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <ShieldCheck className="w-4 h-4 text-[#C9A86A]" />
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-[#F7F4EE]">24x7 Concierge</h4>
+              <h3 className="text-xs font-semibold text-[#F7F4EE]">24x7 Concierge</h3>
               <p className="text-[9px] text-[#94A3B8]">Valet &amp; High Security</p>
             </div>
           </div>
