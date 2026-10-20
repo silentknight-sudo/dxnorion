@@ -28,15 +28,15 @@ export const StickyBottomBar: React.FC<StickyBottomBarProps> = ({
   };
 
   return (
-    <aside className="fixed bottom-0 left-0 right-0 z-40 bg-[#0B1426]/95 backdrop-blur-xl border-t border-[#C9A86A]/30 px-3 py-2.5 shadow-2xl">
+    <aside className="fixed bottom-0 left-0 right-0 z-40 bg-white backdrop-blur-xl border-t border-[#E5E7EB] px-3 py-2.5 shadow-2xl">
       <div className="max-w-md mx-auto grid grid-cols-3 gap-2">
         {/* Call Desk Button */}
         <a
           href={`tel:${cleanPhone}`}
           onClick={handleCallClick}
-          className="flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-[#182746] border border-[#C9A86A]/30 text-[#F7F4EE] hover:text-[#C9A86A] active:scale-95 transition-all text-center"
+          className="flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-[#F4F6FA] border border-[#E5E7EB] text-[#111827] hover:text-[#0E4D92] active:scale-95 transition-all text-center"
         >
-          <PhoneCall className="w-4 h-4 text-[#C9A86A] mb-0.5" />
+          <PhoneCall className="w-4 h-4 text-[#0E4D92] mb-0.5" />
           <span className="text-[10px] font-semibold tracking-wider">Call Desk</span>
         </a>
 
@@ -46,18 +46,18 @@ export const StickyBottomBar: React.FC<StickyBottomBarProps> = ({
           onClick={handleWaClick}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-[#075E54]/40 border border-[#25D366]/40 text-[#F7F4EE] hover:border-[#25D366] active:scale-95 transition-all text-center"
+          className="flex flex-col items-center justify-center py-2 px-1 rounded-xl bg-[#25D366] border border-[#25D366] text-white hover:border-[#25D366] active:scale-95 transition-all text-center"
         >
-          <MessageCircle className="w-4 h-4 text-[#25D366] mb-0.5" />
+          <MessageCircle className="w-4 h-4 text-white mb-0.5" />
           <span className="text-[10px] font-semibold tracking-wider">WhatsApp</span>
         </a>
 
         {/* Quick Enquire CTA Button */}
         <button
           onClick={() => onOpenEnquiry('Bottom Sticky Bar CTA')}
-          className="flex flex-col items-center justify-center py-2 px-1 rounded-xl gold-gradient-bg text-[#0B1426] font-bold shadow-md shadow-[#C9A86A]/30 active:scale-95 transition-all cursor-pointer text-center"
+          className="flex flex-col items-center justify-center py-2 px-1 rounded-xl gold-gradient-bg text-white font-bold shadow-md shadow-black/5 active:scale-95 transition-all cursor-pointer text-center"
         >
-          <Sparkles className="w-4 h-4 mb-0.5 text-[#0B1426]" />
+          <Sparkles className="w-4 h-4 mb-0.5 text-white" />
           <span className="text-[10px] uppercase tracking-wider font-extrabold">Enquire</span>
         </button>
       </div>

@@ -50,17 +50,17 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
   ];
 
   return (
-    <div className="min-h-screen bg-[#0B1426] text-[#F7F4EE]">
+    <div className="min-h-screen bg-white text-[#111827]">
       {/* Top Navbar */}
-      <header className="sticky top-0 z-40 bg-[#0B1426]/95 backdrop-blur-md border-b border-[#C9A86A]/20 px-4 py-3">
+      <header className="sticky top-0 z-40 bg-white backdrop-blur-md border-b border-[#E5E7EB] px-4 py-3">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-full border border-[#C9A86A] flex items-center justify-center bg-[#C9A86A]/10">
-              <span className="font-serif font-bold text-[#C9A86A] text-xs">DO</span>
+            <div className="w-8 h-8 rounded-full border border-[#0E4D92] flex items-center justify-center bg-[#EAF1FB]">
+              <span className="font-bold text-[#0E4D92] text-xs">DO</span>
             </div>
             <div>
-              <span className="text-sm font-serif font-bold tracking-wider uppercase text-[#F7F4EE]">
-                DXN Orion <span className="text-[10px] text-[#C9A86A] font-sans font-semibold">CRM Panel</span>
+              <span className="text-sm font-bold tracking-wider uppercase text-[#111827]">
+                DXN Orion <span className="text-[10px] text-[#0E4D92] font-sans font-semibold">CRM Panel</span>
               </span>
             </div>
           </div>
@@ -68,15 +68,15 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
           <div className="flex items-center space-x-4 text-xs">
             <button
               onClick={() => onNavigatePublic('/')}
-              className="hidden sm:flex items-center gap-1.5 text-[#94A3B8] hover:text-[#C9A86A] transition-colors"
+              className="hidden sm:flex items-center gap-1.5 text-[#4B5563] hover:text-[#0E4D92] transition-colors"
             >
               <span>View Live Website</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </button>
 
-            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-white/5 border border-white/10">
-              <span className="font-semibold text-[#F7F4EE]">{user.name || user.email}</span>
-              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#C9A86A]/20 text-[#DFBF82] font-bold">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-[#F4F6FA] border border-[#E5E7EB]">
+              <span className="font-semibold text-[#111827]">{user.name || user.email}</span>
+              <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#EAF1FB] text-[#0E4D92] font-bold">
                 {user.role || 'ADMIN'}
               </span>
             </div>
@@ -95,7 +95,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
       {/* Main Admin Body */}
       <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Navigation Tabs */}
-        <div className="flex overflow-x-auto no-scrollbar gap-2 mb-6 border-b border-white/10 pb-3">
+        <div className="flex overflow-x-auto no-scrollbar gap-2 mb-6 border-b border-[#E5E7EB] pb-3">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.key;
@@ -111,8 +111,8 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({
                 }}
                 className={`py-2 px-4 rounded-xl text-xs font-semibold flex items-center gap-2 whitespace-nowrap transition-all cursor-pointer ${
                   isActive
-                    ? 'gold-gradient-bg text-[#0B1426] shadow-md shadow-[#C9A86A]/20 font-bold'
-                    : 'glass-panel text-[#F7F4EE] hover:bg-white/10'
+                    ? 'gold-gradient-bg text-white shadow-md shadow-black/5 font-bold'
+                    : 'glass-panel text-[#111827] hover:bg-[#F4F6FA]'
                 }`}
               >
                 <Icon className="w-4 h-4" />

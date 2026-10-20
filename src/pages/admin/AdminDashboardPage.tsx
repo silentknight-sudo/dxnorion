@@ -91,7 +91,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
   };
 
   if (loading) {
-    return <div className="py-20 text-center text-xs text-[#94A3B8]">Loading CRM intelligence...</div>;
+    return <div className="py-20 text-center text-xs text-[#4B5563]">Loading CRM intelligence...</div>;
   }
 
   if (!stats) {
@@ -101,7 +101,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
           <AlertCircle className="w-6 h-6" />
         </div>
         <div>
-          <h3 className="text-sm font-bold text-[#F7F4EE]">Metrics Unavailable</h3>
+          <h3 className="text-sm font-bold text-[#111827]">Metrics Unavailable</h3>
           <p className="text-xs text-red-300 mt-1">
             {errorMessage || 'Unable to load dashboard metrics.'}
           </p>
@@ -109,14 +109,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         <div className="flex items-center justify-center gap-3 pt-2">
           <button
             onClick={() => fetchStats(true)}
-            className="px-4 py-2 rounded-xl gold-gradient-bg text-[#0B1426] text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
+            className="px-4 py-2 rounded-xl gold-gradient-bg text-white text-xs font-bold flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Retry Connection</span>
           </button>
           <a
             href="/admin/login"
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[#F7F4EE] text-xs font-medium transition-colors"
+            className="px-4 py-2 rounded-xl bg-[#F4F6FA] hover:bg-[#F4F6FA] text-[#111827] text-xs font-medium transition-colors"
           >
             Sign In Again
           </a>
@@ -130,7 +130,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     CONTACTED: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
     INTERESTED: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
     SITE_VISIT: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
-    CLOSED: 'bg-emerald-600/30 text-emerald-200 border-emerald-500',
+    CLOSED: 'bg-emerald-600/30 text-emerald-700 border-emerald-500',
     NOT_INTERESTED: 'bg-slate-500/20 text-slate-400 border-slate-500/40'
   };
 
@@ -138,68 +138,68 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
     <div className="space-y-6">
       {/* Top 4 KPI Metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30">
-          <span className="text-[10px] text-[#94A3B8] uppercase font-semibold block">Total Enquiries</span>
+        <div className="glass-panel p-4 rounded-2xl border border-[#E5E7EB]">
+          <span className="text-[10px] text-[#4B5563] uppercase font-semibold block">Total Enquiries</span>
           <div className="flex items-baseline justify-between mt-1">
-            <span className="text-2xl sm:text-3xl font-serif font-bold text-[#F7F4EE]">
+            <span className="text-2xl sm:text-3xl font-bold text-[#111827]">
               {stats.totalLeads}
             </span>
             <span className="text-[10px] font-bold text-emerald-400 flex items-center">
               +100% active
             </span>
           </div>
-          <span className="text-[9px] text-[#94A3B8] mt-1 block">Expressions of Interest</span>
+          <span className="text-[9px] text-[#4B5563] mt-1 block">Expressions of Interest</span>
         </div>
 
-        <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30">
-          <span className="text-[10px] text-[#94A3B8] uppercase font-semibold block">Leads Today</span>
+        <div className="glass-panel p-4 rounded-2xl border border-[#E5E7EB]">
+          <span className="text-[10px] text-[#4B5563] uppercase font-semibold block">Leads Today</span>
           <div className="flex items-baseline justify-between mt-1">
-            <span className="text-2xl sm:text-3xl font-serif font-bold text-[#C9A86A]">
+            <span className="text-2xl sm:text-3xl font-bold text-[#0E4D92]">
               {stats.leadsToday}
             </span>
-            <span className="text-[10px] font-bold text-[#C9A86A]">
+            <span className="text-[10px] font-bold text-[#0E4D92]">
               +{stats.leadsThisWeek} this week
             </span>
           </div>
-          <span className="text-[9px] text-[#94A3B8] mt-1 block">Real-time incoming pace</span>
+          <span className="text-[9px] text-[#4B5563] mt-1 block">Real-time incoming pace</span>
         </div>
 
-        <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30">
-          <span className="text-[10px] text-[#94A3B8] uppercase font-semibold block">Site Visits Booked</span>
+        <div className="glass-panel p-4 rounded-2xl border border-[#E5E7EB]">
+          <span className="text-[10px] text-[#4B5563] uppercase font-semibold block">Site Visits Booked</span>
           <div className="flex items-baseline justify-between mt-1">
-            <span className="text-2xl sm:text-3xl font-serif font-bold text-[#F7F4EE]">
+            <span className="text-2xl sm:text-3xl font-bold text-[#111827]">
               {stats.statusCounts.SITE_VISIT || 0}
             </span>
             <span className="text-[10px] text-purple-400 font-bold">
               High intent
             </span>
           </div>
-          <span className="text-[9px] text-[#94A3B8] mt-1 block">Scheduled golf previews</span>
+          <span className="text-[9px] text-[#4B5563] mt-1 block">Scheduled golf previews</span>
         </div>
 
-        <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30">
-          <span className="text-[10px] text-[#94A3B8] uppercase font-semibold block">EOI Conversion Rate</span>
+        <div className="glass-panel p-4 rounded-2xl border border-[#E5E7EB]">
+          <span className="text-[10px] text-[#4B5563] uppercase font-semibold block">EOI Conversion Rate</span>
           <div className="flex items-baseline justify-between mt-1">
-            <span className="text-2xl sm:text-3xl font-serif font-bold text-emerald-400">
+            <span className="text-2xl sm:text-3xl font-bold text-emerald-400">
               {stats.conversionRate}%
             </span>
             <span className="text-[10px] text-emerald-400 font-bold">Closed Tokens</span>
           </div>
-          <span className="text-[9px] text-[#94A3B8] mt-1 block">Lead to token conversion</span>
+          <span className="text-[9px] text-[#4B5563] mt-1 block">Lead to token conversion</span>
         </div>
       </div>
 
       {/* Middle Section: Status Funnel & Source Distribution */}
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Status Funnel */}
-        <div className="glass-panel p-5 rounded-2xl border border-[#C9A86A]/30">
-          <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-            <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">
+        <div className="glass-panel p-5 rounded-2xl border border-[#E5E7EB]">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] mb-3">
+            <h3 className="font-bold text-sm text-[#111827]">
               Lead Progression Funnel
             </h3>
             <button
               onClick={() => onNavigateTab('leads')}
-              className="text-[10px] text-[#C9A86A] hover:underline cursor-pointer"
+              className="text-[10px] text-[#0E4D92] hover:underline cursor-pointer"
             >
               View Kanban &rarr;
             </button>
@@ -220,13 +220,13 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                 <div
                   key={key}
                   onClick={() => onNavigateTab('leads', key)}
-                  className="p-2 rounded-xl bg-[#0B1426]/60 hover:bg-[#0B1426] transition-colors cursor-pointer border border-white/5"
+                  className="p-2 rounded-xl bg-white/60 hover:bg-white transition-colors cursor-pointer border border-[#E5E7EB]"
                 >
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span className="font-medium text-[#F7F4EE]">{label}</span>
-                    <span className="font-bold text-[#C9A86A]">{count} ({percent}%)</span>
+                    <span className="font-medium text-[#111827]">{label}</span>
+                    <span className="font-bold text-[#0E4D92]">{count} ({percent}%)</span>
                   </div>
-                  <div className="w-full h-1.5 rounded-full bg-white/10 overflow-hidden">
+                  <div className="w-full h-1.5 rounded-full bg-[#F4F6FA] overflow-hidden">
                     <div
                       className="h-full gold-gradient-bg rounded-full transition-all duration-500"
                       style={{ width: `${percent}%` }}
@@ -239,43 +239,43 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         </div>
 
         {/* Source & Campaign Analytics */}
-        <div className="glass-panel p-5 rounded-2xl border border-[#C9A86A]/30">
-          <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-            <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">
+        <div className="glass-panel p-5 rounded-2xl border border-[#E5E7EB]">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] mb-3">
+            <h3 className="font-bold text-sm text-[#111827]">
               Lead Capture Source Breakdown
             </h3>
-            <span className="text-[10px] text-[#94A3B8]">First-Touch Attribution</span>
+            <span className="text-[10px] text-[#4B5563]">First-Touch Attribution</span>
           </div>
 
           <div className="space-y-3">
             {Object.entries(stats.sourceCounts || {}).map(([src, count]: [string, any]) => {
               const percent = stats.totalLeads ? Math.round((count / stats.totalLeads) * 100) : 0;
               return (
-                <div key={src} className="flex items-center justify-between text-xs p-2 rounded-lg bg-[#0B1426]/40">
+                <div key={src} className="flex items-center justify-between text-xs p-2 rounded-lg bg-white/40">
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-[#C9A86A]" />
-                    <span className="capitalize text-[#F7F4EE]">
+                    <div className="w-2 h-2 rounded-full bg-[#F26522]" />
+                    <span className="capitalize text-[#111827]">
                       {src.replace(/_/g, ' ')}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="font-bold text-[#F7F4EE]">{count}</span>
-                    <span className="text-[10px] text-[#94A3B8]">({percent}%)</span>
+                    <span className="font-bold text-[#111827]">{count}</span>
+                    <span className="text-[10px] text-[#4B5563]">({percent}%)</span>
                   </div>
                 </div>
               );
             })}
           </div>
 
-          <div className="mt-4 pt-3 border-t border-white/10">
-            <span className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+          <div className="mt-4 pt-3 border-t border-[#E5E7EB]">
+            <span className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Top UTM Campaigns
             </span>
             <div className="flex flex-wrap gap-1.5">
               {Object.entries(stats.campaignCounts || {}).map(([cmp, cnt]: [string, any]) => (
                 <span
                   key={cmp}
-                  className="text-[10px] px-2 py-0.5 rounded-lg bg-[#C9A86A]/15 text-[#DFBF82] border border-[#C9A86A]/30"
+                  className="text-[10px] px-2 py-0.5 rounded-lg bg-[#EAF1FB] text-[#0E4D92] border border-[#E5E7EB]"
                 >
                   {cmp}: {cnt}
                 </span>
@@ -288,14 +288,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
       {/* Bottom Section: Recent Leads & Top Posts */}
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Recent 10 Leads Table */}
-        <div className="lg:col-span-2 glass-panel p-5 rounded-2xl border border-[#C9A86A]/30">
-          <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-            <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">
+        <div className="lg:col-span-2 glass-panel p-5 rounded-2xl border border-[#E5E7EB]">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] mb-3">
+            <h3 className="font-bold text-sm text-[#111827]">
               Latest Enquiries
             </h3>
             <button
               onClick={() => onNavigateTab('leads')}
-              className="text-xs text-[#C9A86A] hover:underline cursor-pointer"
+              className="text-xs text-[#0E4D92] hover:underline cursor-pointer"
             >
               Full Leads Manager &rarr;
             </button>
@@ -303,7 +303,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="text-[10px] text-[#94A3B8] uppercase border-b border-white/10">
+              <thead className="text-[10px] text-[#4B5563] uppercase border-b border-[#E5E7EB]">
                 <tr>
                   <th className="pb-2">Name &amp; Contact</th>
                   <th className="pb-2">Unit</th>
@@ -314,15 +314,15 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
               </thead>
               <tbody className="divide-y divide-white/5">
                 {stats.recentLeads.map((lead: any) => (
-                  <tr key={lead.id} className="hover:bg-white/5 transition-colors">
+                  <tr key={lead.id} className="hover:bg-[#F4F6FA] transition-colors">
                     <td className="py-2.5">
-                      <span className="font-semibold text-[#F7F4EE] block">{lead.name}</span>
-                      <span className="text-[10px] text-[#94A3B8]">{lead.phone}</span>
+                      <span className="font-semibold text-[#111827] block">{lead.name}</span>
+                      <span className="text-[10px] text-[#4B5563]">{lead.phone}</span>
                     </td>
-                    <td className="py-2.5 text-[#DFBF82]">
+                    <td className="py-2.5 text-[#0E4D92]">
                       {lead.configuration.replace('_', '+')}
                     </td>
-                    <td className="py-2.5 text-[#94A3B8] capitalize text-[10px]">
+                    <td className="py-2.5 text-[#4B5563] capitalize text-[10px]">
                       {lead.source.replace('_', ' ')}
                     </td>
                     <td className="py-2.5">
@@ -333,7 +333,7 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
                     <td className="py-2.5 text-right">
                       <button
                         onClick={() => onSelectLead(lead.id)}
-                        className="text-xs text-[#C9A86A] hover:underline font-medium cursor-pointer"
+                        className="text-xs text-[#0E4D92] hover:underline font-medium cursor-pointer"
                       >
                         Manage
                       </button>
@@ -346,14 +346,14 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
         </div>
 
         {/* Top Blog Posts */}
-        <div className="glass-panel p-5 rounded-2xl border border-[#C9A86A]/30">
-          <div className="flex items-center justify-between pb-3 border-b border-white/10 mb-3">
-            <h3 className="font-serif font-bold text-sm text-[#F7F4EE]">
+        <div className="glass-panel p-5 rounded-2xl border border-[#E5E7EB]">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E5E7EB] mb-3">
+            <h3 className="font-bold text-sm text-[#111827]">
               Top Blog Posts
             </h3>
             <button
               onClick={() => onNavigateTab('blog')}
-              className="text-xs text-[#C9A86A] hover:underline cursor-pointer"
+              className="text-xs text-[#0E4D92] hover:underline cursor-pointer"
             >
               CMS &rarr;
             </button>
@@ -361,16 +361,16 @@ export const AdminDashboardPage: React.FC<AdminDashboardPageProps> = ({
 
           <div className="space-y-3">
             {stats.topPosts.map((post: any) => (
-              <div key={post.id} className="p-2.5 rounded-xl bg-[#0B1426]/60 border border-white/5">
-                <h4 className="text-xs font-semibold text-[#F7F4EE] line-clamp-1">
+              <div key={post.id} className="p-2.5 rounded-xl bg-white/60 border border-[#E5E7EB]">
+                <h4 className="text-xs font-semibold text-[#111827] line-clamp-1">
                   {post.title}
                 </h4>
-                <div className="flex items-center justify-between text-[10px] text-[#94A3B8] mt-1.5">
+                <div className="flex items-center justify-between text-[10px] text-[#4B5563] mt-1.5">
                   <span className="flex items-center gap-1">
-                    <Eye className="w-3 h-3 text-[#C9A86A]" />
+                    <Eye className="w-3 h-3 text-[#0E4D92]" />
                     {post.views} views
                   </span>
-                  <span className="text-[#C9A86A] uppercase font-semibold">
+                  <span className="text-[#0E4D92] uppercase font-semibold">
                     {post.status}
                   </span>
                 </div>

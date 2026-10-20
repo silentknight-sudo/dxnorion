@@ -139,23 +139,23 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
 
   return (
     <div className="space-y-8 max-w-3xl">
-      <div className="pb-3 border-b border-white/10">
-        <h2 className="font-serif font-bold text-xl text-[#F7F4EE]">
+      <div className="pb-3 border-b border-[#E5E7EB]">
+        <h2 className="font-bold text-xl text-[#111827]">
           Site Configuration, Compliance &amp; Tracking
         </h2>
-        <p className="text-xs text-[#94A3B8]">
+        <p className="text-xs text-[#4B5563]">
           Configure public sales hotline, UP RERA registration number, and digital marketing tracking tags.
         </p>
       </div>
 
       {/* Main Settings Form */}
-      <form onSubmit={handleSaveSettings} className="glass-panel p-6 rounded-3xl border border-[#C9A86A]/30 space-y-4">
-        <h3 className="font-serif font-bold text-base text-[#F7F4EE]">
+      <form onSubmit={handleSaveSettings} className="glass-panel p-6 rounded-3xl border border-[#E5E7EB] space-y-4">
+        <h3 className="font-bold text-base text-[#111827]">
           General &amp; Compliance Details
         </h3>
 
         {savedSuccess && (
-          <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-200 text-xs flex items-center gap-2">
+          <div className="p-3 bg-emerald-500/20 border border-emerald-500/40 rounded-xl text-emerald-700 text-xs flex items-center gap-2">
             <Check className="w-4 h-4 text-emerald-400" />
             <span>Settings saved successfully. Changes are now reflected live across all public pages!</span>
           </div>
@@ -163,74 +163,74 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
 
         <div className="grid sm:grid-cols-2 gap-3">
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Project Display Name
             </label>
             <input
               type="text"
               value={settings.siteName}
               onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
 
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               UP RERA Registration Number
             </label>
             <input
               type="text"
               value={settings.reraNumber}
               onChange={(e) => setSettings({ ...settings, reraNumber: e.target.value })}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#C9A86A] font-bold"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#0E4D92] font-bold"
             />
-            <span className="text-[9px] text-[#94A3B8]">Displayed on header, footer &amp; legal disclaimer</span>
+            <span className="text-[9px] text-[#4B5563]">Displayed on header, footer &amp; legal disclaimer</span>
           </div>
 
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Official Sales Phone
             </label>
             <input
               type="text"
               value={settings.phone}
               onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
 
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Sales Desk WhatsApp Number
             </label>
             <input
               type="text"
               value={settings.whatsappNumber}
               onChange={(e) => setSettings({ ...settings, whatsappNumber: e.target.value })}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
 
           <div className="sm:col-span-2">
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Official Enquiry Email
             </label>
             <input
               type="email"
               value={settings.email}
               onChange={(e) => setSettings({ ...settings, email: e.target.value })}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
         </div>
 
-        <h3 className="font-serif font-bold text-base text-[#F7F4EE] pt-4 border-t border-white/10">
+        <h3 className="font-bold text-base text-[#111827] pt-4 border-t border-[#E5E7EB]">
           Analytics &amp; Conversion Tracking IDs
         </h3>
 
         <div className="grid sm:grid-cols-2 gap-3 text-xs">
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Google Analytics 4 Measurement ID
             </label>
             <input
@@ -238,12 +238,12 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
               placeholder="G-XXXXXXXXXX"
               value={settings.ga4Id}
               onChange={(e) => setSettings({ ...settings, ga4Id: e.target.value })}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
 
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Meta Pixel ID
             </label>
             <input
@@ -251,12 +251,12 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
               placeholder="7849102938471"
               value={settings.metaPixelId}
               onChange={(e) => setSettings({ ...settings, metaPixelId: e.target.value })}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
 
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Google Ads Conversion Tag ID
             </label>
             <input
@@ -264,12 +264,12 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
               placeholder="AW-984029182"
               value={settings.googleAdsId}
               onChange={(e) => setSettings({ ...settings, googleAdsId: e.target.value })}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
 
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Search Console Meta Verification
             </label>
             <input
@@ -277,7 +277,7 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
               placeholder="google-site-verification=xxxx"
               value={settings.gscVerification}
               onChange={(e) => setSettings({ ...settings, gscVerification: e.target.value })}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
         </div>
@@ -285,25 +285,25 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
         <button
           type="submit"
           disabled={saving}
-          className="py-2.5 px-6 rounded-xl gold-gradient-bg text-[#0B1426] font-bold text-xs uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-md shadow-[#C9A86A]/20 mt-3"
+          className="py-2.5 px-6 rounded-xl gold-gradient-bg text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 cursor-pointer shadow-md shadow-black/5 mt-3"
         >
-          <Save className="w-4 h-4 text-[#0B1426]" />
+          <Save className="w-4 h-4 text-white" />
           <span>{saving ? 'Updating...' : 'Save Site Settings'}</span>
         </button>
       </form>
 
       {/* Password Change Form */}
-      <form onSubmit={handlePasswordChange} className="glass-panel p-6 rounded-3xl border border-[#C9A86A]/30 space-y-4">
-        <h3 className="font-serif font-bold text-base text-[#F7F4EE] flex items-center gap-2">
-          <Lock className="w-4 h-4 text-[#C9A86A]" />
+      <form onSubmit={handlePasswordChange} className="glass-panel p-6 rounded-3xl border border-[#E5E7EB] space-y-4">
+        <h3 className="font-bold text-base text-[#111827] flex items-center gap-2">
+          <Lock className="w-4 h-4 text-[#0E4D92]" />
           <span>Change Admin Password</span>
         </h3>
 
         {pwStatus && (
           <div className={`p-3 rounded-xl text-xs ${
             pwStatus.startsWith('Success')
-              ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/40'
-              : 'bg-red-500/20 text-red-200 border border-red-500/40'
+              ? 'bg-emerald-500/20 text-emerald-700 border border-emerald-500/40'
+              : 'bg-red-500/20 text-red-700 border border-red-500/40'
           }`}>
             {pwStatus}
           </div>
@@ -311,7 +311,7 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
 
         <div className="grid sm:grid-cols-2 gap-3">
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               New Password (min 8 characters)
             </label>
             <input
@@ -319,12 +319,12 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
               required
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
 
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase block mb-1 font-semibold">
               Confirm New Password
             </label>
             <input
@@ -332,14 +332,14 @@ export const AdminSettingsPage: React.FC<AdminSettingsPageProps> = ({ onSettings
               required
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE]"
+              className="w-full bg-white border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827]"
             />
           </div>
         </div>
 
         <button
           type="submit"
-          className="py-2 px-5 rounded-xl border border-[#C9A86A] text-[#C9A86A] hover:bg-[#C9A86A]/10 font-bold text-xs uppercase tracking-wider cursor-pointer"
+          className="py-2 px-5 rounded-xl border border-[#0E4D92] text-[#0E4D92] hover:bg-[#EAF1FB] font-bold text-xs uppercase tracking-wider cursor-pointer"
         >
           Update Password
         </button>

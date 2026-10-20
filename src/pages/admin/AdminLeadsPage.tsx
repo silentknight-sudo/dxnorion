@@ -266,7 +266,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
       CONTACTED: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
       INTERESTED: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
       SITE_VISIT: 'bg-purple-500/20 text-purple-300 border-purple-500/40',
-      CLOSED: 'bg-emerald-600/30 text-emerald-200 border-emerald-500',
+      CLOSED: 'bg-emerald-600/30 text-emerald-700 border-emerald-500',
       NOT_INTERESTED: 'bg-slate-500/20 text-slate-400 border-slate-500/40'
     };
     return (
@@ -279,17 +279,17 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
   return (
     <div className="space-y-5">
       {/* Top Filter Bar */}
-      <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30 flex flex-col lg:flex-row items-center justify-between gap-3">
+      <div className="glass-panel p-4 rounded-2xl border border-[#E5E7EB] flex flex-col lg:flex-row items-center justify-between gap-3">
         {/* Search */}
         <div className="relative w-full lg:w-72">
-          <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#C9A86A]" />
+          <Search className="w-4 h-4 absolute left-3 top-2.5 text-[#0E4D92]" />
           <input
             type="text"
             placeholder="Search name, phone, email, notes..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchLeads()}
-            className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#F7F4EE] placeholder-[#94A3B8] focus:border-[#C9A86A] focus:outline-none"
+            className="w-full bg-white border border-[#E5E7EB] rounded-xl pl-9 pr-3 py-1.5 text-xs text-[#111827] placeholder-[#9CA3AF] focus:border-[#0E4D92] focus:outline-none"
           />
         </div>
 
@@ -298,7 +298,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-[#0B1426] border border-[#C9A86A]/30 rounded-xl px-2.5 py-1.5 text-xs text-[#F7F4EE] focus:border-[#C9A86A] focus:outline-none"
+            className="bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs text-[#111827] focus:border-[#0E4D92] focus:outline-none"
           >
             <option value="ALL">All Statuses</option>
             {statusList.map(s => <option key={s} value={s}>{s}</option>)}
@@ -307,7 +307,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
           <select
             value={configFilter}
             onChange={(e) => setConfigFilter(e.target.value)}
-            className="bg-[#0B1426] border border-[#C9A86A]/30 rounded-xl px-2.5 py-1.5 text-xs text-[#F7F4EE] focus:border-[#C9A86A] focus:outline-none"
+            className="bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs text-[#111827] focus:border-[#0E4D92] focus:outline-none"
           >
             <option value="ALL">All Units</option>
             <option value="3BHK">3 BHK</option>
@@ -318,7 +318,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
           <select
             value={sourceFilter}
             onChange={(e) => setSourceFilter(e.target.value)}
-            className="bg-[#0B1426] border border-[#C9A86A]/30 rounded-xl px-2.5 py-1.5 text-xs text-[#F7F4EE] focus:border-[#C9A86A] focus:outline-none"
+            className="bg-white border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs text-[#111827] focus:border-[#0E4D92] focus:outline-none"
           >
             <option value="ALL">All Sources</option>
             <option value="hero_form">Hero Form</option>
@@ -330,11 +330,11 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
           </select>
 
           {/* View Toggle */}
-          <div className="flex rounded-xl border border-[#C9A86A]/30 bg-[#0B1426] overflow-hidden p-0.5">
+          <div className="flex rounded-xl border border-[#E5E7EB] bg-white overflow-hidden p-0.5">
             <button
               onClick={() => setViewMode('table')}
               className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                viewMode === 'table' ? 'bg-[#C9A86A] text-[#0B1426]' : 'text-[#94A3B8] hover:text-[#F7F4EE]'
+                viewMode === 'table' ? 'bg-[#F26522] text-white' : 'text-[#4B5563] hover:text-[#111827]'
               }`}
               title="Table View"
             >
@@ -343,7 +343,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
             <button
               onClick={() => setViewMode('kanban')}
               className={`p-1.5 rounded-lg text-xs transition-colors cursor-pointer ${
-                viewMode === 'kanban' ? 'bg-[#C9A86A] text-[#0B1426]' : 'text-[#94A3B8] hover:text-[#F7F4EE]'
+                viewMode === 'kanban' ? 'bg-[#F26522] text-white' : 'text-[#4B5563] hover:text-[#111827]'
               }`}
               title="Kanban Board View"
             >
@@ -355,10 +355,10 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
           <button
             onClick={() => fetchLeads(true)}
             disabled={refreshing}
-            className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl bg-[#C9A86A]/20 hover:bg-[#C9A86A]/30 border border-[#C9A86A]/50 text-[#DFBF82] text-xs font-semibold cursor-pointer transition-all active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl bg-[#EAF1FB] hover:bg-[#EAF1FB] border border-[#0E4D92]/40 text-[#0E4D92] text-xs font-semibold cursor-pointer transition-all active:scale-95 disabled:opacity-50"
             title="Refresh Leads Immediately"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#C9A86A]' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin text-[#0E4D92]' : ''}`} />
             <span>{refreshing ? 'Syncing...' : 'Refresh'}</span>
           </button>
 
@@ -366,7 +366,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
           <a
             href="/api/leads/export"
             download
-            className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl border border-[#C9A86A]/40 text-[#C9A86A] hover:bg-[#C9A86A]/10 text-xs font-semibold"
+            className="flex items-center gap-1.5 py-1.5 px-3 rounded-xl border border-[#E5E7EB] text-[#0E4D92] hover:bg-[#EAF1FB] text-xs font-semibold"
           >
             <Download className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Export CSV</span>
@@ -375,7 +375,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
       </div>
 
       {/* Live Sync Status & New Lead Toast Banner */}
-      <div className="flex items-center justify-between px-1 text-[11px] text-[#94A3B8]">
+      <div className="flex items-center justify-between px-1 text-[11px] text-[#4B5563]">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -388,13 +388,13 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
           <span>Last synced: {lastSynced.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
         </div>
 
-        <div className="text-[11px] text-[#DFBF82]">
-          Showing <span className="font-bold text-[#F7F4EE]">{leads.length}</span> lead{leads.length !== 1 ? 's' : ''}
+        <div className="text-[11px] text-[#0E4D92]">
+          Showing <span className="font-bold text-[#111827]">{leads.length}</span> lead{leads.length !== 1 ? 's' : ''}
         </div>
       </div>
 
       {newLeadAlert && (
-        <div className="glass-panel p-3.5 rounded-2xl border border-emerald-500 bg-emerald-500/10 flex items-center justify-between text-xs text-emerald-200 animate-in fade-in slide-in-from-top-2">
+        <div className="glass-panel p-3.5 rounded-2xl border border-emerald-500 bg-emerald-500/10 flex items-center justify-between text-xs text-emerald-700 animate-in fade-in slide-in-from-top-2">
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-emerald-400 animate-bounce" />
             <span className="font-semibold text-white">{newLeadAlert}</span>
@@ -410,15 +410,15 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
 
       {/* Bulk Actions Floating Bar */}
       {selectedIds.length > 0 && (
-        <div className="glass-panel p-3 rounded-xl border border-[#C9A86A] flex items-center justify-between text-xs animate-in fade-in">
-          <span className="text-[#F7F4EE] font-medium">
+        <div className="glass-panel p-3 rounded-xl border border-[#0E4D92] flex items-center justify-between text-xs animate-in fade-in">
+          <span className="text-[#111827] font-medium">
             {selectedIds.length} leads selected
           </span>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-[#94A3B8]">Set status:</span>
+            <span className="text-[10px] text-[#4B5563]">Set status:</span>
             <select
               onChange={(e) => e.target.value && handleBulkStatus(e.target.value as LeadStatus)}
-              className="bg-[#0B1426] border border-white/20 rounded-lg px-2 py-1 text-[11px] text-[#F7F4EE]"
+              className="bg-white border border-[#E5E7EB] rounded-lg px-2 py-1 text-[11px] text-[#111827]"
               defaultValue=""
             >
               <option value="" disabled>Change status to...</option>
@@ -437,10 +437,10 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
 
       {/* Main Content: Table or Kanban */}
       {viewMode === 'table' ? (
-        <div className="glass-panel rounded-2xl border border-[#C9A86A]/30 overflow-hidden shadow-xl">
+        <div className="glass-panel rounded-2xl border border-[#E5E7EB] overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#0B1426]/80 text-[10px] text-[#94A3B8] uppercase border-b border-white/10">
+              <thead className="bg-white text-[10px] text-[#4B5563] uppercase border-b border-[#E5E7EB]">
                 <tr>
                   <th className="p-3 w-8">
                     <input
@@ -463,7 +463,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
                   return (
                     <tr
                       key={lead.id}
-                      className="hover:bg-white/5 transition-colors cursor-pointer"
+                      className="hover:bg-[#F4F6FA] transition-colors cursor-pointer"
                       onClick={() => openLeadDrawer(lead)}
                     >
                       <td className="p-3" onClick={(e) => e.stopPropagation()}>
@@ -477,29 +477,29 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
                         />
                       </td>
                       <td className="p-3">
-                        <span className="font-semibold text-[#F7F4EE] block">{lead.name}</span>
-                        <div className="flex items-center gap-2 text-[10px] text-[#94A3B8]">
+                        <span className="font-semibold text-[#111827] block">{lead.name}</span>
+                        <div className="flex items-center gap-2 text-[10px] text-[#4B5563]">
                           <span>+91 {lead.phone}</span>
                           {lead.email && <span>• {lead.email}</span>}
                         </div>
                       </td>
                       <td className="p-3">
-                        <span className="text-[#C9A86A] font-semibold">
+                        <span className="text-[#0E4D92] font-semibold">
                           {lead.configuration.replace('_', '+')}
                         </span>
                         {lead.budget && (
-                          <span className="text-[10px] text-[#94A3B8] block">{lead.budget}</span>
+                          <span className="text-[10px] text-[#4B5563] block">{lead.budget}</span>
                         )}
                       </td>
                       <td className="p-3">
-                        <span className="capitalize text-[11px] text-[#F7F4EE] block">
+                        <span className="capitalize text-[11px] text-[#111827] block">
                           {lead.source.replace('_', ' ')}
                         </span>
-                        <span className="text-[10px] text-[#94A3B8]">
+                        <span className="text-[10px] text-[#4B5563]">
                           {lead.utmCampaign || 'organic'}
                         </span>
                       </td>
-                      <td className="p-3 text-[10px] text-[#94A3B8]">
+                      <td className="p-3 text-[10px] text-[#4B5563]">
                         {new Date(lead.createdAt).toLocaleDateString('en-IN', {
                           day: 'numeric',
                           month: 'short',
@@ -511,7 +511,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
                         <select
                           value={lead.status}
                           onChange={(e) => handleUpdateStatus(lead.id, e.target.value as LeadStatus)}
-                          className="bg-[#0B1426] border border-white/20 rounded-lg px-2 py-1 text-[10px] text-[#F7F4EE] focus:border-[#C9A86A]"
+                          className="bg-white border border-[#E5E7EB] rounded-lg px-2 py-1 text-[10px] text-[#111827] focus:border-[#0E4D92]"
                         >
                           {statusList.map(st => <option key={st} value={st}>{st}</option>)}
                         </select>
@@ -520,7 +520,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
                         <div className="flex items-center justify-end gap-1.5">
                           <a
                             href={`tel:+91${lead.phone}`}
-                            className="p-1 rounded bg-[#0B1426] border border-white/10 text-[#C9A86A] hover:bg-[#C9A86A]/20"
+                            className="p-1 rounded bg-white border border-[#E5E7EB] text-[#0E4D92] hover:bg-[#EAF1FB]"
                             title="Call Lead"
                           >
                             <Phone className="w-3.5 h-3.5" />
@@ -551,13 +551,13 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
             return (
               <div
                 key={colStatus}
-                className="glass-panel rounded-2xl p-3 border border-[#C9A86A]/20 flex flex-col h-[75vh]"
+                className="glass-panel rounded-2xl p-3 border border-[#E5E7EB] flex flex-col h-[75vh]"
               >
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
-                  <span className="text-[10px] font-bold text-[#F7F4EE] uppercase tracking-wider">
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-[#E5E7EB]">
+                  <span className="text-[10px] font-bold text-[#111827] uppercase tracking-wider">
                     {colStatus.replace('_', ' ')}
                   </span>
-                  <span className="text-[10px] font-bold text-[#C9A86A] bg-[#C9A86A]/10 px-1.5 py-0.5 rounded">
+                  <span className="text-[10px] font-bold text-[#0E4D92] bg-[#EAF1FB] px-1.5 py-0.5 rounded">
                     {colLeads.length}
                   </span>
                 </div>
@@ -567,16 +567,16 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
                     <div
                       key={lead.id}
                       onClick={() => openLeadDrawer(lead)}
-                      className="p-3 rounded-xl bg-[#0B1426]/90 border border-white/10 hover:border-[#C9A86A] transition-all cursor-pointer shadow-md text-xs space-y-1.5"
+                      className="p-3 rounded-xl bg-white border border-[#E5E7EB] hover:border-[#0E4D92] transition-all cursor-pointer shadow-md text-xs space-y-1.5"
                     >
                       <div className="flex justify-between items-start">
-                        <span className="font-semibold text-[#F7F4EE]">{lead.name}</span>
-                        <span className="text-[9px] text-[#C9A86A] font-bold">
+                        <span className="font-semibold text-[#111827]">{lead.name}</span>
+                        <span className="text-[9px] text-[#0E4D92] font-bold">
                           {lead.configuration.replace('_', '+')}
                         </span>
                       </div>
-                      <p className="text-[10px] text-[#94A3B8]">{lead.phone}</p>
-                      <div className="flex items-center justify-between text-[9px] text-[#94A3B8] pt-1 border-t border-white/5">
+                      <p className="text-[10px] text-[#4B5563]">{lead.phone}</p>
+                      <div className="flex items-center justify-between text-[9px] text-[#4B5563] pt-1 border-t border-[#E5E7EB]">
                         <span className="capitalize">{lead.source.replace('_', ' ')}</span>
                         <span>{new Date(lead.createdAt).toLocaleDateString('en-IN', { month: 'short', day: 'numeric' })}</span>
                       </div>
@@ -592,20 +592,20 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
       {/* Lead Detail Drawer Modal */}
       {activeLead && (
         <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm animate-in fade-in">
-          <div className="w-full max-w-lg bg-[#0B1426] border-l border-[#C9A86A]/40 h-full p-6 overflow-y-auto space-y-6 shadow-2xl">
+          <div className="w-full max-w-lg bg-white border-l border-[#E5E7EB] h-full p-6 overflow-y-auto space-y-6 shadow-2xl">
             {/* Drawer Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-white/10">
+            <div className="flex items-center justify-between pb-4 border-b border-[#E5E7EB]">
               <div>
-                <span className="text-[10px] text-[#C9A86A] uppercase font-bold tracking-wider">
+                <span className="text-[10px] text-[#0E4D92] uppercase font-bold tracking-wider">
                   Lead Dossier #{activeLead.id}
                 </span>
-                <h2 className="text-xl font-serif font-bold text-[#F7F4EE] mt-0.5">
+                <h2 className="text-xl font-bold text-[#111827] mt-0.5">
                   {activeLead.name}
                 </h2>
               </div>
               <button
                 onClick={closeLeadDrawer}
-                className="w-8 h-8 rounded-full bg-white/10 text-[#F7F4EE] flex items-center justify-center hover:bg-white/20 cursor-pointer"
+                className="w-8 h-8 rounded-full bg-[#F4F6FA] text-[#111827] flex items-center justify-center hover:bg-[#F4F6FA] cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -615,9 +615,9 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
             <div className="grid grid-cols-2 gap-3">
               <a
                 href={`tel:+91${activeLead.phone}`}
-                className="py-2.5 px-3 rounded-xl bg-[#111D36] border border-[#C9A86A]/40 text-[#F7F4EE] hover:text-[#C9A86A] flex items-center justify-center gap-2 text-xs font-semibold"
+                className="py-2.5 px-3 rounded-xl bg-[#F4F6FA] border border-[#E5E7EB] text-[#111827] hover:text-[#0E4D92] flex items-center justify-center gap-2 text-xs font-semibold"
               >
-                <Phone className="w-4 h-4 text-[#C9A86A]" />
+                <Phone className="w-4 h-4 text-[#0E4D92]" />
                 <span>Call Lead Desk</span>
               </a>
 
@@ -625,7 +625,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
                 href={`https://wa.me/91${activeLead.phone}?text=${encodeURIComponent(`Hi ${activeLead.name}, this is the official sales desk for DXN Orion Sector 22D Yamuna Expressway. I am sharing the requested floor plans and pre-launch price matrix.`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="py-2.5 px-3 rounded-xl bg-[#075E54] border border-[#25D366]/40 text-[#F7F4EE] flex items-center justify-center gap-2 text-xs font-semibold shadow-lg"
+                className="py-2.5 px-3 rounded-xl bg-[#075E54] border border-[#25D366]/40 text-[#111827] flex items-center justify-center gap-2 text-xs font-semibold shadow-lg"
               >
                 <MessageCircle className="w-4 h-4 text-[#25D366]" />
                 <span>Open WhatsApp</span>
@@ -633,52 +633,52 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
             </div>
 
             {/* Lead Status & Attributes */}
-            <div className="glass-panel p-4 rounded-2xl border border-white/10 space-y-3 text-xs">
+            <div className="glass-panel p-4 rounded-2xl border border-[#E5E7EB] space-y-3 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-[#94A3B8]">Status:</span>
+                <span className="text-[#4B5563]">Status:</span>
                 <select
                   value={activeLead.status}
                   onChange={(e) => handleUpdateStatus(activeLead.id, e.target.value as LeadStatus)}
-                  className="bg-[#0B1426] border border-[#C9A86A]/40 rounded-lg px-2.5 py-1 text-xs text-[#F7F4EE] font-semibold"
+                  className="bg-white border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-xs text-[#111827] font-semibold"
                 >
                   {statusList.map(st => <option key={st} value={st}>{st}</option>)}
                 </select>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-[#94A3B8]">Configuration:</span>
-                <span className="font-bold text-[#C9A86A]">
+                <span className="text-[#4B5563]">Configuration:</span>
+                <span className="font-bold text-[#0E4D92]">
                   {activeLead.configuration.replace('_', '+')}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-[#94A3B8]">Phone:</span>
-                <span className="font-semibold text-[#F7F4EE]">+91 {activeLead.phone}</span>
+                <span className="text-[#4B5563]">Phone:</span>
+                <span className="font-semibold text-[#111827]">+91 {activeLead.phone}</span>
               </div>
 
               {activeLead.email && (
                 <div className="flex items-center justify-between">
-                  <span className="text-[#94A3B8]">Email:</span>
-                  <span className="font-semibold text-[#F7F4EE]">{activeLead.email}</span>
+                  <span className="text-[#4B5563]">Email:</span>
+                  <span className="font-semibold text-[#111827]">{activeLead.email}</span>
                 </div>
               )}
 
               <div className="flex items-center justify-between">
-                <span className="text-[#94A3B8]">Source / Landing:</span>
-                <span className="capitalize text-[#F7F4EE]">
+                <span className="text-[#4B5563]">Source / Landing:</span>
+                <span className="capitalize text-[#111827]">
                   {activeLead.source.replace('_', ' ')} ({activeLead.landingPage})
                 </span>
               </div>
 
               {activeLead.utmCampaign && (
                 <div className="flex items-center justify-between">
-                  <span className="text-[#94A3B8]">Campaign:</span>
-                  <span className="text-[#DFBF82]">{activeLead.utmCampaign}</span>
+                  <span className="text-[#4B5563]">Campaign:</span>
+                  <span className="text-[#0E4D92]">{activeLead.utmCampaign}</span>
                 </div>
               )}
 
-              <div className="flex items-center justify-between text-[10px] text-[#94A3B8] pt-2 border-t border-white/10">
+              <div className="flex items-center justify-between text-[10px] text-[#4B5563] pt-2 border-t border-[#E5E7EB]">
                 <span>Received At:</span>
                 <span>{new Date(activeLead.createdAt).toLocaleString('en-IN')}</span>
               </div>
@@ -686,9 +686,9 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
 
             {/* Activities & Notes Timeline */}
             <div className="space-y-4">
-              <h3 className="font-serif font-bold text-sm text-[#F7F4EE] flex items-center justify-between">
+              <h3 className="font-bold text-sm text-[#111827] flex items-center justify-between">
                 <span>Activity &amp; Relationship History</span>
-                <span className="text-[10px] text-[#C9A86A]">{activities.length} entries</span>
+                <span className="text-[10px] text-[#0E4D92]">{activities.length} entries</span>
               </h3>
 
               {/* Add Note / Activity Form */}
@@ -697,7 +697,7 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
                   <select
                     value={noteType}
                     onChange={(e) => setNoteType(e.target.value as any)}
-                    className="bg-[#111D36] border border-[#C9A86A]/30 rounded-xl px-2.5 py-1.5 text-xs text-[#F7F4EE]"
+                    className="bg-[#F4F6FA] border border-[#E5E7EB] rounded-xl px-2.5 py-1.5 text-xs text-[#111827]"
                   >
                     <option value="NOTE">Internal Note</option>
                     <option value="CALL">Call Logged</option>
@@ -709,11 +709,11 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
                     placeholder="Log conversation details or client preference..."
                     value={newNote}
                     onChange={(e) => setNewNote(e.target.value)}
-                    className="flex-1 bg-[#111D36] border border-[#C9A86A]/30 rounded-xl px-3 py-1.5 text-xs text-[#F7F4EE] placeholder-[#94A3B8] focus:border-[#C9A86A] focus:outline-none"
+                    className="flex-1 bg-[#F4F6FA] border border-[#E5E7EB] rounded-xl px-3 py-1.5 text-xs text-[#111827] placeholder-[#9CA3AF] focus:border-[#0E4D92] focus:outline-none"
                   />
                   <button
                     type="submit"
-                    className="py-1.5 px-3 rounded-xl gold-gradient-bg text-[#0B1426] font-bold text-xs"
+                    className="py-1.5 px-3 rounded-xl gold-gradient-bg text-white font-bold text-xs"
                   >
                     <Send className="w-3.5 h-3.5" />
                   </button>
@@ -723,12 +723,12 @@ export const AdminLeadsPage: React.FC<AdminLeadsPageProps> = ({
               {/* Activity Feed */}
               <div className="space-y-2.5 max-h-64 overflow-y-auto pr-1">
                 {activities.map((act) => (
-                  <div key={act.id} className="p-3 rounded-xl bg-[#111D36]/80 border border-white/5 text-xs space-y-1">
-                    <div className="flex items-center justify-between text-[10px] text-[#94A3B8]">
-                      <span className="font-bold text-[#C9A86A]">{act.type}</span>
+                  <div key={act.id} className="p-3 rounded-xl bg-[#F4F6FA] border border-[#E5E7EB] text-xs space-y-1">
+                    <div className="flex items-center justify-between text-[10px] text-[#4B5563]">
+                      <span className="font-bold text-[#0E4D92]">{act.type}</span>
                       <span>{new Date(act.createdAt).toLocaleString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
-                    <p className="text-[#F7F4EE] leading-relaxed">{act.content}</p>
+                    <p className="text-[#111827] leading-relaxed">{act.content}</p>
                   </div>
                 ))}
               </div>

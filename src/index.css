@@ -1,52 +1,75 @@
 @import "tailwindcss";
 
 @theme {
-  --color-midnight: #0B1426;
-  --color-midnight-card: #111D36;
-  --color-midnight-subtle: #182746;
-  --color-gold: #C9A86A;
-  --color-gold-light: #DFBF82;
-  --color-gold-dark: #A68446;
-  --color-ivory: #F7F4EE;
-  --color-slateText: #94A3B8;
-  --font-serif: "Playfair Display", Georgia, serif;
-  --font-sans: "Manrope", Inter, system-ui, sans-serif;
+  --color-brand: #0E4D92;
+  --color-brand-dark: #0A3A6E;
+  --color-cta: #F26522;
+  --color-cta-dark: #D9541A;
+  --color-ink: #111827;
+  --color-body: #4B5563;
+  --color-line: #E5E7EB;
+  --color-alt: #F4F6FA;
+  --font-sans: "Poppins", "Open Sans", system-ui, sans-serif;
+  --font-serif: "Poppins", "Open Sans", system-ui, sans-serif;
 }
 
 @layer base {
   body {
-    background-color: #0B1426;
-    color: #F7F4EE;
-    font-family: 'Manrope', Inter, sans-serif;
+    background-color: #FFFFFF;
+    color: #111827;
+    font-family: 'Open Sans', system-ui, sans-serif;
     -webkit-tap-highlight-color: transparent;
+  }
+  h1, h2, h3, h4 {
+    font-family: 'Poppins', system-ui, sans-serif;
+    letter-spacing: -0.01em;
   }
 }
 
+/* Plain white card (was glassmorphism) */
 .glass-panel {
-  background: rgba(17, 29, 54, 0.78);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(201, 168, 106, 0.28);
+  background: #FFFFFF;
+  border: 1px solid #E5E7EB;
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.06), 0 4px 12px rgba(17, 24, 39, 0.04);
 }
 
 .glass-panel-hover:hover {
-  border-color: rgba(201, 168, 106, 0.6);
-  background: rgba(24, 39, 70, 0.88);
+  border-color: #0E4D92;
+  box-shadow: 0 6px 20px rgba(14, 77, 146, 0.12);
 }
 
+/* Solid CTA (was gold gradient) */
 .gold-gradient-bg {
-  background: linear-gradient(135deg, #C9A86A 0%, #E6CE9B 50%, #B8924F 100%);
+  background: #F26522;
+  color: #FFFFFF !important;
 }
+.gold-gradient-bg:hover { background: #D9541A; }
 
 .gold-text-gradient {
-  background: linear-gradient(135deg, #FFF3D6 0%, #C9A86A 50%, #E2BE78 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #F26522;
 }
 
 .gold-border-glow {
-  box-shadow: 0 0 20px rgba(201, 168, 106, 0.2);
+  box-shadow: 0 4px 14px rgba(17, 24, 39, 0.08);
 }
+
+/* Blog HTML saved in Firestore still carries dark-theme utility classes; map them to the light theme. */
+.post-body [class*="text-[#F7F4EE]"] { color: #111827; }
+.post-body [class*="text-[#94A3B8]"] { color: #4B5563; }
+.post-body [class*="text-[#C9A86A]"], .post-body [class*="text-[#DFBF82]"] { color: #0E4D92; }
+.post-body [class*="text-[#0B1426]"] { color: #FFFFFF; }
+.post-body [class*="bg-[#111D36]"], .post-body [class*="bg-[#0B1426]"] { background-color: #F4F6FA; }
+.post-body [class*="border-[#C9A86A]"] { border-color: #E5E7EB; }
+.post-body { color: #374151; }
+.post-body h2, .post-body h3 { color: #111827; font-weight: 700; margin-top: 1.25em; }
+.post-body h2 { font-size: 1.35rem; }
+.post-body h3 { font-size: 1.1rem; }
+.post-body a { color: #0E4D92; text-decoration: underline; }
+.post-body ul { list-style: disc; padding-left: 1.25rem; }
+.post-body ol { list-style: decimal; padding-left: 1.25rem; }
+.post-body table { width: 100%; border-collapse: collapse; }
+.post-body th, .post-body td { border: 1px solid #E5E7EB; padding: 0.5rem; text-align: left; }
+.post-body th { background: #F4F6FA; }
 
 .no-scrollbar::-webkit-scrollbar {
   display: none;

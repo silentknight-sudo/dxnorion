@@ -20,7 +20,7 @@ import { NotFoundPage } from './pages/NotFoundPage.tsx';
 const AdminLoginPage = lazy(() => import('./pages/admin/AdminLoginPage.tsx').then(m => ({ default: m.AdminLoginPage })));
 const AdminLayout = lazy(() => import('./pages/admin/AdminLayout.tsx').then(m => ({ default: m.AdminLayout })));
 const adminFallback = (
-  <div className="min-h-screen bg-[#0B1426] flex items-center justify-center text-xs text-[#94A3B8]">Loading…</div>
+  <div className="min-h-screen bg-white flex items-center justify-center text-xs text-[#4B5563]">Loading…</div>
 );
 
 import { PAGE_SEO, NOT_FOUND_SEO, categorySeo, LANDING_PAGES } from './seo/pages.ts';
@@ -218,7 +218,7 @@ export default function App() {
 
     if (authChecking) {
       return (
-        <div className="min-h-screen bg-[#0B1426] flex items-center justify-center text-xs text-[#94A3B8]">
+        <div className="min-h-screen bg-white flex items-center justify-center text-xs text-[#4B5563]">
           Verifying security privileges...
         </div>
       );
@@ -372,7 +372,7 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0B1426] text-[#F7F4EE] flex flex-col font-sans selection:bg-[#C9A86A] selection:text-[#0B1426]">
+    <div className="min-h-screen bg-white text-[#111827] flex flex-col font-sans selection:bg-[#0E4D92] selection:text-white">
       {/* Dynamic JSON-LD Structured Data */}
       <script
         type="application/ld+json"

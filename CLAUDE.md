@@ -24,7 +24,9 @@ Pre-launch marketing site + lead CRM/blog admin for **DXN Orion**, Sector 22D, Y
 - Sitemap, robots.txt and RSS are generated in `server.ts`.
 
 ## Brand / business facts
-- Logo: `public/logo.png` (ORION Yamuna Expressway, 178×63, dark text) — shown on a white pill in Header/Footer because the site background is navy `#0B1426`. Gold `#C9A86A`, ivory `#F7F4EE`.
+- Logo: `public/logo.png` (ORION Yamuna Expressway, 178×63, dark text).
+- Theme (Oct 2026, property-portal style, light): white bg, alt sections `#F4F6FA`, ink `#111827`, body text `#4B5563`, borders `#E5E7EB`, brand blue `#0E4D92`, CTA orange `#F26522` (hover `#D9541A`); headings Poppins, body Open Sans. Tokens in `src/index.css` `@theme`. Avoid dark/gold glassmorphism, serif headings and gradient text. Text over photos stays white on a `from-black/..` overlay.
+- Old blog HTML in Firestore still has dark-theme classes; `.post-body` overrides in `index.css` remap them.
 - Sales phone: +91 72172 27777 (also in `App.tsx` / `db.ts` defaults). Keep JSON-LD phone in sync.
 - Address used: Plot GH-01, Sector 22D, Yamuna Expressway, Greater Noida, UP 203201.
 - Unit sizes: 3 BHK ~1,900, 3 BHK + Servant ~2,400, 4 BHK + Servant ~3,000 sq.ft (matches visible pages); ~11 acres, 4 units/floor.
@@ -40,5 +42,5 @@ Pre-launch marketing site + lead CRM/blog admin for **DXN Orion**, Sector 22D, Y
 - Keyword landing pages `/price-list` and `/faq` come from `LANDING_PAGES`/`FAQ_ITEMS` in `src/seo/pages.ts`, rendered by `src/pages/LandingPage.tsx`. Use both "DXN Orion" and "Orion DXN" word orders (competitor domain oriondxn.co.in).
 - `src/seo/pages.ts` — single source of per-route title/description/crawlable body. Edit here when adding a page.
 - `src/server/seoRender.ts` — in production/Vercel, `server.ts` renders every non-file, non-API URL through this: page-specific `<title>`, meta, canonical, hreflang, OG/Twitter, JSON-LD (WebPage/BlogPosting/CollectionPage/Breadcrumb/FAQ) and HTML inside `<!--seo-root-start-->…<!--seo-root-end-->` in `index.html` (keep those markers). Unknown URLs return 404; `/blog/tag/*` is noindex.
-- `vercel.json` rewrites all non-static paths to `api/index.ts` and bundles `dist/index.html` into the function (`includeFiles`).
+- `vercel.json` 301-redirects dxnorion.com / www.dxnorion.com (a second Vercel project) to https://dxn-orion.com, the only canonical domain. It also rewrites all non-static paths to `api/index.ts` and bundles `dist/index.html` into the function (`includeFiles`).
 - `src/seo/applySeo.ts` updates the same tags on client-side navigation (`App.tsx`, `BlogPostPage.tsx`).

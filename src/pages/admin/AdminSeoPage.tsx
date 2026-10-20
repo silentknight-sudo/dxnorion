@@ -120,13 +120,13 @@ export const AdminSeoPage: React.FC = () => {
   return (
     <div className="space-y-8 max-w-5xl">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E5E7EB]">
         <div>
-          <h2 className="font-serif font-bold text-xl sm:text-2xl text-[#F7F4EE] flex items-center gap-2">
-            <Globe className="w-6 h-6 text-[#C9A86A]" />
+          <h2 className="font-bold text-xl sm:text-2xl text-[#111827] flex items-center gap-2">
+            <Globe className="w-6 h-6 text-[#0E4D92]" />
             <span>SEO &amp; Backlinks Command Center</span>
           </h2>
-          <p className="text-xs text-[#94A3B8] mt-1">
+          <p className="text-xs text-[#4B5563] mt-1">
             Engineered strategies, structured data, backlink badges, and crawler notification to rank #1 on Google.
           </p>
         </div>
@@ -134,7 +134,7 @@ export const AdminSeoPage: React.FC = () => {
         <button
           onClick={handlePingSearchEngines}
           disabled={pinging}
-          className="px-4 py-2.5 rounded-xl gold-gradient-bg text-[#0B1426] text-xs font-bold flex items-center gap-2 shadow-lg hover:brightness-110 active:scale-95 transition-all cursor-pointer whitespace-nowrap self-start"
+          className="px-4 py-2.5 rounded-xl gold-gradient-bg text-white text-xs font-bold flex items-center gap-2 shadow-lg hover:brightness-110 active:scale-95 transition-all cursor-pointer whitespace-nowrap self-start"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${pinging ? 'animate-spin' : ''}`} />
           <span>{pinging ? 'Pinging Search Engines...' : 'Ping Google & Bing XML Sitemap'}</span>
@@ -142,7 +142,7 @@ export const AdminSeoPage: React.FC = () => {
       </div>
 
       {pingStatus && (
-        <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-200 text-xs flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-700 text-xs flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
           <span>{pingStatus}</span>
         </div>
@@ -151,23 +151,23 @@ export const AdminSeoPage: React.FC = () => {
       {/* SEO Health Snapshot Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="glass-panel p-4 rounded-2xl border border-emerald-500/30">
-          <span className="text-[10px] text-[#94A3B8] uppercase font-semibold block">Schema.org JSON-LD</span>
-          <span className="font-serif text-lg font-bold text-emerald-300 mt-1 block">Active (@graph)</span>
+          <span className="text-[10px] text-[#4B5563] uppercase font-semibold block">Schema.org JSON-LD</span>
+          <span className="text-lg font-bold text-emerald-300 mt-1 block">Active (@graph)</span>
           <span className="text-[11px] text-emerald-400/80 mt-1 block">5 Schemas Implemented</span>
         </div>
 
-        <div className="glass-panel p-4 rounded-2xl border border-[#C9A86A]/30">
-          <span className="text-[10px] text-[#94A3B8] uppercase font-semibold block">XML Sitemap Index</span>
-          <span className="font-serif text-lg font-bold text-[#DFBF82] mt-1 block">19 Dynamic URLs</span>
-          <a href="/sitemap.xml" target="_blank" className="text-[11px] text-[#C9A86A] hover:underline mt-1 inline-flex items-center gap-1">
+        <div className="glass-panel p-4 rounded-2xl border border-[#E5E7EB]">
+          <span className="text-[10px] text-[#4B5563] uppercase font-semibold block">XML Sitemap Index</span>
+          <span className="text-lg font-bold text-[#0E4D92] mt-1 block">19 Dynamic URLs</span>
+          <a href="/sitemap.xml" target="_blank" className="text-[11px] text-[#0E4D92] hover:underline mt-1 inline-flex items-center gap-1">
             <span>View /sitemap.xml</span>
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
 
         <div className="glass-panel p-4 rounded-2xl border border-blue-500/30">
-          <span className="text-[10px] text-[#94A3B8] uppercase font-semibold block">Published SEO Articles</span>
-          <span className="font-serif text-lg font-bold text-blue-300 mt-1 block">6 Guides Live</span>
+          <span className="text-[10px] text-[#4B5563] uppercase font-semibold block">Published SEO Articles</span>
+          <span className="text-lg font-bold text-blue-300 mt-1 block">6 Guides Live</span>
           <a href="/blog" target="_blank" className="text-[11px] text-blue-400 hover:underline mt-1 inline-flex items-center gap-1">
             <span>View Blog Hub</span>
             <ExternalLink className="w-3 h-3" />
@@ -175,21 +175,21 @@ export const AdminSeoPage: React.FC = () => {
         </div>
 
         <div className="glass-panel p-4 rounded-2xl border border-purple-500/30">
-          <span className="text-[10px] text-[#94A3B8] uppercase font-semibold block">Authority Citations</span>
-          <span className="font-serif text-lg font-bold text-purple-300 mt-1 block">6 Portals Linked</span>
+          <span className="text-[10px] text-[#4B5563] uppercase font-semibold block">Authority Citations</span>
+          <span className="text-lg font-bold text-purple-300 mt-1 block">6 Portals Linked</span>
           <span className="text-[11px] text-purple-400/80 mt-1 block">UP RERA, YEIDA, NIAL</span>
         </div>
       </div>
 
       {/* Target Keywords & SERP Strategy */}
-      <div className="glass-panel p-5 rounded-2xl border border-[#C9A86A]/30 space-y-4">
+      <div className="glass-panel p-5 rounded-2xl border border-[#E5E7EB] space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h3 className="font-serif font-bold text-base text-[#F7F4EE] flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-[#C9A86A]" />
+            <h3 className="font-bold text-base text-[#111827] flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-[#0E4D92]" />
               <span>Target Keyword Matrix &amp; Search Engine Optimization</span>
             </h3>
-            <p className="text-xs text-[#94A3B8]">
+            <p className="text-xs text-[#4B5563]">
               High-intent queries targeted for organic Google first-page positioning.
             </p>
           </div>
@@ -199,8 +199,8 @@ export const AdminSeoPage: React.FC = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs text-[#94A3B8]">
-            <thead className="text-[10px] uppercase bg-white/5 text-[#F7F4EE]/70 border-b border-white/10">
+          <table className="w-full text-left text-xs text-[#4B5563]">
+            <thead className="text-[10px] uppercase bg-[#F4F6FA] text-[#374151] border-b border-[#E5E7EB]">
               <tr>
                 <th className="py-2.5 px-3">Search Query / Keyword</th>
                 <th className="py-2.5 px-3">Est. Volume</th>
@@ -211,24 +211,24 @@ export const AdminSeoPage: React.FC = () => {
             </thead>
             <tbody className="divide-y divide-white/5">
               {highIntentKeywords.map((k, i) => (
-                <tr key={i} className="hover:bg-white/5 transition-colors">
-                  <td className="py-2.5 px-3 font-semibold text-[#F7F4EE]">
+                <tr key={i} className="hover:bg-[#F4F6FA] transition-colors">
+                  <td className="py-2.5 px-3 font-semibold text-[#111827]">
                     {k.keyword}
                   </td>
-                  <td className="py-2.5 px-3 text-[#DFBF82] font-mono">{k.volume}</td>
+                  <td className="py-2.5 px-3 text-[#0E4D92] font-mono">{k.volume}</td>
                   <td className="py-2.5 px-3 text-slate-300">{k.intent}</td>
                   <td className="py-2.5 px-3">
                     <a
                       href={k.targetUrl}
                       target="_blank"
-                      className="text-[#C9A86A] hover:underline inline-flex items-center gap-1 font-mono text-[11px]"
+                      className="text-[#0E4D92] hover:underline inline-flex items-center gap-1 font-mono text-[11px]"
                     >
                       <span>{k.targetUrl}</span>
                       <ArrowUpRight className="w-3 h-3" />
                     </a>
                   </td>
                   <td className="py-2.5 px-3">
-                    <span className="px-2 py-0.5 rounded bg-[#C9A86A]/20 text-[#DFBF82] font-bold text-[10px]">
+                    <span className="px-2 py-0.5 rounded bg-[#EAF1FB] text-[#0E4D92] font-bold text-[10px]">
                       {k.serpRank}
                     </span>
                   </td>
@@ -240,30 +240,30 @@ export const AdminSeoPage: React.FC = () => {
       </div>
 
       {/* Embeddable Inbound Backlink Badges */}
-      <div className="glass-panel p-5 rounded-2xl border border-[#C9A86A]/30 space-y-4">
+      <div className="glass-panel p-5 rounded-2xl border border-[#E5E7EB] space-y-4">
         <div>
-          <h3 className="font-serif font-bold text-base text-[#F7F4EE] flex items-center gap-2">
-            <Link2 className="w-4 h-4 text-[#C9A86A]" />
+          <h3 className="font-bold text-base text-[#111827] flex items-center gap-2">
+            <Link2 className="w-4 h-4 text-[#0E4D92]" />
             <span>Embeddable Backlink Badges (Inbound Link Builder)</span>
           </h3>
-          <p className="text-xs text-[#94A3B8] mt-1">
+          <p className="text-xs text-[#4B5563] mt-1">
             Provide these pre-styled HTML snippets to broker networks, property bloggers, and real estate news outlets. Each placement earns a high-value contextual inbound backlink with targeted anchor text.
           </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-4 pt-2">
           {embedBadges.map((badge) => (
-            <div key={badge.id} className="p-4 rounded-xl bg-[#0B1426]/90 border border-white/10 flex flex-col justify-between space-y-3">
+            <div key={badge.id} className="p-4 rounded-xl bg-white border border-[#E5E7EB] flex flex-col justify-between space-y-3">
               <div>
-                <h4 className="font-bold text-xs text-[#F7F4EE]">{badge.title}</h4>
-                <p className="text-[11px] text-[#94A3B8] mt-1">{badge.description}</p>
-                <div className="mt-3 p-2 rounded bg-black/40 border border-white/5 font-mono text-[9px] text-[#C9A86A] break-all max-h-24 overflow-y-auto">
+                <h4 className="font-bold text-xs text-[#111827]">{badge.title}</h4>
+                <p className="text-[11px] text-[#4B5563] mt-1">{badge.description}</p>
+                <div className="mt-3 p-2 rounded bg-black/40 border border-[#E5E7EB] font-mono text-[9px] text-[#0E4D92] break-all max-h-24 overflow-y-auto">
                   {badge.html}
                 </div>
               </div>
               <button
                 onClick={() => copyToClipboard(badge.id, badge.html)}
-                className="w-full py-2 px-3 rounded-lg bg-white/10 hover:bg-[#C9A86A]/20 hover:border-[#C9A86A]/50 border border-white/10 text-xs font-semibold text-[#F7F4EE] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
+                className="w-full py-2 px-3 rounded-lg bg-[#F4F6FA] hover:bg-[#EAF1FB] hover:border-[#0E4D92]/40 border border-[#E5E7EB] text-xs font-semibold text-[#111827] flex items-center justify-center gap-1.5 transition-all cursor-pointer"
               >
                 {copiedKey === badge.id ? (
                   <>
@@ -272,7 +272,7 @@ export const AdminSeoPage: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <Copy className="w-3.5 h-3.5 text-[#C9A86A]" />
+                    <Copy className="w-3.5 h-3.5 text-[#0E4D92]" />
                     <span>Copy HTML Embed Code</span>
                   </>
                 )}
@@ -283,25 +283,25 @@ export const AdminSeoPage: React.FC = () => {
       </div>
 
       {/* PR & Directory Syndication Kit */}
-      <div className="glass-panel p-5 rounded-2xl border border-[#C9A86A]/30 space-y-4">
+      <div className="glass-panel p-5 rounded-2xl border border-[#E5E7EB] space-y-4">
         <div>
-          <h3 className="font-serif font-bold text-base text-[#F7F4EE] flex items-center gap-2">
-            <Share2 className="w-4 h-4 text-[#C9A86A]" />
+          <h3 className="font-bold text-base text-[#111827] flex items-center gap-2">
+            <Share2 className="w-4 h-4 text-[#0E4D92]" />
             <span>High-Authority Directory &amp; PR Syndication Kit</span>
           </h3>
-          <p className="text-xs text-[#94A3B8] mt-1">
+          <p className="text-xs text-[#4B5563] mt-1">
             Copy pre-formatted listing descriptions and press releases to submit to MagicBricks, 99acres, Housing.com, ANI, and Economic Times property portals.
           </p>
         </div>
 
         <div className="space-y-4 pt-2">
           {pressReleaseTemplates.map((template) => (
-            <div key={template.id} className="p-4 rounded-xl bg-[#0B1426]/90 border border-white/10 space-y-2">
+            <div key={template.id} className="p-4 rounded-xl bg-white border border-[#E5E7EB] space-y-2">
               <div className="flex items-center justify-between">
-                <span className="font-bold text-xs text-[#DFBF82]">{template.name}</span>
+                <span className="font-bold text-xs text-[#0E4D92]">{template.name}</span>
                 <button
                   onClick={() => copyToClipboard(template.id, template.content)}
-                  className="px-3 py-1 rounded bg-[#C9A86A]/20 hover:bg-[#C9A86A]/30 border border-[#C9A86A]/40 text-[#DFBF82] text-xs font-semibold flex items-center gap-1 cursor-pointer"
+                  className="px-3 py-1 rounded bg-[#EAF1FB] hover:bg-[#EAF1FB] border border-[#E5E7EB] text-[#0E4D92] text-xs font-semibold flex items-center gap-1 cursor-pointer"
                 >
                   {copiedKey === template.id ? (
                     <>
@@ -316,7 +316,7 @@ export const AdminSeoPage: React.FC = () => {
                   )}
                 </button>
               </div>
-              <pre className="p-3 rounded bg-black/40 text-[10px] font-mono text-[#94A3B8] whitespace-pre-wrap max-h-40 overflow-y-auto leading-relaxed border border-white/5">
+              <pre className="p-3 rounded bg-black/40 text-[10px] font-mono text-[#4B5563] whitespace-pre-wrap max-h-40 overflow-y-auto leading-relaxed border border-[#E5E7EB]">
                 {template.content}
               </pre>
             </div>

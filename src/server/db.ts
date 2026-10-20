@@ -199,14 +199,14 @@ const INITIAL_POSTS: Post[] = [
         <li><strong>Buddh International Circuit & Sports City:</strong> 7 minutes distance, surrounded by Olympic-grade sporting arenas.</li>
       </ul>
 
-      <div class="blog-cta-box glass-panel p-6 rounded-2xl border border-[#C9A86A]/40 my-8 text-center">
-        <h3 class="font-serif text-xl font-bold text-[#F7F4EE] mb-2">Explore DXN Orion Sector 22D</h3>
-        <p class="text-sm text-[#94A3B8] mb-4">Register your pre-launch Expression of Interest for golf-facing 3 & 4 BHK sky estates before public price revision.</p>
-        <a href="/#enquire" class="inline-block gold-gradient-bg text-[#0B1426] font-bold text-xs uppercase px-6 py-3 rounded-xl tracking-wider shadow-lg">Request Pre-Launch Dossier</a>
+      <div class="blog-cta-box glass-panel p-6 rounded-2xl border border-[#E5E7EB] my-8 text-center">
+        <h3 class="text-xl font-bold text-[#111827] mb-2">Explore DXN Orion Sector 22D</h3>
+        <p class="text-sm text-[#4B5563] mb-4">Register your pre-launch Expression of Interest for golf-facing 3 & 4 BHK sky estates before public price revision.</p>
+        <a href="/#enquire" class="inline-block gold-gradient-bg text-white font-bold text-xs uppercase px-6 py-3 rounded-xl tracking-wider shadow-lg">Request Pre-Launch Dossier</a>
       </div>
 
       <h2>Master Plan Analysis: Sector 22D Zonal Attributes</h2>
-      <p>YEIDA's sector regulations enforce expansive 45-meter wide secondary collector roads and 100-meter primary expressway green buffers. This guarantees that residential complexes like <a href="/" class="text-[#C9A86A] underline">DXN Orion</a> retain unobstructed natural daylight, cross-ventilation, and pristine sunset views over the golf horizons.</p>
+      <p>YEIDA's sector regulations enforce expansive 45-meter wide secondary collector roads and 100-meter primary expressway green buffers. This guarantees that residential complexes like <a href="/" class="text-[#0E4D92] underline">DXN Orion</a> retain unobstructed natural daylight, cross-ventilation, and pristine sunset views over the golf horizons.</p>
 
       <h2>Investment Potential & Price Projections</h2>
       <p>Property values in Sector 22D have witnessed a steady annual appreciation of 18% to 24% over the last 36 months, propelled by the construction velocity of Jewar Airport. Institutional developers are curating bespoke clubhouses and international school campuses in the immediate vicinity, making it primed for substantial 5-year capital compounding.</p>
@@ -259,7 +259,7 @@ const INITIAL_POSTS: Post[] = [
       <p>Spanning over 5,000 hectares upon final master development, Noida International Airport (DXN) will rank among Asia's largest multi-runway airports. Designed by Zurich Airport International AG, its carbon-neutral infrastructure is already attracting multinational airline headquarters, logistics park operators, and luxury hospitality giants.</p>
 
       <h2>Why Pre-Launch Residential Projects Yield Maximum ROI</h2>
-      <p>Entering the corridor at the pre-launch or early developmental phase — such as registering for priority allocation at <a href="/" class="text-[#C9A86A] underline">DXN Orion Sector 22D</a> — enables investors to capture inaugural pricing before commercial airline passenger traffic triggers retail escalation.</p>
+      <p>Entering the corridor at the pre-launch or early developmental phase — such as registering for priority allocation at <a href="/" class="text-[#0E4D92] underline">DXN Orion Sector 22D</a> — enables investors to capture inaugural pricing before commercial airline passenger traffic triggers retail escalation.</p>
     `,
     faqJson: [
       {
@@ -305,12 +305,12 @@ const INITIAL_POSTS: Post[] = [
       <p>The Yamuna Expressway provides high-speed, signal-free transit with dedicated service lanes, whereas Noida Extension contends with chronic bottleneck roundabouts like Gaur Chowk during peak commuter hours.</p>
 
       <h2>Comparison Table: Key Investment Metrics</h2>
-      <table class="w-full text-left border border-white/20 my-4 text-xs">
-        <thead class="bg-[#111D36] text-[#C9A86A]">
+      <table class="w-full text-left border border-[#E5E7EB] my-4 text-xs">
+        <thead class="bg-[#F4F6FA] text-[#0E4D92]">
           <tr>
-            <th class="p-2 border border-white/10">Feature</th>
-            <th class="p-2 border border-white/10">Yamuna Expressway (Sector 22D)</th>
-            <th class="p-2 border border-white/10">Noida Extension</th>
+            <th class="p-2 border border-[#E5E7EB]">Feature</th>
+            <th class="p-2 border border-[#E5E7EB]">Yamuna Expressway (Sector 22D)</th>
+            <th class="p-2 border border-[#E5E7EB]">Noida Extension</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-white/10">
@@ -321,7 +321,7 @@ const INITIAL_POSTS: Post[] = [
           </tr>
           <tr>
             <td class="p-2 font-bold">Airport Distance</td>
-            <td class="p-2 text-[#C9A86A]">15 Mins (Direct Expressway)</td>
+            <td class="p-2 text-[#0E4D92]">15 Mins (Direct Expressway)</td>
             <td class="p-2">55-70 Mins (Via congested urban routes)</td>
           </tr>
           <tr>
@@ -372,7 +372,7 @@ const INITIAL_POSTS: Post[] = [
       <p>In modern high-profile estates, having an independent service entry and en-suite servant quarter maintains household privacy while providing 24/7 domestic support. The 3 BHK+S (Type B) and 4 BHK+S (Type C) residences are specifically planned with dual-entry elevators to ensure staff and logistics movements remain separate from private family foyers.</p>
 
       <div class="my-6">
-        <a href="/floor-plans" class="text-[#C9A86A] underline font-bold">View Interactive Floor Plans for 3 & 4 BHK Configurations &rarr;</a>
+        <a href="/floor-plans" class="text-[#0E4D92] underline font-bold">View Interactive Floor Plans for 3 & 4 BHK Configurations &rarr;</a>
       </div>
     `,
     faqJson: [
