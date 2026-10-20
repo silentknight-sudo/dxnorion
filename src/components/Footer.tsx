@@ -57,6 +57,14 @@ export const Footer: React.FC<FooterProps> = ({
           <button onClick={() => handleNavClick('/contact')} className="hover:text-[#C9A86A] transition-colors cursor-pointer">
             Priority Desk
           </button>
+          <span className="text-[#C9A86A]/30">•</span>
+          <a href="/price-list" onClick={(e) => { e.preventDefault(); handleNavClick('/price-list'); }} className="hover:text-[#C9A86A] transition-colors">
+            DXN Orion Price List
+          </a>
+          <span className="text-[#C9A86A]/30">•</span>
+          <a href="/faq" onClick={(e) => { e.preventDefault(); handleNavClick('/faq'); }} className="hover:text-[#C9A86A] transition-colors">
+            FAQs
+          </a>
         </div>
 
         {/* Featured Market Guides for SEO Internal Link Equity */}

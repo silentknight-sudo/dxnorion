@@ -27,6 +27,7 @@ Pre-launch marketing site + lead CRM/blog admin for **DXN Orion**, Sector 22D, Y
 - Logo: `public/logo.png` (ORION Yamuna Expressway, 178×63, dark text) — shown on a white pill in Header/Footer because the site background is navy `#0B1426`. Gold `#C9A86A`, ivory `#F7F4EE`.
 - Sales phone: +91 72172 27777 (also in `App.tsx` / `db.ts` defaults). Keep JSON-LD phone in sync.
 - Address used: Plot GH-01, Sector 22D, Yamuna Expressway, Greater Noida, UP 203201.
+- Unit sizes: 3 BHK ~1,900, 3 BHK + Servant ~2,400, 4 BHK + Servant ~3,000 sq.ft (matches visible pages); ~11 acres, 4 units/floor.
 - Pricing/RERA claims (from ₹2.20 Cr*, UPRERA-PRJ-2025-APP-88492, IGBC Gold) are marketing copy — confirm with the owner before changing.
 
 ## Gotchas
@@ -36,6 +37,7 @@ Pre-launch marketing site + lead CRM/blog admin for **DXN Orion**, Sector 22D, Y
 - Outstanding off-code SEO tasks: GSC/Bing verification tokens, real tracking IDs, social profiles + `sameAs`, SPF/DMARC DNS, Google Business Profile.
 
 ## Per-page SEO (server + client)
+- Keyword landing pages `/price-list` and `/faq` come from `LANDING_PAGES`/`FAQ_ITEMS` in `src/seo/pages.ts`, rendered by `src/pages/LandingPage.tsx`. Use both "DXN Orion" and "Orion DXN" word orders (competitor domain oriondxn.co.in).
 - `src/seo/pages.ts` — single source of per-route title/description/crawlable body. Edit here when adding a page.
 - `src/server/seoRender.ts` — in production/Vercel, `server.ts` renders every non-file, non-API URL through this: page-specific `<title>`, meta, canonical, hreflang, OG/Twitter, JSON-LD (WebPage/BlogPosting/CollectionPage/Breadcrumb/FAQ) and HTML inside `<!--seo-root-start-->…<!--seo-root-end-->` in `index.html` (keep those markers). Unknown URLs return 404; `/blog/tag/*` is noindex.
 - `vercel.json` rewrites all non-static paths to `api/index.ts` and bundles `dist/index.html` into the function (`includeFiles`).

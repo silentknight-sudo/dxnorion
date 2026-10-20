@@ -2,7 +2,7 @@
 // content into the SPA's index.html so search engines and AI crawlers get real HTML per URL.
 import {
   PAGE_SEO, NOT_FOUND_SEO, SITE_URL, SITE_NAME, DEFAULT_OG_IMAGE,
-  PageSeo, wrapBody, categorySeo, clampDescription
+  PageSeo, wrapBody, categorySeo, clampDescription, LANDING_PAGES
 } from '../seo/pages.ts';
 
 export interface SeoPost {
@@ -198,6 +198,13 @@ ${list.map(p => `<article><h2><a href="/blog/${esc(p.slug)}">${esc(p.title)}</a>
       breadcrumbLd([home, { name: page.breadcrumb || page.title, path }]),
       ORG_FULL
     ];
+    const faq = LANDING_PAGES[path]?.faq;
+    if (faq?.length) {
+      jsonLd.push({
+        '@type': 'FAQPage',
+        mainEntity: faq.map(f => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } }))
+      } as any);
+    }
     return {
       status: 200, seo: page, path, image: DEFAULT_OG_IMAGE, type: 'website', jsonLd,
       bodyHtml: page.bodyHtml || wrapBody(`<h1>${esc(page.title)}</h1><p>${esc(page.description)}</p>`)

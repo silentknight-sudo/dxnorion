@@ -113,7 +113,7 @@ export const AdminSeoPage: React.FC = () => {
     {
       id: 'directory-listing',
       name: 'Real Estate Directory Submission (MagicBricks / 99acres / Housing)',
-      content: `Project Name: DXN Orion\nLocation: Sector 22D, Yamuna Expressway, Greater Noida, Gautam Buddha Nagar, Uttar Pradesh 203201\nConfigurations: 3 BHK (2,150 sq.ft) | 3 BHK + Servant (2,600 sq.ft) | 4 BHK + Servant (3,250 sq.ft)\nKey USP: 15 mins to Jewar Airport, 8 mins to Film City, Low Density Golf Course Facing Towers, IGBC Gold Pre-Certified.\nPrice Range: ₹2.20 Cr - ₹4.50 Cr\nRERA Status: Applied / Acknowledged (UPRERA-PRJ-2025-APP-88492)\nOfficial Portal: https://dxn-orion.com\nFloor Plans & Brochure: https://dxn-orion.com/floor-plans\nDetailed Location Analysis: https://dxn-orion.com/blog/sector-22d-yamuna-expressway-complete-location-guide-2026`
+      content: `Project Name: DXN Orion\nLocation: Sector 22D, Yamuna Expressway, Greater Noida, Gautam Buddha Nagar, Uttar Pradesh 203201\nConfigurations: 3 BHK (1,900 sq.ft) | 3 BHK + Servant (2,400 sq.ft) | 4 BHK + Servant (3,000 sq.ft)\nKey USP: 15 mins to Jewar Airport, 8 mins to Film City, Low Density Golf Course Facing Towers, IGBC Gold Pre-Certified.\nPrice Range: ₹2.20 Cr - ₹4.50 Cr\nRERA Status: Applied / Acknowledged (UPRERA-PRJ-2025-APP-88492)\nOfficial Portal: https://dxn-orion.com\nFloor Plans & Brochure: https://dxn-orion.com/floor-plans\nDetailed Location Analysis: https://dxn-orion.com/blog/sector-22d-yamuna-expressway-complete-location-guide-2026`
     }
   ];
 

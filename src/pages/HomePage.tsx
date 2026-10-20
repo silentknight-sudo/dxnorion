@@ -244,7 +244,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               DXN Orion Sector 22D Yamuna Expressway: <span className="gold-text-gradient italic">Luxury 3 &amp; 4 BHK</span> Beside the Greens
             </h1>
             <p className="text-xs sm:text-sm text-[#94A3B8] mt-1.5 leading-relaxed max-w-xl">
-              Ultra-modern 3 &amp; 4 BHK sky estates overlooking panoramic golf courses. 15 Mins from Noida Int&apos;l Airport (Jewar).
+              DXN Orion (Orion DXN): ultra-modern 3 &amp; 4 BHK sky estates overlooking panoramic golf courses. 15 Mins from Noida Int&apos;l Airport (Jewar).
             </p>
           </div>
 
