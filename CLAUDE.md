@@ -42,5 +42,5 @@ Pre-launch marketing site + lead CRM/blog admin for **DXN Orion**, Sector 22D, Y
 - Keyword landing pages `/price-list` and `/faq` come from `LANDING_PAGES`/`FAQ_ITEMS` in `src/seo/pages.ts`, rendered by `src/pages/LandingPage.tsx`. Use both "DXN Orion" and "Orion DXN" word orders (competitor domain oriondxn.co.in).
 - `src/seo/pages.ts` — single source of per-route title/description/crawlable body. Edit here when adding a page.
 - `src/server/seoRender.ts` — in production/Vercel, `server.ts` renders every non-file, non-API URL through this: page-specific `<title>`, meta, canonical, hreflang, OG/Twitter, JSON-LD (WebPage/BlogPosting/CollectionPage/Breadcrumb/FAQ) and HTML inside `<!--seo-root-start-->…<!--seo-root-end-->` in `index.html` (keep those markers). Unknown URLs return 404; `/blog/tag/*` is noindex.
-- `vercel.json` rewrites all non-static paths to `api/index.ts` and bundles `dist/index.html` into the function (`includeFiles`).
+- `vercel.json` 301-redirects dxnorion.com / www.dxnorion.com (a second Vercel project) to https://dxn-orion.com, the only canonical domain. It also rewrites all non-static paths to `api/index.ts` and bundles `dist/index.html` into the function (`includeFiles`).
 - `src/seo/applySeo.ts` updates the same tags on client-side navigation (`App.tsx`, `BlogPostPage.tsx`).

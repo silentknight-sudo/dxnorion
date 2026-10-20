@@ -29,5 +29,29 @@
     "api/index.ts": {
       "includeFiles": "dist/index.html"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "dxnorion.com"
+        }
+      ],
+      "destination": "https://dxn-orion.com/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.dxnorion.com"
+        }
+      ],
+      "destination": "https://dxn-orion.com/$1",
+      "permanent": true
+    }
+  ]
 }
