@@ -32,7 +32,8 @@ Pre-launch marketing site + lead CRM/blog admin for **DXN Orion**, Sector 22D, Y
 ## Gotchas
 - Running `bun install`/`npm i` rewrites `bun.lock`; don't commit that unless dependencies actually changed.
 - `public/uploads/` contains admin-uploaded files committed to the repo.
-- Outstanding off-code SEO tasks: real GSC verification code, real tracking IDs, social profiles + `sameAs`, SPF/DMARC DNS, Google Business Profile.
+- Site verification: set `GSC_VERIFICATION` / `BING_VERIFICATION` env vars (token only); `vite.config.ts` injects them at `<!--site-verification-->`. IndexNow key file is `public/<key>.txt` (key in `server.ts`); published posts auto-submit, admin "ping" submits all URLs.
+- Outstanding off-code SEO tasks: GSC/Bing verification tokens, real tracking IDs, social profiles + `sameAs`, SPF/DMARC DNS, Google Business Profile.
 
 ## Per-page SEO (server + client)
 - `src/seo/pages.ts` — single source of per-route title/description/crawlable body. Edit here when adding a page.

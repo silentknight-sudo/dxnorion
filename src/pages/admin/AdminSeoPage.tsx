@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { adminFetch } from '../../utils/adminAuth.ts';
 import {
   Globe, Link2, CheckCircle2, Copy, ExternalLink, Sparkles,
   TrendingUp, Search, Share2, Award, ShieldCheck, RefreshCw, Send,
@@ -20,10 +21,10 @@ export const AdminSeoPage: React.FC = () => {
     setPinging(true);
     setPingStatus(null);
     try {
-      const res = await fetch('/api/admin/ping-sitemap', { method: 'POST' });
+      const res = await adminFetch('/api/admin/ping-sitemap', { method: 'POST' });
       if (res.ok) {
         const data = await res.json();
-        setPingStatus(`Sitemap pinged successfully! Google & Bing notification logged at ${new Date().toLocaleTimeString()}.`);
+        setPingStatus(`${data.message} (${new Date().toLocaleTimeString()})`);
       } else {
         setPingStatus('Sitemap ping dispatched to crawler queues.');
       }

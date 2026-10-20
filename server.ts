@@ -198,10 +198,11 @@ app.get('/sitemap.xml', async (_req: Request, res: Response) => {
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 `;
 
+  const latestPost = posts.reduce((max, p) => (p.updatedAt > max ? p.updatedAt : max), '2026-10-01');
   staticPages.forEach(p => {
     xml += `  <url>
-    <loc>${baseUrl}${p.loc}</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <loc>${baseUrl}${p.loc === '/' ? '/' : p.loc}</loc>
+    <lastmod>${(p.loc === '/' || p.loc === '/blog' ? latestPost : '2026-10-01').split('T')[0]}</lastmod>
     <changefreq>${p.changefreq}</changefreq>
     <priority>${p.priority}</priority>
   </url>
@@ -221,7 +222,7 @@ app.get('/sitemap.xml', async (_req: Request, res: Response) => {
   categories.forEach(cat => {
     xml += `  <url>
     <loc>${baseUrl}/blog/category/${cat.slug}</loc>
-    <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
+    <lastmod>${latestPost.split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -251,13 +252,43 @@ Sitemap: ${baseUrl}/sitemap.xml
 });
 
 // Search Engine Sitemap Ping Endpoint
-app.post('/api/admin/ping-sitemap', (_req: Request, res: Response) => {
+// IndexNow (Bing, Yandex, Seznam, Naver…): instant notification of new/changed URLs.
+// Key file is served from public/41ed763217f37b5f3b18e4630795df70.txt. Google discovers updates via the sitemap in Search Console.
+const INDEXNOW_KEY = '41ed763217f37b5f3b18e4630795df70';
+
+async function submitIndexNow(urls: string[]): Promise<{ ok: boolean; status: number }> {
   const baseUrl = getCanonicalBaseUrl();
-  const sitemapUrl = encodeURIComponent(`${baseUrl}/sitemap.xml`);
-  console.log(`📡 Ping notification dispatched for search engines: ${sitemapUrl}`);
+  try {
+    const resp = await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        host: new URL(baseUrl).host,
+        key: INDEXNOW_KEY,
+        keyLocation: `${baseUrl}/${INDEXNOW_KEY}.txt`,
+        urlList: urls.slice(0, 10000)
+      })
+    });
+    return { ok: resp.ok, status: resp.status };
+  } catch (e) {
+    console.error('IndexNow submission failed:', e);
+    return { ok: false, status: 0 };
+  }
+}
+
+app.post('/api/admin/ping-sitemap', requireAdmin, async (_req: Request, res: Response) => {
+  const baseUrl = getCanonicalBaseUrl();
+  const posts = await getAllPosts(false);
+  const urls = [
+    '/', '/floor-plans', '/amenities', '/location', '/blog', '/contact',
+    ...posts.filter(p => !p.noindex).map(p => `/blog/${p.slug}`)
+  ].map(p => `${baseUrl}${p}`);
+  const result = await submitIndexNow(urls);
   res.json({
-    success: true,
-    message: 'Sitemap ping notification dispatched to Google and Bing crawler queues.',
+    success: result.ok,
+    message: result.ok
+      ? `Submitted ${urls.length} URLs to IndexNow (Bing & partners). For Google, keep the sitemap submitted in Search Console.`
+      : `IndexNow submission failed (HTTP ${result.status}).`,
     sitemapUrl: `${baseUrl}/sitemap.xml`,
     timestamp: new Date().toISOString()
   });
@@ -980,6 +1011,7 @@ app.post('/api/posts', requireAdmin, async (req: Request, res: Response) => {
     setDoc(doc(firestore, 'posts', post.id), post, { merge: true }).catch(() => {});
   } catch (e) {}
 
+  if (post.status === 'PUBLISHED') await submitIndexNow([`${getCanonicalBaseUrl()}/blog/${post.slug}`]);
   res.json(post);
 });
 
@@ -994,6 +1026,7 @@ app.put('/api/posts/:id', requireAdmin, async (req: Request, res: Response) => {
   }
 
   const updated = db.Posts.update(req.params.id, updates);
+  if (updated?.status === 'PUBLISHED') submitIndexNow([`${getCanonicalBaseUrl()}/blog/${updated.slug}`]).catch(() => {});
   try {
     const { doc, setDoc } = await import('firebase/firestore');
     const { db: firestore } = await import('./src/lib/firebase.ts');
