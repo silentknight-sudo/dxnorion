@@ -188,6 +188,8 @@ app.get('/sitemap.xml', async (_req: Request, res: Response) => {
     { loc: '/floor-plans', changefreq: 'weekly', priority: '0.9' },
     { loc: '/amenities', changefreq: 'weekly', priority: '0.8' },
     { loc: '/location', changefreq: 'weekly', priority: '0.9' },
+    { loc: '/price-list', changefreq: 'weekly', priority: '0.9' },
+    { loc: '/faq', changefreq: 'monthly', priority: '0.8' },
     { loc: '/blog', changefreq: 'daily', priority: '0.8' },
     { loc: '/contact', changefreq: 'monthly', priority: '0.7' },
     { loc: '/privacy-policy', changefreq: 'yearly', priority: '0.3' },
@@ -280,7 +282,7 @@ app.post('/api/admin/ping-sitemap', requireAdmin, async (_req: Request, res: Res
   const baseUrl = getCanonicalBaseUrl();
   const posts = await getAllPosts(false);
   const urls = [
-    '/', '/floor-plans', '/amenities', '/location', '/blog', '/contact',
+    '/', '/price-list', '/floor-plans', '/amenities', '/location', '/faq', '/blog', '/contact',
     ...posts.filter(p => !p.noindex).map(p => `/blog/${p.slug}`)
   ].map(p => `${baseUrl}${p}`);
   const result = await submitIndexNow(urls);

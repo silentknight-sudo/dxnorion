@@ -481,8 +481,7 @@ const INITIAL_ACTIVITIES: LeadActivity[] = [];
 
 const INITIAL_REDIRECTS: Redirect[] = [
   { id: 'red-1', fromPath: '/brochure', toPath: '/#enquire', statusCode: 301, createdAt: new Date().toISOString() },
-  { id: 'red-2', fromPath: '/jewar-airport-flats', toPath: '/location', statusCode: 301, createdAt: new Date().toISOString() },
-  { id: 'red-3', fromPath: '/price-list', toPath: '/#pricing', statusCode: 302, createdAt: new Date().toISOString() }
+  { id: 'red-2', fromPath: '/jewar-airport-flats', toPath: '/location', statusCode: 301, createdAt: new Date().toISOString() }
 ];
 
 const INITIAL_SETTINGS: SiteSettings = {

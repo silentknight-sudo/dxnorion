@@ -23,7 +23,8 @@ const adminFallback = (
   <div className="min-h-screen bg-[#0B1426] flex items-center justify-center text-xs text-[#94A3B8]">Loading…</div>
 );
 
-import { PAGE_SEO, NOT_FOUND_SEO, categorySeo } from './seo/pages.ts';
+import { PAGE_SEO, NOT_FOUND_SEO, categorySeo, LANDING_PAGES } from './seo/pages.ts';
+import { LandingPage } from './pages/LandingPage.tsx';
 import { applySeo } from './seo/applySeo.ts';
 import { captureUtmParams } from './utils/utm.ts';
 import { SiteSettings } from './types/index.ts';
@@ -316,6 +317,14 @@ export default function App() {
     pageContent = (
       <BlogPostPage
         slug={postSlug}
+        onNavigate={navigate}
+        onOpenEnquiry={handleOpenEnquiry}
+      />
+    );
+  } else if (LANDING_PAGES[currentPath]) {
+    pageContent = (
+      <LandingPage
+        page={LANDING_PAGES[currentPath]}
         onNavigate={navigate}
         onOpenEnquiry={handleOpenEnquiry}
       />

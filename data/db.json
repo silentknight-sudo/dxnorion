@@ -547,13 +547,6 @@
       "toPath": "/location",
       "statusCode": 301,
       "createdAt": "2026-10-01T18:41:49.641Z"
-    },
-    {
-      "id": "red-3",
-      "fromPath": "/price-list",
-      "toPath": "/#pricing",
-      "statusCode": 302,
-      "createdAt": "2026-10-01T18:41:49.641Z"
     }
   ],
   "settings": {
