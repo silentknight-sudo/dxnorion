@@ -113,14 +113,14 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
   return (
     <div className={`space-y-2 ${className}`}>
       <div className="flex items-center justify-between">
-        <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block font-semibold">
+        <label className="text-[10px] text-[#4B5563] uppercase tracking-wider block font-semibold">
           {label}
         </label>
-        <span className="text-[10px] text-[#C9A86A]">{recommendedSize}</span>
+        <span className="text-[10px] text-[#0E4D92]">{recommendedSize}</span>
       </div>
 
       {error && (
-        <div className="p-2.5 bg-red-500/20 border border-red-500/40 rounded-xl text-red-200 text-xs flex items-center gap-2">
+        <div className="p-2.5 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-center gap-2">
           <AlertCircle className="w-3.5 h-3.5 shrink-0 text-red-400" />
           <span>{error}</span>
           <button
@@ -144,10 +144,10 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
       {value ? (
         /* Image Preview Box */
-        <div className="relative rounded-2xl border border-[#C9A86A]/40 overflow-hidden bg-[#0B1426]/90 p-3 group">
+        <div className="relative rounded-2xl border border-[#E5E7EB] overflow-hidden bg-white p-3 group">
           <div className="flex flex-col sm:flex-row gap-3 items-center">
             {/* Thumbnail */}
-            <div className="relative w-full sm:w-44 h-28 rounded-xl overflow-hidden bg-black/40 border border-white/10 shrink-0">
+            <div className="relative w-full sm:w-44 h-28 rounded-xl overflow-hidden bg-black/40 border border-[#E5E7EB] shrink-0">
               <img
                 src={value}
                 alt={altText || 'Uploaded image preview'}
@@ -164,13 +164,13 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
 
             {/* Info & Replace / Remove Controls */}
             <div className="flex-1 w-full space-y-2">
-              <div className="text-xs text-[#F7F4EE] font-medium truncate max-w-xs sm:max-w-md">
+              <div className="text-xs text-[#111827] font-medium truncate max-w-xs sm:max-w-md">
                 {value.startsWith('/uploads/') ? value.replace('/uploads/', '') : value}
               </div>
 
               {onAltChange && (
                 <div>
-                  <label className="text-[9px] text-[#94A3B8] uppercase block mb-0.5">
+                  <label className="text-[9px] text-[#4B5563] uppercase block mb-0.5">
                     Image Alt Description (SEO)
                   </label>
                   <input
@@ -178,7 +178,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                     value={altText || ''}
                     onChange={(e) => onAltChange(e.target.value)}
                     placeholder="Descriptive alt text for Google Image Search..."
-                    className="w-full bg-[#0B1426] border border-[#C9A86A]/30 rounded-lg px-2.5 py-1 text-xs text-[#F7F4EE] placeholder-[#94A3B8] focus:border-[#C9A86A] focus:outline-none"
+                    className="w-full bg-white border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-xs text-[#111827] placeholder-[#9CA3AF] focus:border-[#0E4D92] focus:outline-none"
                   />
                 </div>
               )}
@@ -188,7 +188,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="py-1 px-3 rounded-lg bg-[#C9A86A]/20 hover:bg-[#C9A86A]/30 border border-[#C9A86A]/50 text-[#DFBF82] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
+                  className="py-1 px-3 rounded-lg bg-[#EAF1FB] hover:bg-[#EAF1FB] border border-[#0E4D92]/40 text-[#0E4D92] text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer"
                 >
                   <RefreshCw className={`w-3 h-3 ${uploading ? 'animate-spin' : ''}`} />
                   <span>{uploading ? 'Uploading...' : 'Replace Image'}</span>
@@ -215,32 +215,32 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
           onClick={() => fileInputRef.current?.click()}
           className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
             dragOver
-              ? 'border-[#C9A86A] bg-[#C9A86A]/10 scale-[1.01]'
-              : 'border-[#C9A86A]/40 bg-[#0B1426]/60 hover:bg-[#0B1426]/90 hover:border-[#C9A86A]'
+              ? 'border-[#0E4D92] bg-[#EAF1FB] scale-[1.01]'
+              : 'border-[#E5E7EB] bg-white/60 hover:bg-white hover:border-[#0E4D92]'
           }`}
         >
           {uploading ? (
             <div className="py-4 flex flex-col items-center justify-center space-y-2">
-              <Loader2 className="w-8 h-8 text-[#C9A86A] animate-spin" />
-              <p className="text-xs font-medium text-[#DFBF82]">Uploading image to server...</p>
-              <p className="text-[10px] text-[#94A3B8]">Optimizing and saving file</p>
+              <Loader2 className="w-8 h-8 text-[#0E4D92] animate-spin" />
+              <p className="text-xs font-medium text-[#0E4D92]">Uploading image to server...</p>
+              <p className="text-[10px] text-[#4B5563]">Optimizing and saving file</p>
             </div>
           ) : (
             <div className="py-2 flex flex-col items-center justify-center space-y-2">
-              <div className="w-12 h-12 rounded-2xl border border-[#C9A86A]/50 bg-[#C9A86A]/10 flex items-center justify-center text-[#C9A86A]">
+              <div className="w-12 h-12 rounded-2xl border border-[#0E4D92]/40 bg-[#EAF1FB] flex items-center justify-center text-[#0E4D92]">
                 <UploadCloud className="w-6 h-6" />
               </div>
               <div>
-                <p className="text-xs font-semibold text-[#F7F4EE]">
+                <p className="text-xs font-semibold text-[#111827]">
                   Click to browse or drag &amp; drop your image here
                 </p>
-                <p className="text-[10px] text-[#94A3B8] mt-0.5">
+                <p className="text-[10px] text-[#4B5563] mt-0.5">
                   Supports PNG, JPG, WebP, SVG (Auto-compressed for ultra-fast loading)
                 </p>
               </div>
               <button
                 type="button"
-                className="mt-1 py-1.5 px-4 rounded-xl gold-gradient-bg text-[#0B1426] text-xs font-bold uppercase tracking-wider shadow-md hover:brightness-105 active:scale-95 transition-all pointer-events-none"
+                className="mt-1 py-1.5 px-4 rounded-xl gold-gradient-bg text-white text-xs font-bold uppercase tracking-wider shadow-md hover:brightness-105 active:scale-95 transition-all pointer-events-none"
               >
                 Choose File from Device
               </button>
@@ -254,15 +254,15 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
         <button
           type="button"
           onClick={() => setManualInputOpen(!manualInputOpen)}
-          className="text-[10px] text-[#94A3B8] hover:text-[#C9A86A] transition-colors cursor-pointer"
+          className="text-[10px] text-[#4B5563] hover:text-[#0E4D92] transition-colors cursor-pointer"
         >
           {manualInputOpen ? 'Hide link input' : 'Paste link manually instead'}
         </button>
       </div>
 
       {manualInputOpen && (
-        <div className="p-3 bg-[#0B1426] rounded-xl border border-white/10 space-y-1.5 animate-in fade-in">
-          <label className="text-[9px] text-[#94A3B8] uppercase block">
+        <div className="p-3 bg-white rounded-xl border border-[#E5E7EB] space-y-1.5 animate-in fade-in">
+          <label className="text-[9px] text-[#4B5563] uppercase block">
             Direct Image URL Link
           </label>
           <input
@@ -270,7 +270,7 @@ export const ImageUpload: React.FC<ImageUploadProps> = ({
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
             placeholder="https://example.com/image.jpg"
-            className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-lg px-2.5 py-1 text-xs text-[#F7F4EE] placeholder-[#94A3B8] focus:border-[#C9A86A] focus:outline-none"
+            className="w-full bg-white border border-[#E5E7EB] rounded-lg px-2.5 py-1 text-xs text-[#111827] placeholder-[#9CA3AF] focus:border-[#0E4D92] focus:outline-none"
           />
         </div>
       )}

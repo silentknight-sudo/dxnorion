@@ -67,13 +67,13 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
     <div className="max-w-5xl mx-auto pt-20 pb-24 px-4">
       {/* Header & Title */}
       <div className="text-center mb-8">
-        <span className="text-[10px] sm:text-xs font-bold text-[#C9A86A] uppercase tracking-widest block mb-1">
+        <span className="text-[10px] sm:text-xs font-bold text-[#0E4D92] uppercase tracking-widest block mb-1">
           Yamuna Expressway Real Estate Journal
         </span>
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#F7F4EE]">
+        <h1 className="text-3xl sm:text-4xl font-bold text-[#111827]">
           Yamuna Expressway Real Estate Blog
         </h1>
-        <p className="text-xs sm:text-sm text-[#94A3B8] mt-2 max-w-xl mx-auto">
+        <p className="text-xs sm:text-sm text-[#4B5563] mt-2 max-w-xl mx-auto">
           In-depth research on Jewar Airport, Sector 22D growth dynamics, RERA guidelines, and pre-launch property investment in Greater Noida.
         </p>
       </div>
@@ -82,13 +82,13 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
       <div className="space-y-4 mb-8">
         {/* Search Input */}
         <div className="max-w-md mx-auto relative">
-          <Search className="w-4 h-4 absolute left-3.5 top-3 text-[#C9A86A]" />
+          <Search className="w-4 h-4 absolute left-3.5 top-3 text-[#0E4D92]" />
           <input
             type="text"
             placeholder="Search articles on Sector 22D, Jewar Airport, RERA..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-[#111D36]/80 border border-[#C9A86A]/30 rounded-2xl pl-10 pr-4 py-2.5 text-xs text-[#F7F4EE] placeholder-[#94A3B8] focus:outline-none focus:border-[#C9A86A]"
+            className="w-full bg-[#F4F6FA] border border-[#E5E7EB] rounded-2xl pl-10 pr-4 py-2.5 text-xs text-[#111827] placeholder-[#9CA3AF] focus:outline-none focus:border-[#0E4D92]"
           />
         </div>
 
@@ -98,8 +98,8 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
             onClick={() => setSelectedCat('all')}
             className={`py-1.5 px-3.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
               selectedCat === 'all'
-                ? 'gold-gradient-bg text-[#0B1426] shadow-sm'
-                : 'glass-panel text-[#F7F4EE] hover:bg-white/10'
+                ? 'gold-gradient-bg text-white shadow-sm'
+                : 'glass-panel text-[#111827] hover:bg-[#F4F6FA]'
             }`}
           >
             All Articles
@@ -110,8 +110,8 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
               onClick={() => setSelectedCat(c.slug)}
               className={`py-1.5 px-3.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                 selectedCat === c.slug
-                  ? 'gold-gradient-bg text-[#0B1426] shadow-sm'
-                  : 'glass-panel text-[#F7F4EE] hover:bg-white/10'
+                  ? 'gold-gradient-bg text-white shadow-sm'
+                  : 'glass-panel text-[#111827] hover:bg-[#F4F6FA]'
               }`}
             >
               {c.name}
@@ -122,7 +122,7 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
 
       {/* Active Filter Indicator */}
       {(tagFilter || categoryFilter) && (
-        <div className="mb-6 p-3 rounded-xl bg-[#C9A86A]/10 border border-[#C9A86A]/30 flex items-center justify-between text-xs text-[#C9A86A]">
+        <div className="mb-6 p-3 rounded-xl bg-[#EAF1FB] border border-[#E5E7EB] flex items-center justify-between text-xs text-[#0E4D92]">
           <span>
             Showing filtered articles for: <strong>{tagFilter || categoryFilter}</strong>
           </span>
@@ -133,12 +133,12 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
       )}
 
       {loading ? (
-        <div className="py-20 text-center text-xs text-[#94A3B8]">Loading real estate intelligence...</div>
+        <div className="py-20 text-center text-xs text-[#4B5563]">Loading real estate intelligence...</div>
       ) : filteredPosts.length === 0 ? (
-        <div className="py-16 text-center glass-panel rounded-3xl p-8 border border-white/10">
-          <BookOpen className="w-8 h-8 text-[#C9A86A] mx-auto mb-2" />
-          <h3 className="font-serif font-bold text-base text-[#F7F4EE]">No Articles Found</h3>
-          <p className="text-xs text-[#94A3B8] mt-1">Try adjusting your search keywords or category filters.</p>
+        <div className="py-16 text-center glass-panel rounded-3xl p-8 border border-[#E5E7EB]">
+          <BookOpen className="w-8 h-8 text-[#0E4D92] mx-auto mb-2" />
+          <h3 className="font-bold text-base text-[#111827]">No Articles Found</h3>
+          <p className="text-xs text-[#4B5563] mt-1">Try adjusting your search keywords or category filters.</p>
         </div>
       ) : (
         <div className="space-y-8">
@@ -146,7 +146,7 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
           {featuredPost && (
             <div
               onClick={() => onNavigate(`/blog/${featuredPost.slug}`)}
-              className="glass-panel rounded-3xl overflow-hidden border border-[#C9A86A] shadow-2xl cursor-pointer hover:border-[#C9A86A]/80 transition-all group"
+              className="glass-panel rounded-3xl overflow-hidden border border-[#0E4D92] shadow-2xl cursor-pointer hover:border-[#0E4D92]/40 transition-all group"
             >
               <div className="grid md:grid-cols-2 gap-6 p-6 sm:p-8">
                 <div className="relative rounded-2xl overflow-hidden h-52 sm:h-72">
@@ -155,36 +155,36 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
                     alt={featuredPost.coverImageAlt}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute top-3 left-3 bg-[#0B1426]/90 backdrop-blur-md px-3 py-1 rounded-full border border-[#C9A86A]/40 text-[10px] text-[#C9A86A] font-bold uppercase">
+                  <div className="absolute top-3 left-3 bg-white backdrop-blur-md px-3 py-1 rounded-full border border-[#E5E7EB] text-[10px] text-[#0E4D92] font-bold uppercase">
                     Featured Analysis
                   </div>
                 </div>
 
                 <div className="flex flex-col justify-between">
                   <div>
-                    <div className="flex items-center gap-2 text-[10px] text-[#C9A86A] font-semibold uppercase tracking-wider mb-2">
+                    <div className="flex items-center gap-2 text-[10px] text-[#0E4D92] font-semibold uppercase tracking-wider mb-2">
                       <span>{featuredPost.categoryName}</span>
                       <span>•</span>
-                      <span className="flex items-center gap-1 text-[#94A3B8]">
-                        <Clock className="w-3 h-3 text-[#C9A86A]" />
+                      <span className="flex items-center gap-1 text-[#4B5563]">
+                        <Clock className="w-3 h-3 text-[#0E4D92]" />
                         {featuredPost.readingTime} min read
                       </span>
                     </div>
 
-                    <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#F7F4EE] group-hover:text-[#C9A86A] transition-colors">
+                    <h2 className="text-xl sm:text-2xl font-bold text-[#111827] group-hover:text-[#0E4D92] transition-colors">
                       {featuredPost.title}
                     </h2>
 
-                    <p className="text-xs sm:text-sm text-[#94A3B8] mt-2.5 leading-relaxed line-clamp-3">
+                    <p className="text-xs sm:text-sm text-[#4B5563] mt-2.5 leading-relaxed line-clamp-3">
                       {featuredPost.excerpt}
                     </p>
                   </div>
 
-                  <div className="mt-4 pt-4 border-t border-white/10 flex items-center justify-between">
-                    <span className="text-[10px] text-[#94A3B8]">
+                  <div className="mt-4 pt-4 border-t border-[#E5E7EB] flex items-center justify-between">
+                    <span className="text-[10px] text-[#4B5563]">
                       By {featuredPost.authorName}
                     </span>
-                    <span className="text-xs text-[#C9A86A] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                    <span className="text-xs text-[#0E4D92] font-bold flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                       Read Full Guide <ArrowRight className="w-3.5 h-3.5" />
                     </span>
                   </div>
@@ -199,7 +199,7 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
               <div
                 key={post.id}
                 onClick={() => onNavigate(`/blog/${post.slug}`)}
-                className="glass-panel rounded-2xl overflow-hidden border border-[#C9A86A]/25 hover:border-[#C9A86A]/70 transition-all cursor-pointer group flex flex-col justify-between"
+                className="glass-panel rounded-2xl overflow-hidden border border-[#E5E7EB] hover:border-[#0E4D92]/40 transition-all cursor-pointer group flex flex-col justify-between"
               >
                 <div>
                   <div className="relative h-44 overflow-hidden">
@@ -208,32 +208,32 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
                       alt={post.coverImageAlt}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute top-2.5 left-2.5 bg-[#0B1426]/90 backdrop-blur-md px-2.5 py-0.5 rounded-full text-[9px] text-[#C9A86A] font-bold uppercase">
+                    <div className="absolute top-2.5 left-2.5 bg-white backdrop-blur-md px-2.5 py-0.5 rounded-full text-[9px] text-[#0E4D92] font-bold uppercase">
                       {post.categoryName}
                     </div>
                   </div>
 
                   <div className="p-4 sm:p-5">
-                    <div className="flex items-center gap-2 text-[10px] text-[#94A3B8] mb-2">
-                      <Clock className="w-3 h-3 text-[#C9A86A]" />
+                    <div className="flex items-center gap-2 text-[10px] text-[#4B5563] mb-2">
+                      <Clock className="w-3 h-3 text-[#0E4D92]" />
                       <span>{post.readingTime} min read</span>
                       <span>•</span>
-                      <Eye className="w-3 h-3 text-[#C9A86A]" />
+                      <Eye className="w-3 h-3 text-[#0E4D92]" />
                       <span>{post.views} views</span>
                     </div>
 
-                    <h3 className="text-base font-serif font-bold text-[#F7F4EE] group-hover:text-[#C9A86A] transition-colors line-clamp-2">
+                    <h3 className="text-base font-bold text-[#111827] group-hover:text-[#0E4D92] transition-colors line-clamp-2">
                       {post.title}
                     </h3>
 
-                    <p className="text-xs text-[#94A3B8] mt-2 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-[#4B5563] mt-2 line-clamp-2 leading-relaxed">
                       {post.excerpt}
                     </p>
                   </div>
                 </div>
 
                 <div className="p-4 sm:p-5 pt-0">
-                  <div className="pt-3 border-t border-white/10 flex items-center justify-between text-xs text-[#C9A86A] font-semibold">
+                  <div className="pt-3 border-t border-[#E5E7EB] flex items-center justify-between text-xs text-[#0E4D92] font-semibold">
                     <span>Read Article</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -245,17 +245,17 @@ export const BlogListPage: React.FC<BlogListPageProps> = ({
       )}
 
       {/* Blog Newsletter / Lead CTA */}
-      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[#C9A86A] mt-14 text-center max-w-xl mx-auto">
-        <Sparkles className="w-6 h-6 text-[#C9A86A] mx-auto mb-2" />
-        <h3 className="font-serif font-bold text-lg text-[#F7F4EE]">
+      <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[#0E4D92] mt-14 text-center max-w-xl mx-auto">
+        <Sparkles className="w-6 h-6 text-[#0E4D92] mx-auto mb-2" />
+        <h3 className="font-bold text-lg text-[#111827]">
           Stay Ahead of Yamuna Expressway Price Revisions
         </h3>
-        <p className="text-xs text-[#94A3B8] mt-1">
+        <p className="text-xs text-[#4B5563] mt-1">
           Receive quarterly infrastructure milestones, airport operational updates, and confidential pre-launch price sheets directly.
         </p>
         <button
           onClick={() => onOpenEnquiry('Blog Newsletter & Market Intelligence Dossier')}
-          className="mt-4 py-2.5 px-8 rounded-xl gold-gradient-bg text-[#0B1426] font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#C9A86A]/20 cursor-pointer"
+          className="mt-4 py-2.5 px-8 rounded-xl gold-gradient-bg text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-black/5 cursor-pointer"
         >
           Subscribe to Investor Updates
         </button>

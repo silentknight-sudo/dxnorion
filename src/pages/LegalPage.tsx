@@ -15,20 +15,20 @@ export const LegalPage: React.FC<LegalPageProps> = ({
   return (
     <div className="max-w-3xl mx-auto pt-20 pb-24 px-4">
       {/* Breadcrumb */}
-      <nav className="flex items-center space-x-2 text-[11px] text-[#94A3B8] mb-6">
-        <button onClick={() => onNavigate('/')} className="hover:text-[#C9A86A]">Home</button>
-        <ChevronRight className="w-3 h-3 text-[#C9A86A]/40" />
-        <span className="text-[#C9A86A]">{type === 'privacy' ? 'Privacy Policy' : 'Statutory Disclaimer'}</span>
+      <nav className="flex items-center space-x-2 text-[11px] text-[#4B5563] mb-6">
+        <button onClick={() => onNavigate('/')} className="hover:text-[#0E4D92]">Home</button>
+        <ChevronRight className="w-3 h-3 text-[#0E4D92]" />
+        <span className="text-[#0E4D92]">{type === 'privacy' ? 'Privacy Policy' : 'Statutory Disclaimer'}</span>
       </nav>
 
-      <div className="glass-panel p-6 sm:p-10 rounded-3xl border border-[#C9A86A]/30 space-y-6 text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
-        <div className="flex items-center gap-2 pb-4 border-b border-white/10">
-          <ShieldCheck className="w-6 h-6 text-[#C9A86A]" />
+      <div className="glass-panel p-6 sm:p-10 rounded-3xl border border-[#E5E7EB] space-y-6 text-xs sm:text-sm text-[#4B5563] leading-relaxed">
+        <div className="flex items-center gap-2 pb-4 border-b border-[#E5E7EB]">
+          <ShieldCheck className="w-6 h-6 text-[#0E4D92]" />
           <div>
-            <h1 className="font-serif font-bold text-xl sm:text-2xl text-[#F7F4EE]">
+            <h1 className="font-bold text-xl sm:text-2xl text-[#111827]">
               {type === 'privacy' ? 'Privacy Policy & Data Protection' : 'Statutory Disclaimer & Compliance'}
             </h1>
-            <span className="text-[10px] text-[#C9A86A] uppercase font-semibold">
+            <span className="text-[10px] text-[#0E4D92] uppercase font-semibold">
               RERA Application No: {reraNumber}
             </span>
           </div>
@@ -37,21 +37,21 @@ export const LegalPage: React.FC<LegalPageProps> = ({
         {type === 'privacy' ? (
           <>
             <section className="space-y-2">
-              <h2 className="font-serif font-bold text-base text-[#F7F4EE]">1. Commitment to Privacy</h2>
+              <h2 className="font-bold text-base text-[#111827]">1. Commitment to Privacy</h2>
               <p>
                 At DXN Orion and our authorized marketing agency Elite Capital Advisors, we respect your privacy and are committed to safeguarding personal information collected through our digital pre-launch channels.
               </p>
             </section>
 
             <section className="space-y-2">
-              <h2 className="font-serif font-bold text-base text-[#F7F4EE]">2. Information We Collect</h2>
+              <h2 className="font-bold text-base text-[#111827]">2. Information We Collect</h2>
               <p>
                 When you express interest in DXN Orion (Sector 22D, Yamuna Expressway), we collect your name, contact phone number, email address, preferred apartment configuration (3 BHK / 4 BHK), and marketing referral data (UTM attribution parameters).
               </p>
             </section>
 
             <section className="space-y-2">
-              <h2 className="font-serif font-bold text-base text-[#F7F4EE]">3. Purpose of Data Processing</h2>
+              <h2 className="font-bold text-base text-[#111827]">3. Purpose of Data Processing</h2>
               <p>
                 Your contact details are exclusively utilized to:
               </p>
@@ -63,7 +63,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             </section>
 
             <section className="space-y-2">
-              <h2 className="font-serif font-bold text-base text-[#F7F4EE]">4. Zero Spam &amp; Third-Party Sharing</h2>
+              <h2 className="font-bold text-base text-[#111827]">4. Zero Spam &amp; Third-Party Sharing</h2>
               <p>
                 We do not sell, rent, or lease your personal identifiers to any external third-party telemarketers or advertisers. Communications are conducted strictly via our dedicated relationship managers.
               </p>
@@ -72,14 +72,14 @@ export const LegalPage: React.FC<LegalPageProps> = ({
         ) : (
           <>
             <section className="space-y-2">
-              <h2 className="font-serif font-bold text-base text-[#F7F4EE]">1. Authorized Marketing Partner Notice</h2>
+              <h2 className="font-bold text-base text-[#111827]">1. Authorized Marketing Partner Notice</h2>
               <p>
                 This website is managed by an authorized channel sales partner (Elite Capital Advisors) and serves exclusively for informational purposes. It does not constitute an advertisement, booking offer, contract, or guarantee of allotment.
               </p>
             </section>
 
             <section className="space-y-2">
-              <h2 className="font-serif font-bold text-base text-[#F7F4EE]">2. UP RERA Statutory Compliance</h2>
+              <h2 className="font-bold text-base text-[#111827]">2. UP RERA Statutory Compliance</h2>
               <p>
                 The project &ldquo;DXN Orion&rdquo; situated in Sector 22D, Yamuna Expressway, Greater Noida, Uttar Pradesh, is in its pre-launch conceptual stage. Formal application for project registration under the Real Estate (Regulation and Development) Act is currently under process with the Uttar Pradesh Real Estate Regulatory Authority (UP RERA).
               </p>
@@ -89,7 +89,7 @@ export const LegalPage: React.FC<LegalPageProps> = ({
             </section>
 
             <section className="space-y-2">
-              <h2 className="font-serif font-bold text-base text-[#F7F4EE]">3. Artistic Impressions &amp; Tentative Specifications</h2>
+              <h2 className="font-bold text-base text-[#111827]">3. Artistic Impressions &amp; Tentative Specifications</h2>
               <p>
                 All 3D architectural renders, elevation drawings, floor plans, lifestyle amenities, and landscape layouts displayed are artist&apos;s impressions and are indicative only. Dimensions, configurations, and pricing are subject to final municipal and statutory approvals.
               </p>
@@ -97,9 +97,9 @@ export const LegalPage: React.FC<LegalPageProps> = ({
           </>
         )}
 
-        <div className="pt-4 border-t border-white/10 text-[11px] text-[#94A3B8] flex justify-between items-center">
+        <div className="pt-4 border-t border-[#E5E7EB] text-[11px] text-[#4B5563] flex justify-between items-center">
           <span>Last Updated: October 2026</span>
-          <button onClick={() => onNavigate('/')} className="text-[#C9A86A] underline">
+          <button onClick={() => onNavigate('/')} className="text-[#0E4D92] underline">
             Return to Homepage
           </button>
         </div>

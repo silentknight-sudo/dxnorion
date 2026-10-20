@@ -19,7 +19,7 @@ export const Footer: React.FC<FooterProps> = ({
   };
 
   return (
-    <footer className="border-t border-[#C9A86A]/20 bg-[#111D36]/95 py-10 px-4 text-center text-[#94A3B8]">
+    <footer className="border-t border-[#E5E7EB] bg-[#F4F6FA] py-10 px-4 text-center text-[#4B5563]">
       <div className="max-w-4xl mx-auto space-y-6">
         {/* Emblem & Project Name */}
         <div className="flex items-center justify-center">
@@ -28,88 +28,88 @@ export const Footer: React.FC<FooterProps> = ({
           </span>
         </div>
 
-        <p className="text-xs text-[#C9A86A] font-semibold uppercase tracking-wider">
+        <p className="text-xs text-[#0E4D92] font-semibold uppercase tracking-wider">
           Plot GH-01, Sector 22D, Yamuna Expressway, Greater Noida, Uttar Pradesh 203201, India
         </p>
 
         {/* Quick Nav Links */}
-        <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-[#F7F4EE]/80">
-          <button onClick={() => handleNavClick('/')} className="hover:text-[#C9A86A] transition-colors cursor-pointer">
+        <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-medium text-[#374151]">
+          <button onClick={() => handleNavClick('/')} className="hover:text-[#0E4D92] transition-colors cursor-pointer">
             Overview
           </button>
-          <span className="text-[#C9A86A]/30">•</span>
-          <button onClick={() => handleNavClick('/floor-plans')} className="hover:text-[#C9A86A] transition-colors cursor-pointer">
+          <span className="text-[#0E4D92]">•</span>
+          <button onClick={() => handleNavClick('/floor-plans')} className="hover:text-[#0E4D92] transition-colors cursor-pointer">
             3 &amp; 4 BHK Floor Plans
           </button>
-          <span className="text-[#C9A86A]/30">•</span>
-          <button onClick={() => handleNavClick('/amenities')} className="hover:text-[#C9A86A] transition-colors cursor-pointer">
+          <span className="text-[#0E4D92]">•</span>
+          <button onClick={() => handleNavClick('/amenities')} className="hover:text-[#0E4D92] transition-colors cursor-pointer">
             Resort Amenities
           </button>
-          <span className="text-[#C9A86A]/30">•</span>
-          <button onClick={() => handleNavClick('/location')} className="hover:text-[#C9A86A] transition-colors cursor-pointer">
+          <span className="text-[#0E4D92]">•</span>
+          <button onClick={() => handleNavClick('/location')} className="hover:text-[#0E4D92] transition-colors cursor-pointer">
             Location Advantage &amp; Jewar Airport
           </button>
-          <span className="text-[#C9A86A]/30">•</span>
-          <button onClick={() => handleNavClick('/blog')} className="hover:text-[#C9A86A] transition-colors cursor-pointer">
+          <span className="text-[#0E4D92]">•</span>
+          <button onClick={() => handleNavClick('/blog')} className="hover:text-[#0E4D92] transition-colors cursor-pointer">
             Real Estate Market Research
           </button>
-          <span className="text-[#C9A86A]/30">•</span>
-          <button onClick={() => handleNavClick('/contact')} className="hover:text-[#C9A86A] transition-colors cursor-pointer">
+          <span className="text-[#0E4D92]">•</span>
+          <button onClick={() => handleNavClick('/contact')} className="hover:text-[#0E4D92] transition-colors cursor-pointer">
             Priority Desk
           </button>
-          <span className="text-[#C9A86A]/30">•</span>
-          <a href="/price-list" onClick={(e) => { e.preventDefault(); handleNavClick('/price-list'); }} className="hover:text-[#C9A86A] transition-colors">
+          <span className="text-[#0E4D92]">•</span>
+          <a href="/price-list" onClick={(e) => { e.preventDefault(); handleNavClick('/price-list'); }} className="hover:text-[#0E4D92] transition-colors">
             DXN Orion Price List
           </a>
-          <span className="text-[#C9A86A]/30">•</span>
-          <a href="/faq" onClick={(e) => { e.preventDefault(); handleNavClick('/faq'); }} className="hover:text-[#C9A86A] transition-colors">
+          <span className="text-[#0E4D92]">•</span>
+          <a href="/faq" onClick={(e) => { e.preventDefault(); handleNavClick('/faq'); }} className="hover:text-[#0E4D92] transition-colors">
             FAQs
           </a>
         </div>
 
         {/* Featured Market Guides for SEO Internal Link Equity */}
-        <div className="border-t border-white/10 pt-5 max-w-4xl mx-auto">
-          <span className="text-[10px] text-[#C9A86A] font-bold uppercase tracking-widest block mb-2">
+        <div className="border-t border-[#E5E7EB] pt-5 max-w-4xl mx-auto">
+          <span className="text-[10px] text-[#0E4D92] font-bold uppercase tracking-widest block mb-2">
             Featured Sector 22D Real Estate Intelligence &amp; Location Analysis
           </span>
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[11px] text-[#94A3B8]">
-            <button onClick={() => handleNavClick('/blog/sector-22d-yamuna-expressway-complete-location-guide-2026')} className="hover:text-[#DFBF82] underline transition-colors cursor-pointer">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5 text-[11px] text-[#4B5563]">
+            <button onClick={() => handleNavClick('/blog/sector-22d-yamuna-expressway-complete-location-guide-2026')} className="hover:text-[#0E4D92] underline transition-colors cursor-pointer">
               Sector 22D Location Guide (2026)
             </button>
             <span>•</span>
-            <button onClick={() => handleNavClick('/blog/why-property-near-noida-international-airport-is-gaining-value')} className="hover:text-[#DFBF82] underline transition-colors cursor-pointer">
+            <button onClick={() => handleNavClick('/blog/why-property-near-noida-international-airport-is-gaining-value')} className="hover:text-[#0E4D92] underline transition-colors cursor-pointer">
               Jewar Airport Value Drivers
             </button>
             <span>•</span>
-            <button onClick={() => handleNavClick('/blog/yamuna-expressway-vs-noida-extension-where-should-you-invest')} className="hover:text-[#DFBF82] underline transition-colors cursor-pointer">
+            <button onClick={() => handleNavClick('/blog/yamuna-expressway-vs-noida-extension-where-should-you-invest')} className="hover:text-[#0E4D92] underline transition-colors cursor-pointer">
               Yamuna Exp. vs Noida Extension
             </button>
             <span>•</span>
-            <button onClick={() => handleNavClick('/blog/3-bhk-vs-4-bhk-choosing-the-right-luxury-apartment-size')} className="hover:text-[#DFBF82] underline transition-colors cursor-pointer">
+            <button onClick={() => handleNavClick('/blog/3-bhk-vs-4-bhk-choosing-the-right-luxury-apartment-size')} className="hover:text-[#0E4D92] underline transition-colors cursor-pointer">
               3 BHK vs 4 BHK Sizes
             </button>
             <span>•</span>
-            <button onClick={() => handleNavClick('/blog/how-to-check-up-rera-registration-before-buying-a-flat')} className="hover:text-[#DFBF82] underline transition-colors cursor-pointer">
+            <button onClick={() => handleNavClick('/blog/how-to-check-up-rera-registration-before-buying-a-flat')} className="hover:text-[#0E4D92] underline transition-colors cursor-pointer">
               UP RERA Buyer Checklist
             </button>
             <span>•</span>
-            <button onClick={() => handleNavClick('/blog/upcoming-infrastructure-around-yeida-film-city-metro-and-expressways')} className="hover:text-[#DFBF82] underline transition-colors cursor-pointer">
+            <button onClick={() => handleNavClick('/blog/upcoming-infrastructure-around-yeida-film-city-metro-and-expressways')} className="hover:text-[#0E4D92] underline transition-colors cursor-pointer">
               YEIDA Film City &amp; Pod Taxis
             </button>
           </div>
         </div>
 
         {/* Government Authority Verification & Regional Master Plan Links */}
-        <div className="border-t border-white/5 pt-4 max-w-4xl mx-auto">
-          <span className="text-[10px] text-[#94A3B8]/70 uppercase tracking-widest block mb-2 font-medium">
+        <div className="border-t border-[#E5E7EB] pt-4 max-w-4xl mx-auto">
+          <span className="text-[10px] text-[#4B5563] uppercase tracking-widest block mb-2 font-medium">
             Statutory Portals &amp; Official Regulatory Citations
           </span>
-          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] text-[#94A3B8]/80">
+          <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[10px] text-[#4B5563]">
             <a
               href="https://up-rera.in/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#C9A86A] transition-colors"
+              className="hover:text-[#0E4D92] transition-colors"
             >
               UP RERA Official Portal ↗
             </a>
@@ -118,7 +118,7 @@ export const Footer: React.FC<FooterProps> = ({
               href="https://yamunaexpresswayauthority.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#C9A86A] transition-colors"
+              className="hover:text-[#0E4D92] transition-colors"
             >
               YEIDA Master Plan 2031 ↗
             </a>
@@ -127,7 +127,7 @@ export const Footer: React.FC<FooterProps> = ({
               href="https://nialjewar.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#C9A86A] transition-colors"
+              className="hover:text-[#0E4D92] transition-colors"
             >
               Noida International Airport (NIAL) ↗
             </a>
@@ -136,7 +136,7 @@ export const Footer: React.FC<FooterProps> = ({
               href="https://igbc.in/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#C9A86A] transition-colors"
+              className="hover:text-[#0E4D92] transition-colors"
             >
               IGBC Green Buildings ↗
             </a>
@@ -145,7 +145,7 @@ export const Footer: React.FC<FooterProps> = ({
               href="https://credaincr.org/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#C9A86A] transition-colors"
+              className="hover:text-[#0E4D92] transition-colors"
             >
               CREDAI NCR Real Estate ↗
             </a>
@@ -154,7 +154,7 @@ export const Footer: React.FC<FooterProps> = ({
               href="https://nhai.gov.in/"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-[#C9A86A] transition-colors"
+              className="hover:text-[#0E4D92] transition-colors"
             >
               NHAI Eastern Peripheral Corridor ↗
             </a>
@@ -162,13 +162,13 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
 
         {/* Regulatory & Statutory Disclaimers */}
-        <div className="max-w-2xl mx-auto space-y-3 text-[10px] leading-relaxed border-t border-white/10 pt-5 text-[#94A3B8]">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#C9A86A]/15 border border-[#C9A86A]/30 text-[#DFBF82] font-semibold">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#C9A86A]" />
+        <div className="max-w-2xl mx-auto space-y-3 text-[10px] leading-relaxed border-t border-[#E5E7EB] pt-5 text-[#4B5563]">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#EAF1FB] border border-[#E5E7EB] text-[#0E4D92] font-semibold">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#0E4D92]" />
             <span>RERA Acknowledgment No: {reraNumber}</span>
           </div>
 
-          <p className="text-amber-200/90 font-medium">
+          <p className="text-amber-800 font-medium">
             *Disclaimers &amp; Statutory Notice: Project is currently under pre-launch stage. Formal application for RERA registration is under process with UP RERA. Visual representations, artistic renders, images, and dimensions are for conceptual presentation purposes only.
           </p>
           <p>
@@ -177,28 +177,28 @@ export const Footer: React.FC<FooterProps> = ({
         </div>
 
         {/* Legal & Copyright */}
-        <div className="border-t border-white/5 pt-4 flex flex-col sm:flex-row items-center justify-between text-[10px] gap-2">
-          <p className="text-[#94A3B8]/70">
-            Official Channel Sales Partner: <span className="text-[#F7F4EE] font-medium">Elite Capital Advisors</span>
+        <div className="border-t border-[#E5E7EB] pt-4 flex flex-col sm:flex-row items-center justify-between text-[10px] gap-2">
+          <p className="text-[#4B5563]">
+            Official Channel Sales Partner: <span className="text-[#111827] font-medium">Elite Capital Advisors</span>
           </p>
           <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-            <a href="/sitemap.xml" target="_blank" rel="noopener" className="hover:text-[#C9A86A] transition-colors">
+            <a href="/sitemap.xml" target="_blank" rel="noopener" className="hover:text-[#0E4D92] transition-colors">
               XML Sitemap
             </a>
             <span>•</span>
-            <a href="/blog/rss.xml" target="_blank" rel="noopener" className="hover:text-[#C9A86A] transition-colors">
+            <a href="/blog/rss.xml" target="_blank" rel="noopener" className="hover:text-[#0E4D92] transition-colors">
               RSS Feed
             </a>
             <span>•</span>
-            <button onClick={() => handleNavClick('/privacy-policy')} className="hover:text-[#C9A86A] transition-colors">
+            <button onClick={() => handleNavClick('/privacy-policy')} className="hover:text-[#0E4D92] transition-colors">
               Privacy Policy
             </button>
             <span>•</span>
-            <button onClick={() => handleNavClick('/disclaimer')} className="hover:text-[#C9A86A] transition-colors">
+            <button onClick={() => handleNavClick('/disclaimer')} className="hover:text-[#0E4D92] transition-colors">
               Disclaimer
             </button>
             <span>•</span>
-            <button onClick={() => handleNavClick('/admin/login')} className="hover:text-[#C9A86A] transition-colors inline-flex items-center gap-1 opacity-60 hover:opacity-100">
+            <button onClick={() => handleNavClick('/admin/login')} className="hover:text-[#0E4D92] transition-colors inline-flex items-center gap-1 opacity-60 hover:opacity-100">
               <Lock className="w-2.5 h-2.5" />
               <span>Admin Portal</span>
             </button>

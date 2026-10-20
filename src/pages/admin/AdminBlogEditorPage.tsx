@@ -488,20 +488,20 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
   return (
     <div className="space-y-6">
       {/* Top Header matching background of screenshot */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-white/10">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-[#E5E7EB]">
         <div>
-          <h1 className="font-serif font-bold text-2xl text-[#F7F4EE]">
+          <h1 className="font-bold text-2xl text-[#111827]">
             Blog Management
           </h1>
-          <p className="text-xs text-[#94A3B8] mt-1">
+          <p className="text-xs text-[#4B5563] mt-1">
             Create, edit, and publish search-optimized property guides.
           </p>
         </div>
         <button
           onClick={handleOpenNewModal}
-          className="py-2.5 px-4 rounded-xl gold-gradient-bg text-[#0B1426] font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-[#C9A86A]/20 cursor-pointer active:scale-95 transition"
+          className="py-2.5 px-4 rounded-xl gold-gradient-bg text-white font-semibold text-xs flex items-center justify-center gap-1.5 shadow-md shadow-black/5 cursor-pointer active:scale-95 transition"
         >
-          <Plus className="w-4 h-4 text-[#0B1426]" />
+          <Plus className="w-4 h-4 text-white" />
           <span>Create New Blog Post</span>
         </button>
       </div>
@@ -509,12 +509,12 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
       {/* Posts List Cards matching background in screenshot */}
       <div className="space-y-3">
         {loading && posts.length === 0 ? (
-          <div className="py-16 text-center text-xs text-[#94A3B8]">Loading articles...</div>
+          <div className="py-16 text-center text-xs text-[#4B5563]">Loading articles...</div>
         ) : posts.length === 0 ? (
-          <div className="py-16 text-center glass-panel rounded-2xl border border-white/10 p-8 space-y-3">
-            <FileText className="w-10 h-10 text-[#C9A86A]/60 mx-auto" />
-            <p className="text-sm text-[#F7F4EE] font-medium">No blog posts published yet.</p>
-            <p className="text-xs text-[#94A3B8]">Click "Create New Blog Post" to add your first article.</p>
+          <div className="py-16 text-center glass-panel rounded-2xl border border-[#E5E7EB] p-8 space-y-3">
+            <FileText className="w-10 h-10 text-[#0E4D92] mx-auto" />
+            <p className="text-sm text-[#111827] font-medium">No blog posts published yet.</p>
+            <p className="text-xs text-[#4B5563]">Click "Create New Blog Post" to add your first article.</p>
           </div>
         ) : (
           posts.map((post) => {
@@ -533,7 +533,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                     />
                   )}
                   <div className="space-y-1">
-                    <h3 className="font-serif font-bold text-base text-slate-900 leading-snug">
+                    <h3 className="font-bold text-base text-slate-900 leading-snug">
                       {post.title}
                     </h3>
                     <p className="text-xs text-slate-500 font-mono">
@@ -585,7 +585,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
             
             {/* Modal Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
-              <h2 className="font-serif font-bold text-lg sm:text-xl text-slate-900">
+              <h2 className="font-bold text-lg sm:text-xl text-slate-900">
                 {editingPost.id ? 'Edit Blog Post' : 'Create New Blog Post'}
               </h2>
               <button
@@ -607,7 +607,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                   placeholder="Blog Title"
                   value={editingPost.title || ''}
                   onChange={(e) => handleTitleChange(e.target.value)}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0E4D92]/40 focus:border-transparent transition"
                 />
               </div>
 
@@ -618,7 +618,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                   placeholder="Blog Slug (e.g., my-awesome-blog)"
                   value={editingPost.slug || ''}
                   onChange={(e) => setEditingPost({ ...editingPost, slug: e.target.value })}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition font-mono text-xs"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0E4D92]/40 focus:border-transparent transition font-mono text-xs"
                 />
               </div>
 
@@ -629,7 +629,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                   placeholder="Excerpt (short description)"
                   value={editingPost.excerpt || ''}
                   onChange={(e) => setEditingPost({ ...editingPost, excerpt: e.target.value })}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0E4D92]/40 focus:border-transparent transition"
                 />
               </div>
 
@@ -640,7 +640,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                   placeholder="SEO Title"
                   value={editingPost.metaTitle || ''}
                   onChange={(e) => setEditingPost({ ...editingPost, metaTitle: e.target.value })}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0E4D92]/40 focus:border-transparent transition"
                 />
               </div>
 
@@ -651,7 +651,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                   placeholder="SEO Description"
                   value={editingPost.metaDescription || ''}
                   onChange={(e) => setEditingPost({ ...editingPost, metaDescription: e.target.value })}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0E4D92]/40 focus:border-transparent transition"
                 />
               </div>
 
@@ -662,7 +662,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                   placeholder="SEO Keywords"
                   value={editingPost.focusKeyword || ''}
                   onChange={(e) => setEditingPost({ ...editingPost, focusKeyword: e.target.value })}
-                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent transition"
+                  className="w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0E4D92]/40 focus:border-transparent transition"
                 />
               </div>
 
@@ -709,7 +709,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                       </>
                     ) : (
                       <>
-                        <UploadCloud className="w-3.5 h-3.5 text-[#C9A86A]" />
+                        <UploadCloud className="w-3.5 h-3.5 text-[#0E4D92]" />
                         <span>Change Cover</span>
                       </>
                     )}
@@ -739,7 +739,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                     <button
                       type="button"
                       onClick={() => handleToolbarAction('italic')}
-                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-800 text-xs italic font-serif cursor-pointer transition active:scale-95"
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-800 text-xs italic cursor-pointer transition active:scale-95"
                       title="Italic"
                     >
                       I
@@ -839,17 +839,17 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                     <button
                       type="button"
                       onClick={() => handleToolbarAction('image')}
-                      className="w-8 h-8 rounded-lg border border-[#C9A86A]/40 bg-[#C9A86A]/10 hover:bg-[#C9A86A]/20 flex items-center justify-center text-[#967439] cursor-pointer transition active:scale-95"
+                      className="w-8 h-8 rounded-lg border border-[#E5E7EB] bg-[#EAF1FB] hover:bg-[#EAF1FB] flex items-center justify-center text-[#0E4D92] cursor-pointer transition active:scale-95"
                       title="Upload or Insert Image"
                     >
-                      <ImageIcon className="w-4 h-4 text-[#967439]" />
+                      <ImageIcon className="w-4 h-4 text-[#0E4D92]" />
                     </button>
 
                     {/* Clear Format Tx */}
                     <button
                       type="button"
                       onClick={() => handleToolbarAction('clear')}
-                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 text-xs font-serif cursor-pointer transition active:scale-95"
+                      className="w-8 h-8 rounded-lg border border-slate-200 hover:bg-slate-50 flex items-center justify-center text-slate-700 text-xs cursor-pointer transition active:scale-95"
                       title="Clear Formatting"
                     >
                       T<span className="text-[10px] text-slate-400">x</span>
@@ -912,7 +912,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                     placeholder="Write your article content here... (HTML or text formatted)"
                     value={editingPost.contentHtml || ''}
                     onChange={(e) => handleContentChange(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl p-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60 focus:border-transparent font-sans leading-relaxed resize-y min-h-[280px]"
+                    className="w-full border border-slate-200 rounded-xl p-4 text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0E4D92]/40 focus:border-transparent font-sans leading-relaxed resize-y min-h-[280px]"
                   />
                 )}
               </div>
@@ -931,11 +931,11 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                 type="button"
                 onClick={handleSavePost}
                 disabled={saving}
-                className="bg-[#DFBF82] hover:bg-[#C9A86A] text-[#0B1426] font-semibold text-sm px-7 py-2.5 rounded-xl shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-60 flex items-center gap-2"
+                className="bg-[#D9541A] hover:bg-[#F26522] text-white font-semibold text-sm px-7 py-2.5 rounded-xl shadow-xs transition active:scale-95 cursor-pointer disabled:opacity-60 flex items-center gap-2"
               >
                 {saving ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin text-[#0B1426]" />
+                    <Loader2 className="w-4 h-4 animate-spin text-white" />
                     <span>Saving...</span>
                   </>
                 ) : (
@@ -956,8 +956,8 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
             {/* Header */}
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <ImageIcon className="w-5 h-5 text-[#C9A86A]" />
-                <h3 className="font-serif font-bold text-base text-slate-900">Insert Image</h3>
+                <ImageIcon className="w-5 h-5 text-[#0E4D92]" />
+                <h3 className="font-bold text-base text-slate-900">Insert Image</h3>
               </div>
               <button
                 onClick={() => setIsImageModalOpen(false)}
@@ -1009,11 +1009,11 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
 
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-slate-200 hover:border-[#C9A86A] rounded-2xl p-6 text-center cursor-pointer transition bg-slate-50/50 hover:bg-[#C9A86A]/5"
+                  className="border-2 border-dashed border-slate-200 hover:border-[#0E4D92] rounded-2xl p-6 text-center cursor-pointer transition bg-slate-50/50 hover:bg-[#EAF1FB]"
                 >
                   {imageUploadLoading ? (
                     <div className="space-y-2 py-4">
-                      <Loader2 className="w-8 h-8 text-[#C9A86A] animate-spin mx-auto" />
+                      <Loader2 className="w-8 h-8 text-[#0E4D92] animate-spin mx-auto" />
                       <p className="text-xs text-slate-600 font-medium">Processing image...</p>
                     </div>
                   ) : imagePreviewUrl ? (
@@ -1023,11 +1023,11 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                         alt="Preview"
                         className="max-h-36 mx-auto rounded-xl object-contain border border-slate-200 shadow-xs"
                       />
-                      <p className="text-[11px] text-[#C9A86A] font-semibold">Click to choose a different image</p>
+                      <p className="text-[11px] text-[#0E4D92] font-semibold">Click to choose a different image</p>
                     </div>
                   ) : (
                     <div className="space-y-2 py-2">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-[#C9A86A]">
+                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-[#0E4D92]">
                         <UploadCloud className="w-5 h-5" />
                       </div>
                       <p className="text-xs font-semibold text-slate-800">
@@ -1054,7 +1054,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                     placeholder="https://images.unsplash.com/photo-..."
                     value={imagePreviewUrl}
                     onChange={(e) => setImagePreviewUrl(e.target.value)}
-                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60"
+                    className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0E4D92]/40"
                   />
                 </div>
 
@@ -1081,7 +1081,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                 placeholder="e.g. Master Bedroom with Golf View"
                 value={imageAltText}
                 onChange={(e) => setImageAltText(e.target.value)}
-                className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#C9A86A]/60"
+                className="w-full border border-slate-200 rounded-xl px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#0E4D92]/40"
               />
             </div>
 
@@ -1091,7 +1091,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                 type="checkbox"
                 checked={imageAsCover}
                 onChange={(e) => setImageAsCover(e.target.checked)}
-                className="rounded text-[#C9A86A] focus:ring-[#C9A86A]"
+                className="rounded text-[#0E4D92] focus:ring-[#0E4D92]/40"
               />
               <span>Also use this image as the main article cover photo</span>
             </label>
@@ -1109,7 +1109,7 @@ export const AdminBlogEditorPage: React.FC<AdminBlogEditorPageProps> = ({ onNavi
                 type="button"
                 onClick={handleInsertImageIntoContent}
                 disabled={!imagePreviewUrl.trim() || imageUploadLoading}
-                className="py-2 px-5 rounded-xl bg-[#DFBF82] hover:bg-[#C9A86A] text-[#0B1426] text-xs font-semibold shadow-2xs cursor-pointer transition disabled:opacity-50"
+                className="py-2 px-5 rounded-xl bg-[#D9541A] hover:bg-[#F26522] text-white text-xs font-semibold shadow-2xs cursor-pointer transition disabled:opacity-50"
               >
                 Insert Image into Article
               </button>

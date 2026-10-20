@@ -76,26 +76,26 @@ export const FloorPlansPage: React.FC<FloorPlansPageProps> = ({ onOpenEnquiry, o
     <div className="max-w-4xl mx-auto pt-20 pb-24 px-4">
       {/* Header */}
       <div className="text-center mb-8">
-        <span className="text-[10px] sm:text-xs font-bold text-[#C9A86A] uppercase tracking-widest block mb-1">
+        <span className="text-[10px] sm:text-xs font-bold text-[#0E4D92] uppercase tracking-widest block mb-1">
           Master Planned Layouts
         </span>
-        <h1 className="text-3xl sm:text-4xl font-serif font-bold text-[#F7F4EE]">
+        <h1 className="text-3xl sm:text-4xl font-bold text-[#111827]">
           DXN Orion Floor Plans – 3 &amp; 4 BHK
         </h1>
-        <p className="text-xs sm:text-sm text-[#94A3B8] mt-2 max-w-xl mx-auto">
+        <p className="text-xs sm:text-sm text-[#4B5563] mt-2 max-w-xl mx-auto">
           Low-density 4-to-a-core luxury residences in Sector 22D, Yamuna Expressway. Explore protected blueprints and specifications.
         </p>
       </div>
 
       {/* Plan Selector Tabs */}
       <div className="flex justify-center mb-8">
-        <div className="glass-panel p-1.5 rounded-2xl border border-[#C9A86A]/40 flex gap-1 sm:gap-2 max-w-md w-full">
+        <div className="glass-panel p-1.5 rounded-2xl border border-[#E5E7EB] flex gap-1 sm:gap-2 max-w-md w-full">
           <button
             onClick={() => setSelectedPlan('3BHK')}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedPlan === '3BHK'
-                ? 'gold-gradient-bg text-[#0B1426] shadow-md shadow-[#C9A86A]/20'
-                : 'text-[#F7F4EE] hover:bg-white/5'
+                ? 'gold-gradient-bg text-white shadow-md shadow-black/5'
+                : 'text-[#111827] hover:bg-[#F4F6FA]'
             }`}
           >
             3 BHK (1,900 sq ft)
@@ -104,8 +104,8 @@ export const FloorPlansPage: React.FC<FloorPlansPageProps> = ({ onOpenEnquiry, o
             onClick={() => setSelectedPlan('3BHK_SERVANT')}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all relative cursor-pointer ${
               selectedPlan === '3BHK_SERVANT'
-                ? 'gold-gradient-bg text-[#0B1426] shadow-md shadow-[#C9A86A]/20'
-                : 'text-[#F7F4EE] hover:bg-white/5'
+                ? 'gold-gradient-bg text-white shadow-md shadow-black/5'
+                : 'text-[#111827] hover:bg-[#F4F6FA]'
             }`}
           >
             3 BHK+S (2,400 sq ft)
@@ -114,8 +114,8 @@ export const FloorPlansPage: React.FC<FloorPlansPageProps> = ({ onOpenEnquiry, o
             onClick={() => setSelectedPlan('4BHK_SERVANT')}
             className={`flex-1 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
               selectedPlan === '4BHK_SERVANT'
-                ? 'gold-gradient-bg text-[#0B1426] shadow-md shadow-[#C9A86A]/20'
-                : 'text-[#F7F4EE] hover:bg-white/5'
+                ? 'gold-gradient-bg text-white shadow-md shadow-black/5'
+                : 'text-[#111827] hover:bg-[#F4F6FA]'
             }`}
           >
             4 BHK+S (3,000 sq ft)
@@ -124,87 +124,87 @@ export const FloorPlansPage: React.FC<FloorPlansPageProps> = ({ onOpenEnquiry, o
       </div>
 
       {/* Active Floor Plan Card */}
-      <div className="glass-panel rounded-3xl border border-[#C9A86A] overflow-hidden shadow-2xl p-6 sm:p-8">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-white/10 gap-3">
+      <div className="glass-panel rounded-3xl border border-[#0E4D92] overflow-hidden shadow-2xl p-6 sm:p-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-[#E5E7EB] gap-3">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-[#C9A86A]">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#0E4D92]">
               {current.type}
             </span>
-            <h2 className="text-2xl font-serif font-bold text-[#F7F4EE] mt-0.5">
+            <h2 className="text-2xl font-bold text-[#111827] mt-0.5">
               {current.title}
             </h2>
-            <p className="text-xs text-[#94A3B8] mt-1">
+            <p className="text-xs text-[#4B5563] mt-1">
               {current.description}
             </p>
           </div>
           <div className="text-left sm:text-right">
-            <span className="text-lg font-serif font-bold text-[#C9A86A]">
+            <span className="text-lg font-bold text-[#0E4D92]">
               {current.superArea}
             </span>
-            <p className="text-[10px] text-[#94A3B8]">Super Built-Up Area</p>
+            <p className="text-[10px] text-[#4B5563]">Super Built-Up Area</p>
           </div>
         </div>
 
         {/* Protected Schematic Blueprint View */}
-        <div className="relative my-6 h-64 sm:h-80 rounded-2xl bg-[#0B1426] border border-[#C9A86A]/30 overflow-hidden flex items-center justify-center p-4">
+        <div className="relative my-6 h-64 sm:h-80 rounded-2xl bg-white border border-[#E5E7EB] overflow-hidden flex items-center justify-center p-4">
           {/* Blueprint Grid Watermark */}
-          <div className="w-full h-full opacity-20 filter blur-[2px] border-2 border-dashed border-[#C9A86A]/60 flex flex-col justify-between p-4 bg-[linear-gradient(to_right,#C9A86A_1px,transparent_1px),linear-gradient(to_bottom,#C9A86A_1px,transparent_1px)] bg-[size:24px_24px]">
+          <div className="w-full h-full opacity-20 filter blur-[2px] border-2 border-dashed border-[#0E4D92]/40 flex flex-col justify-between p-4 bg-[linear-gradient(to_right,#C9A86A_1px,transparent_1px),linear-gradient(to_bottom,#C9A86A_1px,transparent_1px)] bg-[size:24px_24px]">
             <div className="flex justify-between h-1/2 gap-4">
-              <div className="w-1/2 border border-[#C9A86A]/50 rounded p-2" />
-              <div className="w-1/2 border border-[#C9A86A]/50 rounded p-2" />
+              <div className="w-1/2 border border-[#0E4D92]/40 rounded p-2" />
+              <div className="w-1/2 border border-[#0E4D92]/40 rounded p-2" />
             </div>
-            <div className="h-1/2 border-t border-[#C9A86A]/50 mt-2 rounded" />
+            <div className="h-1/2 border-t border-[#0E4D92]/40 mt-2 rounded" />
           </div>
 
-          <div className="absolute inset-0 bg-[#0B1426]/75 backdrop-blur-[3px] flex flex-col items-center justify-center text-center p-4">
-            <div className="w-12 h-12 rounded-full bg-[#C9A86A]/20 border border-[#C9A86A] flex items-center justify-center text-[#C9A86A] mb-2 shadow-lg">
+          <div className="absolute inset-0 bg-white/75 backdrop-blur-[3px] flex flex-col items-center justify-center text-center p-4">
+            <div className="w-12 h-12 rounded-full bg-[#EAF1FB] border border-[#0E4D92] flex items-center justify-center text-[#0E4D92] mb-2 shadow-lg">
               <Lock className="w-6 h-6" />
             </div>
-            <h3 className="text-base font-serif font-bold text-[#F7F4EE]">
+            <h3 className="text-base font-bold text-[#111827]">
               Architectural Blueprint Protected
             </h3>
-            <p className="text-xs text-[#94A3B8] max-w-sm mt-1">
+            <p className="text-xs text-[#4B5563] max-w-sm mt-1">
               Detailed room dimensions, structural cad files, and electrical layouts are reserved for verified pre-launch buyers.
             </p>
             <button
               onClick={() => onOpenEnquiry(`Unlock Blueprint: ${current.title}`, selectedPlan)}
-              className="mt-4 py-2.5 px-6 rounded-xl gold-gradient-bg text-[#0B1426] font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-[#C9A86A]/20 cursor-pointer active:scale-95"
+              className="mt-4 py-2.5 px-6 rounded-xl gold-gradient-bg text-white font-bold text-xs uppercase tracking-wider flex items-center gap-2 shadow-lg shadow-black/5 cursor-pointer active:scale-95"
             >
-              <FileText className="w-4 h-4 text-[#0B1426]" />
+              <FileText className="w-4 h-4 text-white" />
               <span>Unlock Architectural Layout PDF</span>
             </button>
           </div>
         </div>
 
         {/* Spatial Key Metrics Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-y border-white/10 text-xs">
-          <div className="p-3 bg-[#0B1426]/60 rounded-xl border border-[#C9A86A]/20">
-            <span className="text-[10px] text-[#94A3B8] block">Carpet Area</span>
-            <span className="font-bold text-[#F7F4EE]">{current.carpetArea}</span>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-4 border-y border-[#E5E7EB] text-xs">
+          <div className="p-3 bg-white/60 rounded-xl border border-[#E5E7EB]">
+            <span className="text-[10px] text-[#4B5563] block">Carpet Area</span>
+            <span className="font-bold text-[#111827]">{current.carpetArea}</span>
           </div>
-          <div className="p-3 bg-[#0B1426]/60 rounded-xl border border-[#C9A86A]/20">
-            <span className="text-[10px] text-[#94A3B8] block">Balcony Deck</span>
-            <span className="font-bold text-[#F7F4EE]">{current.balconyArea}</span>
+          <div className="p-3 bg-white/60 rounded-xl border border-[#E5E7EB]">
+            <span className="text-[10px] text-[#4B5563] block">Balcony Deck</span>
+            <span className="font-bold text-[#111827]">{current.balconyArea}</span>
           </div>
-          <div className="p-3 bg-[#0B1426]/60 rounded-xl border border-[#C9A86A]/20">
-            <span className="text-[10px] text-[#94A3B8] block">Orientation</span>
-            <span className="font-bold text-[#C9A86A]">{current.facing}</span>
+          <div className="p-3 bg-white/60 rounded-xl border border-[#E5E7EB]">
+            <span className="text-[10px] text-[#4B5563] block">Orientation</span>
+            <span className="font-bold text-[#0E4D92]">{current.facing}</span>
           </div>
-          <div className="p-3 bg-[#0B1426]/60 rounded-xl border border-[#C9A86A]/20">
-            <span className="text-[10px] text-[#94A3B8] block">Core Privacy</span>
-            <span className="font-bold text-[#F7F4EE]">{current.unitsPerFloor}</span>
+          <div className="p-3 bg-white/60 rounded-xl border border-[#E5E7EB]">
+            <span className="text-[10px] text-[#4B5563] block">Core Privacy</span>
+            <span className="font-bold text-[#111827]">{current.unitsPerFloor}</span>
           </div>
         </div>
 
         {/* Detailed Room Specifications */}
         <div className="mt-6">
-          <h4 className="text-sm font-serif font-bold text-[#F7F4EE] mb-3">
+          <h4 className="text-sm font-bold text-[#111827] mb-3">
             Layout Highlights &amp; Spatial Specifications
           </h4>
-          <div className="grid sm:grid-cols-2 gap-2.5 text-xs text-[#94A3B8]">
+          <div className="grid sm:grid-cols-2 gap-2.5 text-xs text-[#4B5563]">
             {current.specs.map((spec, idx) => (
               <div key={idx} className="flex items-start gap-2">
-                <CheckCircle2 className="w-4 h-4 text-[#C9A86A] shrink-0 mt-0.5" />
+                <CheckCircle2 className="w-4 h-4 text-[#0E4D92] shrink-0 mt-0.5" />
                 <span>{spec}</span>
               </div>
             ))}
@@ -212,16 +212,16 @@ export const FloorPlansPage: React.FC<FloorPlansPageProps> = ({ onOpenEnquiry, o
         </div>
 
         {/* Bottom CTA Box */}
-        <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="mt-8 pt-6 border-t border-[#E5E7EB] flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
-            <span className="text-xs text-[#94A3B8]">Indicative Price Structure:</span>
-            <div className="text-lg font-serif font-bold text-[#C9A86A]">
+            <span className="text-xs text-[#4B5563]">Indicative Price Structure:</span>
+            <div className="text-lg font-bold text-[#0E4D92]">
               Exclusive Pre-Launch CLP Plan
             </div>
           </div>
           <button
             onClick={() => onOpenEnquiry(`Pre-Launch Pricing for ${current.title}`, selectedPlan)}
-            className="w-full sm:w-auto py-3 px-8 rounded-xl gold-gradient-bg text-[#0B1426] font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#C9A86A]/25 cursor-pointer active:scale-95"
+            className="w-full sm:w-auto py-3 px-8 rounded-xl gold-gradient-bg text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-black/5 cursor-pointer active:scale-95"
           >
             Request Instant Price Breakdown
           </button>

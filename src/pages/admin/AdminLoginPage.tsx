@@ -66,26 +66,26 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
   };
 
   return (
-    <div className="min-h-screen bg-[#0B1426] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4">
       {/* noindex meta enforcement */}
-      <div className="w-full max-w-sm glass-panel p-6 sm:p-8 rounded-3xl border border-[#C9A86A] shadow-2xl relative overflow-hidden">
+      <div className="w-full max-w-sm glass-panel p-6 sm:p-8 rounded-3xl border border-[#0E4D92] shadow-2xl relative overflow-hidden">
         {/* Ambient Glow */}
-        <div className="absolute -top-14 -right-14 w-28 h-28 bg-[#C9A86A]/20 rounded-full blur-2xl pointer-events-none" />
+        <div className="absolute -top-14 -right-14 w-28 h-28 bg-[#EAF1FB] rounded-full blur-2xl pointer-events-none" />
 
         <div className="text-center mb-6">
-          <div className="w-10 h-10 rounded-full border border-[#C9A86A] flex items-center justify-center bg-[#C9A86A]/10 mx-auto mb-2">
-            <span className="font-serif font-bold text-[#C9A86A] text-sm">DO</span>
+          <div className="w-10 h-10 rounded-full border border-[#0E4D92] flex items-center justify-center bg-[#EAF1FB] mx-auto mb-2">
+            <span className="font-bold text-[#0E4D92] text-sm">DO</span>
           </div>
-          <h1 className="font-serif font-bold text-xl text-[#F7F4EE]">
+          <h1 className="font-bold text-xl text-[#111827]">
             DXN Orion Admin Console
           </h1>
-          <p className="text-[11px] text-[#94A3B8] mt-0.5">
+          <p className="text-[11px] text-[#4B5563] mt-0.5">
             Executive CRM &amp; Content Management System
           </p>
         </div>
 
         {error && (
-          <div className="p-3 mb-4 bg-red-500/20 border border-red-500/40 rounded-xl text-red-200 text-xs flex items-start gap-2">
+          <div className="p-3 mb-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-xs flex items-start gap-2">
             <AlertCircle className="w-4 h-4 shrink-0 text-red-400 mt-0.5" />
             <span>{error}</span>
           </div>
@@ -93,35 +93,35 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
 
         <form onSubmit={handleSubmit} className="space-y-3.5">
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase tracking-wider block mb-1 font-semibold">
               Admin Email
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 absolute left-3 top-2.5 text-[#C9A86A]" />
+              <Mail className="w-4 h-4 absolute left-3 top-2.5 text-[#0E4D92]" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@company.com"
-                className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl pl-9 pr-3 py-2 text-xs text-[#F7F4EE] placeholder-[#94A3B8] focus:border-[#C9A86A] focus:outline-none"
+                className="w-full bg-white border border-[#E5E7EB] rounded-xl pl-9 pr-3 py-2 text-xs text-[#111827] placeholder-[#9CA3AF] focus:border-[#0E4D92] focus:outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-[10px] text-[#94A3B8] uppercase tracking-wider block mb-1 font-semibold">
+            <label className="text-[10px] text-[#4B5563] uppercase tracking-wider block mb-1 font-semibold">
               Secure Password
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 absolute left-3 top-2.5 text-[#C9A86A]" />
+              <Lock className="w-4 h-4 absolute left-3 top-2.5 text-[#0E4D92]" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••••••"
-                className="w-full bg-[#0B1426]/90 border border-[#C9A86A]/30 rounded-xl pl-9 pr-3 py-2 text-xs text-[#F7F4EE] placeholder-[#94A3B8] focus:border-[#C9A86A] focus:outline-none"
+                className="w-full bg-white border border-[#E5E7EB] rounded-xl pl-9 pr-3 py-2 text-xs text-[#111827] placeholder-[#9CA3AF] focus:border-[#0E4D92] focus:outline-none"
               />
             </div>
           </div>
@@ -129,26 +129,26 @@ export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onLoginSuccess, 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-xl gold-gradient-bg text-[#0B1426] font-bold text-xs uppercase tracking-wider shadow-lg shadow-[#C9A86A]/20 flex items-center justify-center gap-2 cursor-pointer active:scale-98 transition-all hover:brightness-105 disabled:opacity-50 mt-2"
+            className="w-full py-2.5 rounded-xl gold-gradient-bg text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-black/5 flex items-center justify-center gap-2 cursor-pointer active:scale-98 transition-all hover:brightness-105 disabled:opacity-50 mt-2"
           >
             {loading ? (
               <>
-                <Loader2 className="w-4 h-4 animate-spin text-[#0B1426]" />
+                <Loader2 className="w-4 h-4 animate-spin text-white" />
                 <span>Verifying Credentials...</span>
               </>
             ) : (
               <>
-                <Shield className="w-3.5 h-3.5 text-[#0B1426]" />
+                <Shield className="w-3.5 h-3.5 text-white" />
                 <span>Authorize &amp; Sign In</span>
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-6 pt-4 border-t border-white/10 text-center">
+        <div className="mt-6 pt-4 border-t border-[#E5E7EB] text-center">
           <button
             onClick={() => onNavigate('/')}
-            className="text-[10px] text-[#94A3B8] hover:text-[#C9A86A] transition-colors cursor-pointer"
+            className="text-[10px] text-[#4B5563] hover:text-[#0E4D92] transition-colors cursor-pointer"
           >
             &larr; Return to Public Website
           </button>
